@@ -3,118 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Dots & Boxes 📦 | UsBlog Games</title>
+    <title>Online Dots & Boxes 💕 | UsBlog Games</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
         :root {
-            --primary: #ff6b9d;
-            --blue: #74b9ff;
-            --gold: #fdcb6e;
-            --dark: #1a1a2e;
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --white: #ffffff;
+            --dark-amethyst: #1a1a2e;
+            --purple-deep: #2d1b69;
+            --rose-pink: #ff6b9d;
+            --rose-glow: rgba(255, 107, 157, 0.6);
+            --sunset-gold: #fdcb6e;
+            --gold-glow: rgba(253, 203, 110, 0.6);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --pearl: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
-            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 30%, #9d174d 60%, #f472b6 100%);
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at center, #2d1b69 0%, #1a1a2e 50%, #0a0a1a 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
             overflow-x: hidden;
+            position: relative;
         }
 
-        .game-shell {
-            background: rgba(30, 27, 75, 0.9);
+        .particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            animation: floatParticle linear infinite;
+            opacity: 0.2;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.25; }
+            90% { opacity: 0.15; }
+            100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
+        }
+
+        .game-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(26, 26, 46, 0.95);
             backdrop-filter: blur(20px);
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
             border-radius: 2rem;
-            padding: 1.25rem;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
+            padding: 1.5rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
             width: 100%;
-            max-width: 1100px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .game-header {
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
             justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 15px;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
         }
 
         .back-btn {
-            color: white;
+            color: #ff6b9d;
             text-decoration: none;
             padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 107, 157, 0.3);
         }
 
         .game-title {
-            font-size: 22px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f9a8d4, #f472b6, #e879f9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ff6b9d;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
         }
 
-        .players-info { display: flex; gap: 8px; flex-wrap: wrap; }
-        .player-chip { padding: 6px 14px; border-radius: 18px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-        .player-chip.you { background: rgba(255, 107, 157, 0.2); border: 1px solid #ff6b9d; color: #ff6b9d; }
-        .player-chip.opponent { background: rgba(116, 185, 255, 0.2); border: 1px solid #74b9ff; color: #74b9ff; }
-
-        .main-layout { display: flex; gap: 15px; align-items: flex-start; }
-        .game-area { flex: 1; min-width: 0; }
-
-        .turn-indicator {
+        .status-bar {
             text-align: center;
-            padding: 10px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            font-size: 13px;
+            padding: 0.6rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #ff6b9d;
+            font-weight: 600;
         }
-        .turn-indicator.your-turn { background: rgba(255, 107, 157, 0.2); color: #ff6b9d; border: 1px solid #ff6b9d; }
-        .turn-indicator.opponent-turn { background: rgba(116, 185, 255, 0.2); color: #74b9ff; border: 1px solid #74b9ff; }
 
-        .board-wrap {
-            position: relative;
-            border-radius: 1.25rem;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            background: rgba(0, 0, 0, 0.3);
-            padding: 30px;
+        .scoreboard {
             display: flex;
+            gap: 1rem;
             justify-content: center;
-            align-items: center;
+            margin-bottom: 1rem;
         }
 
-        .dots-board {
+        .score-chip {
+            padding: 0.5rem 1.2rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .score-chip.pink { color: #ff6b9d; border: 1px solid rgba(255, 107, 157, 0.3); }
+        .score-chip.gold { color: #fdcb6e; border: 1px solid rgba(253, 203, 110, 0.3); }
+
+        .main-layout {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .game-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .board-wrapper {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 2px solid var(--glass-border);
+            position: relative;
+        }
+
+        .board {
             position: relative;
             width: 100%;
-            max-width: 400px;
             aspect-ratio: 1;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         .dot {
             position: absolute;
             width: 14px;
             height: 14px;
-            background: radial-gradient(circle, #ffffff, #e0e0e0);
+            background: radial-gradient(circle at 40% 40%, #ffffff, #e0e0e0, #b0b0b0);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
             z-index: 3;
             pointer-events: none;
         }
@@ -123,8 +168,8 @@
             position: absolute;
             cursor: pointer;
             border-radius: 3px;
+            transition: all 0.25s ease;
             z-index: 2;
-            transition: all 0.2s;
             background: transparent;
         }
 
@@ -132,18 +177,19 @@
         .vline { width: 6px; transform: translateX(-3px); }
 
         .hline:hover, .vline:hover {
-            background: rgba(255, 107, 157, 0.4) !important;
+            background: rgba(255, 107, 157, 0.4);
+            box-shadow: 0 0 15px rgba(255, 107, 157, 0.5);
         }
 
         .hline.pink, .vline.pink {
             background: #ff6b9d;
-            box-shadow: 0 0 10px rgba(255, 107, 157, 0.7);
+            box-shadow: 0 0 15px rgba(255, 107, 157, 0.7);
             cursor: default;
         }
 
-        .hline.blue, .vline.blue {
-            background: #74b9ff;
-            box-shadow: 0 0 10px rgba(116, 185, 255, 0.7);
+        .hline.gold, .vline.gold {
+            background: #fdcb6e;
+            box-shadow: 0 0 15px rgba(253, 203, 110, 0.7);
             cursor: default;
         }
 
@@ -152,28 +198,25 @@
             transform: translate(-50%, -50%);
             font-size: 2rem;
             z-index: 1;
-            animation: popIn 0.4s ease;
+            animation: popIn 0.5s ease;
         }
 
         @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            50% { transform: translate(-50%, -50%) scale(1.3); }
-            100% { transform: translate(-50%, -50%) scale(1); }
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-45deg); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.3) rotate(10deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
         }
 
-        .info-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; justify-content: center; }
-        .info-pill { font-size: 11px; color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06); padding: 6px 12px; border-radius: 15px; }
-
         .chat-sidebar {
-            width: 260px;
-            min-width: 260px;
+            width: 240px;
+            min-width: 240px;
             display: flex;
             flex-direction: column;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 1.25rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
-            max-height: 550px;
+            max-height: 450px;
         }
 
         .chat-header {
@@ -186,13 +229,13 @@
             font-size: 14px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 10px; min-height: 200px; max-height: 400px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 10px; min-height: 150px; max-height: 250px; }
         .chat-messages::-webkit-scrollbar { width: 4px; }
         .chat-messages::-webkit-scrollbar-thumb { background: rgba(255, 107, 157, 0.5); border-radius: 2px; }
 
         .chat-message { margin-bottom: 10px; padding: 8px 12px; border-radius: 12px; font-size: 12px; }
-        .chat-message.you { background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(255, 107, 157, 0.3); margin-left: 20px; }
-        .chat-message.opponent { background: rgba(116, 185, 255, 0.15); border: 1px solid rgba(116, 185, 255, 0.3); margin-right: 20px; }
+        .chat-message.you { background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(255, 107, 157, 0.3); margin-left: 15px; }
+        .chat-message.opponent { background: rgba(116, 185, 255, 0.15); border: 1px solid rgba(116, 185, 255, 0.3); margin-right: 15px; }
         .chat-message .sender { font-weight: bold; font-size: 10px; display: block; margin-bottom: 3px; }
         .chat-message.you .sender { color: #ff6b9d; }
         .chat-message.opponent .sender { color: #74b9ff; }
@@ -219,38 +262,41 @@
         }
 
         .win-emoji { font-size: 3rem; margin-bottom: 0.5rem; }
-        .win-title { font-size: 1.5rem; font-weight: bold; color: #ff6b9d; margin-bottom: 0.5rem; }
+        .win-title { font-family: 'Dancing Script', cursive; font-size: 1.8rem; font-weight: bold; color: #ff6b9d; margin-bottom: 0.5rem; }
 
         @media (max-width: 850px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; margin-top: 15px; max-height: 250px; }
-            .chat-messages { max-height: 150px; min-height: 100px; }
-            .game-title { font-size: 18px; }
+            .chat-sidebar { width: 100%; min-width: auto; margin-top: 15px; max-height: 200px; }
+            .chat-messages { max-height: 100px; min-height: 80px; }
+            .game-title { font-size: 1.4rem; }
             .box-icon { font-size: 1.5rem; }
+            .dot { width: 10px; height: 10px; }
+            .hline { height: 4px; }
+            .vline { width: 4px; }
         }
     </style>
 </head>
 <body>
-    <div class="game-shell">
+    <div class="particles" id="particles"></div>
+    
+    <div class="game-container">
         <div class="game-header">
             <a href="lobby.html" class="back-btn">← Lobby</a>
-            <h1 class="game-title">📦 Online Dots & Boxes</h1>
-            <div class="players-info">
-                <div class="player-chip you" id="youChip">💕 You: 0</div>
-                <div class="player-chip opponent" id="opponentChip">💙 Opponent: 0</div>
-            </div>
+            <h1 class="game-title">💕 Online Dots & Boxes</h1>
+            <div style="width: 60px;"></div>
+        </div>
+
+        <div class="status-bar" id="statusBar">Loading...</div>
+
+        <div class="scoreboard">
+            <div class="score-chip pink">💕 You: <span id="playerScore">0</span></div>
+            <div class="score-chip gold">💍 Opponent: <span id="opponentScore">0</span></div>
         </div>
 
         <div class="main-layout">
             <div class="game-area">
-                <div class="turn-indicator" id="turnIndicator">Loading...</div>
-                <div class="board-wrap" id="boardWrap">
-                    <div class="dots-board" id="dotsBoard"></div>
-                </div>
-                <div class="info-bar">
-                    <div class="info-pill">📦 Click between dots</div>
-                    <div class="info-pill">💕 You are Pink</div>
-                    <div class="info-pill">🌐 Real-Time 1vs1</div>
+                <div class="board-wrapper">
+                    <div class="board" id="board"></div>
                 </div>
             </div>
 
@@ -287,7 +333,6 @@
         const auth = firebase.auth();
         const database = firebase.database();
 
-        const GRID = 4;
         let roomId = null;
         let myPlayerId = null;
         let opponentId = null;
@@ -303,22 +348,33 @@
         let vLines = Array(3).fill(null).map(() => Array(4).fill(null));
         let boxes = Array(3).fill(null).map(() => Array(3).fill(null));
         let gameOver = false;
-        let spacing = 100;
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const symbols = ['💕', '💗', '💖', '✨', '💘'];
+            for (let i = 0; i < 10; i++) {
+                const p = document.createElement('span');
+                p.className = 'particle';
+                p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                p.style.left = Math.random() * 100 + '%';
+                p.style.fontSize = Math.random() * 12 + 8 + 'px';
+                p.style.animationDuration = Math.random() * 12 + 8 + 's';
+                container.appendChild(p);
+            }
+        }
 
         function init() {
+            createParticles();
             auth.onAuthStateChanged((user) => {
                 if (!user) { window.location.href = 'login.html'; return; }
-
                 database.ref('users/' + user.uid).once('value').then((snapshot) => {
                     const data = snapshot.val();
                     myName = data ? data.username : user.email.split('@')[0];
-                    document.getElementById('youChip').textContent = `💕 ${myName}: 0`;
+                    document.getElementById('playerScore').textContent = '0';
                 });
-
                 const params = new URLSearchParams(window.location.search);
                 roomId = params.get('match') || params.get('team');
                 myPlayerId = user.uid;
-
                 if (!roomId) { window.location.href = 'lobby.html'; return; }
                 setupRoom();
             });
@@ -326,16 +382,11 @@
 
         function setupRoom() {
             database.ref('matchmaking/' + roomId).once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    setupFromRoomData(snapshot.val(), 'matchmaking');
-                } else {
+                if (snapshot.exists()) setupFromRoomData(snapshot.val(), 'matchmaking');
+                else {
                     database.ref('teams/' + roomId).once('value').then((teamSnap) => {
-                        if (teamSnap.exists()) {
-                            setupFromRoomData(teamSnap.val(), 'teams');
-                        } else {
-                            alert('Room not found!');
-                            window.location.href = 'lobby.html';
-                        }
+                        if (teamSnap.exists()) setupFromRoomData(teamSnap.val(), 'teams');
+                        else { alert('Room not found!'); window.location.href = 'lobby.html'; }
                     });
                 }
             });
@@ -349,22 +400,18 @@
                 opponentName = roomData.player2Name || 'Opponent';
             } else {
                 isHost = false;
-                myColor = 'blue';
+                myColor = 'gold';
                 opponentId = roomData.player1 || null;
                 opponentName = roomData.player1Name || 'Opponent';
             }
-
-            document.getElementById('opponentChip').textContent = `💙 ${opponentName}: 0`;
-
-            if (opponentId) {
-                startGame();
-            } else {
+            document.getElementById('opponentScore').textContent = '0';
+            if (opponentId) startGame();
+            else {
                 database.ref(collection + '/' + roomId).on('value', (snap) => {
                     const data = snap.val();
                     if (data && data.player2) {
                         opponentId = data.player2;
                         opponentName = data.player2Name || 'Opponent';
-                        document.getElementById('opponentChip').textContent = `💙 ${opponentName}: 0`;
                         startGame();
                     }
                 });
@@ -374,18 +421,11 @@
         function startGame() {
             gameStarted = true;
             renderBoard();
-            updateTurnIndicator();
-
+            updateStatus();
             if (isHost) {
-                database.ref('gameRooms/' + roomId + '/dbState').set({
-                    hLines: hLines,
-                    vLines: vLines,
-                    boxes: boxes
-                });
+                syncState();
                 database.ref('gameRooms/' + roomId + '/dbTurn').set('pink');
-                database.ref('gameRooms/' + roomId + '/dbScores').set({ pink: 0, blue: 0 });
             }
-
             database.ref('gameRooms/' + roomId + '/dbState').on('value', (snap) => {
                 const data = snap.val();
                 if (data && !isHost) {
@@ -395,49 +435,35 @@
                     renderBoard();
                 }
             });
-
             database.ref('gameRooms/' + roomId + '/dbTurn').on('value', (snap) => {
                 const turn = snap.val();
-                if (turn) {
-                    currentTurn = turn;
-                    updateTurnIndicator();
-                }
+                if (turn) { currentTurn = turn; updateStatus(); }
             });
-
             database.ref('gameRooms/' + roomId + '/dbScores').on('value', (snap) => {
                 const scores = snap.val();
                 if (scores) {
                     myScore = scores[myColor] || 0;
-                    opponentScore = scores[myColor === 'pink' ? 'blue' : 'pink'] || 0;
-                    updateScoreDisplay();
+                    opponentScore = scores[myColor === 'pink' ? 'gold' : 'pink'] || 0;
+                    updateScores();
                 }
             });
-
-            database.ref('gameRooms/' + roomId + '/dbGameOver').on('value', (snap) => {
-                if (snap.val()) {
-                    gameOver = true;
-                    showGameOver();
-                }
-            });
-
             setupChat();
         }
 
-        function updateTurnIndicator() {
-            const indicator = document.getElementById('turnIndicator');
-            if (gameOver) return;
-            if (currentTurn === myColor) {
-                indicator.textContent = '💕 Your Turn! Draw a line';
-                indicator.className = 'turn-indicator your-turn';
-            } else {
-                indicator.textContent = '💙 Opponent\'s Turn...';
-                indicator.className = 'turn-indicator opponent-turn';
-            }
+        function syncState() {
+            database.ref('gameRooms/' + roomId + '/dbState').set({ hLines, vLines, boxes });
         }
 
-        function updateScoreDisplay() {
-            document.getElementById('youChip').textContent = `💕 ${myName}: ${myScore}`;
-            document.getElementById('opponentChip').textContent = `💙 ${opponentName}: ${opponentScore}`;
+        function updateStatus() {
+            const bar = document.getElementById('statusBar');
+            if (gameOver) return;
+            if (currentTurn === myColor) bar.textContent = '💕 Your turn! Draw a line';
+            else bar.textContent = '💙 Opponent\'s turn...';
+        }
+
+        function updateScores() {
+            document.getElementById('playerScore').textContent = myScore;
+            document.getElementById('opponentScore').textContent = opponentScore;
         }
 
         function drawLine(type, row, col) {
@@ -449,101 +475,89 @@
             if (type === 'h') hLines[row][col] = myColor;
             else vLines[row][col] = myColor;
 
-            let boxCompleted = false;
-
+            let boxDone = false;
             if (type === 'h') {
-                if (row > 0 && checkBox(row - 1, col)) { boxes[row - 1][col] = myColor; myScore++; boxCompleted = true; }
-                if (row < 3 && checkBox(row, col)) { boxes[row][col] = myColor; myScore++; boxCompleted = true; }
+                if (row > 0 && checkBox(row-1, col)) { boxes[row-1][col] = myColor; myScore++; boxDone = true; }
+                if (row < 3 && checkBox(row, col)) { boxes[row][col] = myColor; myScore++; boxDone = true; }
             } else {
-                if (col > 0 && checkBox(row, col - 1)) { boxes[row][col - 1] = myColor; myScore++; boxCompleted = true; }
-                if (col < 3 && checkBox(row, col)) { boxes[row][col] = myColor; myScore++; boxCompleted = true; }
+                if (col > 0 && checkBox(row, col-1)) { boxes[row][col-1] = myColor; myScore++; boxDone = true; }
+                if (col < 3 && checkBox(row, col)) { boxes[row][col] = myColor; myScore++; boxDone = true; }
             }
 
-            if (!boxCompleted) {
-                currentTurn = currentTurn === 'pink' ? 'blue' : 'pink';
-            }
+            if (!boxDone) currentTurn = currentTurn === 'pink' ? 'gold' : 'pink';
 
-            database.ref('gameRooms/' + roomId + '/dbState').set({ hLines, vLines, boxes });
+            syncState();
             database.ref('gameRooms/' + roomId + '/dbTurn').set(currentTurn);
             database.ref('gameRooms/' + roomId + '/dbScores').set({
                 pink: myColor === 'pink' ? myScore : opponentScore,
-                blue: myColor === 'blue' ? myScore : opponentScore
+                gold: myColor === 'gold' ? myScore : opponentScore
             });
 
-            if (boxes.every(row => row.every(b => b !== null))) {
+            if (boxes.every(r => r.every(b => b !== null))) {
                 gameOver = true;
-                database.ref('gameRooms/' + roomId + '/dbGameOver').set(true);
                 showGameOver();
             }
 
             renderBoard();
-            updateTurnIndicator();
-            updateScoreDisplay();
+            updateStatus();
+            updateScores();
         }
 
         function checkBox(row, col) {
-            return hLines[row][col] !== null && hLines[row + 1][col] !== null &&
-                   vLines[row][col] !== null && vLines[row][col + 1] !== null;
+            return hLines[row][col] !== null && hLines[row+1][col] !== null &&
+                   vLines[row][col] !== null && vLines[row][col+1] !== null;
         }
 
         function renderBoard() {
-            const boardEl = document.getElementById('dotsBoard');
+            const boardEl = document.getElementById('board');
             boardEl.innerHTML = '';
-            spacing = 100;
+            const spacing = 100;
 
-            // Boxes
-            for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 3; col++) {
-                    if (boxes[row][col]) {
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    if (boxes[r][c]) {
                         const box = document.createElement('div');
                         box.className = 'box-icon';
-                        box.style.left = (col * spacing + spacing / 2) + 'px';
-                        box.style.top = (row * spacing + spacing / 2) + 'px';
-                        box.textContent = boxes[row][col] === 'pink' ? '💕' : '💙';
+                        box.style.left = (c*spacing + spacing/2) + 'px';
+                        box.style.top = (r*spacing + spacing/2) + 'px';
+                        box.textContent = boxes[r][c] === 'pink' ? '💕' : '💍';
                         boardEl.appendChild(box);
                     }
                 }
             }
 
-            // Horizontal lines
-            for (let row = 0; row < 4; row++) {
-                for (let col = 0; col < 3; col++) {
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 3; c++) {
                     const line = document.createElement('div');
                     line.className = 'hline';
-                    if (hLines[row][col]) line.classList.add(hLines[row][col]);
-                    line.style.left = (col * spacing + 5) + 'px';
-                    line.style.top = (row * spacing) + 'px';
+                    if (hLines[r][c]) line.classList.add(hLines[r][c]);
+                    line.style.left = (c*spacing + 5) + 'px';
+                    line.style.top = (r*spacing) + 'px';
                     line.style.width = (spacing - 10) + 'px';
-                    if (!hLines[row][col]) {
-                        line.addEventListener('click', () => drawLine('h', row, col));
-                    }
+                    if (!hLines[r][c]) line.addEventListener('click', () => drawLine('h', r, c));
                     boardEl.appendChild(line);
                 }
             }
 
-            // Vertical lines
-            for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 4; col++) {
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 4; c++) {
                     const line = document.createElement('div');
                     line.className = 'vline';
-                    if (vLines[row][col]) line.classList.add(vLines[row][col]);
-                    line.style.left = (col * spacing) + 'px';
-                    line.style.top = (row * spacing + 5) + 'px';
+                    if (vLines[r][c]) line.classList.add(vLines[r][c]);
+                    line.style.left = (c*spacing) + 'px';
+                    line.style.top = (r*spacing + 5) + 'px';
                     line.style.height = (spacing - 10) + 'px';
-                    if (!vLines[row][col]) {
-                        line.addEventListener('click', () => drawLine('v', row, col));
-                    }
+                    if (!vLines[r][c]) line.addEventListener('click', () => drawLine('v', r, c));
                     boardEl.appendChild(line);
                 }
             }
 
-            // Dots
-            for (let row = 0; row < 4; row++) {
-                for (let col = 0; col < 4; col++) {
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 4; c++) {
                     const dot = document.createElement('div');
                     dot.className = 'dot';
-                    dot.style.left = (col * spacing) + 'px';
-                    dot.style.top = (row * spacing) + 'px';
+                    dot.style.left = (c*spacing) + 'px';
+                    dot.style.top = (r*spacing) + 'px';
                     boardEl.appendChild(dot);
                 }
             }
@@ -552,13 +566,13 @@
         function showGameOver() {
             const overlay = document.createElement('div');
             overlay.className = 'win-overlay';
-            const isWinner = myScore > opponentScore;
+            const isWin = myScore > opponentScore;
             const isTie = myScore === opponentScore;
             overlay.innerHTML = `
                 <div class="win-content">
-                    <div class="win-emoji">${isTie ? '🤝' : isWinner ? '🎉' : '💙'}</div>
-                    <div class="win-title">${isTie ? 'It\'s a Tie!' : isWinner ? 'You Win!' : 'Opponent Wins!'}</div>
-                    <div style="color: white; font-size: 0.9rem; margin-bottom: 1rem;">💕 ${myScore} - ${opponentScore} 💙</div>
+                    <div class="win-emoji">${isTie ? '🤝' : isWin ? '🎉' : '💙'}</div>
+                    <div class="win-title">${isTie ? 'It\'s a Tie!' : isWin ? 'You Win!' : 'Opponent Wins!'}</div>
+                    <div style="color: white; margin-bottom: 1rem;">💕 ${myScore} - ${opponentScore} 💍</div>
                     <button onclick="location.href='lobby.html'" style="padding: 10px 20px; border-radius: 20px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer;">Back to Lobby</button>
                 </div>
             `;
@@ -579,8 +593,7 @@
             const message = input.value.trim();
             if (message && roomId) {
                 database.ref('gameRooms/' + roomId + '/chat').push({
-                    sender: myName,
-                    message: message,
+                    sender: myName, message: message,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
                 input.value = '';
@@ -589,9 +602,7 @@
 
         function displayMessage(sender, message, isYou) {
             const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages.querySelector('div[style*="padding: 20px"]')) {
-                chatMessages.innerHTML = '';
-            }
+            if (chatMessages.querySelector('div[style*="padding: 20px"]')) chatMessages.innerHTML = '';
             const div = document.createElement('div');
             div.className = `chat-message ${isYou ? 'you' : 'opponent'}`;
             div.innerHTML = `<span class="sender">${sender}</span><span class="text">${message}</span>`;

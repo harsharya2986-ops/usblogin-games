@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Tic Tac Tumble 🎲 | UsBlog Games</title>
+    <title>Online Tic Tac Tumble 💕 | UsBlog Games</title>
     <style>
         :root {
             --primary: #ff6b9d;
-            --blue: #74b9ff;
-            --gold: #fdcb6e;
+            --lavender: #a29bfe;
+            --gold: #ffd700;
             --dark: #1a1a2e;
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.12);
             --white: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
-            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 30%, #9d174d 60%, #f472b6 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 40%, #4a2d6b 70%, #1a1a2e 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -29,14 +29,14 @@
         }
 
         .game-shell {
-            background: rgba(30, 27, 75, 0.9);
+            background: rgba(26, 26, 46, 0.95);
             backdrop-filter: blur(20px);
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
             border-radius: 2rem;
-            padding: 1.25rem;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
+            padding: 1.5rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
             width: 100%;
-            max-width: 1100px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .game-header {
@@ -49,29 +49,27 @@
         }
 
         .back-btn {
-            color: white;
+            color: #ff6b9d;
             text-decoration: none;
             padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 107, 157, 0.3);
         }
 
         .game-title {
-            font-size: 22px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f9a8d4, #f472b6, #e879f9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 20px;
+            font-weight: 700;
+            color: #ff6b9d;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
         }
 
         .players-info { display: flex; gap: 8px; flex-wrap: wrap; }
-        .player-chip { padding: 6px 14px; border-radius: 18px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+        .player-chip { padding: 6px 14px; border-radius: 15px; font-size: 12px; font-weight: 600; white-space: nowrap; }
         .player-chip.you { background: rgba(255, 107, 157, 0.2); border: 1px solid #ff6b9d; color: #ff6b9d; }
-        .player-chip.opponent { background: rgba(116, 185, 255, 0.2); border: 1px solid #74b9ff; color: #74b9ff; }
+        .player-chip.opponent { background: rgba(162, 155, 254, 0.2); border: 1px solid #a29bfe; color: #a29bfe; }
 
         .main-layout { display: flex; gap: 15px; align-items: flex-start; }
         .game-area { flex: 1; min-width: 0; }
@@ -82,105 +80,103 @@
             border-radius: 15px;
             margin-bottom: 10px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 14px;
         }
         .turn-indicator.your-turn { background: rgba(255, 107, 157, 0.2); color: #ff6b9d; border: 1px solid #ff6b9d; }
-        .turn-indicator.opponent-turn { background: rgba(116, 185, 255, 0.2); color: #74b9ff; border: 1px solid #74b9ff; }
+        .turn-indicator.opponent-turn { background: rgba(162, 155, 254, 0.2); color: #a29bfe; border: 1px solid #a29bfe; }
 
         .board-wrap {
-            position: relative;
+            background: rgba(255, 255, 255, 0.06);
             border-radius: 1.25rem;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            display: flex;
-            justify-content: center;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.12);
         }
 
-        .tumble-board {
+        .board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            width: 100%;
-            max-width: 360px;
+            gap: 10px;
             aspect-ratio: 1;
+            width: 100%;
+            max-width: 380px;
+            margin: 0 auto;
         }
 
-        .tumble-cell {
-            background: rgba(255, 255, 255, 0.06);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 0.75rem;
+        .cell {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 3rem;
             cursor: pointer;
             transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.08);
         }
 
-        .tumble-cell:hover {
+        .cell:hover {
             background: rgba(255, 255, 255, 0.12);
-            border-color: #ff6b9d;
+            border-color: rgba(255, 107, 157, 0.5);
             transform: scale(1.05);
         }
 
-        .tumble-cell.pink { animation: popIn 0.4s ease; text-shadow: 0 0 25px rgba(255, 107, 157, 0.9); }
-        .tumble-cell.blue { animation: popIn 0.4s ease; text-shadow: 0 0 25px rgba(116, 185, 255, 0.9); }
-        .tumble-cell.win { animation: winPulse 0.7s ease infinite; border-color: #fdcb6e; box-shadow: 0 0 30px rgba(253, 203, 110, 0.8); }
+        .cell.pink { animation: popIn 0.4s ease; text-shadow: 0 0 25px rgba(255, 107, 157, 0.9); }
+        .cell.lavender { animation: popIn 0.4s ease; text-shadow: 0 0 25px rgba(162, 155, 254, 0.9); }
+        .cell.win { animation: winPulse 0.7s ease infinite; border-color: #ffd700; box-shadow: 0 0 35px rgba(255, 215, 0, 0.9); }
 
         @keyframes popIn {
             0% { transform: scale(0) rotate(-45deg); opacity: 0; }
             50% { transform: scale(1.25) rotate(10deg); }
+            70% { transform: scale(0.9); }
             100% { transform: scale(1) rotate(0); opacity: 1; }
         }
 
         @keyframes winPulse {
-            0%, 100% { border-color: #fdcb6e; box-shadow: 0 0 30px rgba(253, 203, 110, 0.8); }
-            50% { border-color: #fff; box-shadow: 0 0 50px rgba(255, 255, 255, 1); }
+            0%, 100% { border-color: #ffd700; box-shadow: 0 0 35px rgba(255, 215, 0, 0.9); }
+            50% { border-color: #fff; box-shadow: 0 0 55px rgba(255, 255, 255, 1); }
         }
 
         .info-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; justify-content: center; }
         .info-pill { font-size: 11px; color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06); padding: 6px 12px; border-radius: 15px; }
 
         .chat-sidebar {
-            width: 260px;
-            min-width: 260px;
+            width: 240px;
+            min-width: 240px;
             display: flex;
             flex-direction: column;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 1.25rem;
+            border-radius: 1rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
-            max-height: 550px;
+            max-height: 480px;
         }
 
         .chat-header {
-            padding: 12px 15px;
+            padding: 10px;
             background: rgba(255, 107, 157, 0.15);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
             font-weight: bold;
             color: #ff6b9d;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 10px; min-height: 200px; max-height: 400px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 150px; max-height: 300px; }
         .chat-messages::-webkit-scrollbar { width: 4px; }
         .chat-messages::-webkit-scrollbar-thumb { background: rgba(255, 107, 157, 0.5); border-radius: 2px; }
 
-        .chat-message { margin-bottom: 10px; padding: 8px 12px; border-radius: 12px; font-size: 12px; }
-        .chat-message.you { background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(255, 107, 157, 0.3); margin-left: 20px; }
-        .chat-message.opponent { background: rgba(116, 185, 255, 0.15); border: 1px solid rgba(116, 185, 255, 0.3); margin-right: 20px; }
-        .chat-message .sender { font-weight: bold; font-size: 10px; display: block; margin-bottom: 3px; }
+        .chat-message { margin-bottom: 8px; padding: 6px 10px; border-radius: 10px; font-size: 11px; }
+        .chat-message.you { background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(255, 107, 157, 0.3); margin-left: 15px; }
+        .chat-message.opponent { background: rgba(162, 155, 254, 0.15); border: 1px solid rgba(162, 155, 254, 0.3); margin-right: 15px; }
+        .chat-message .sender { font-weight: bold; font-size: 9px; display: block; margin-bottom: 2px; }
         .chat-message.you .sender { color: #ff6b9d; }
-        .chat-message.opponent .sender { color: #74b9ff; }
+        .chat-message.opponent .sender { color: #a29bfe; }
         .chat-message .text { color: rgba(255, 255, 255, 0.9); }
 
-        .chat-input-area { display: flex; gap: 6px; padding: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-        .chat-input-area input { flex: 1; padding: 8px 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 12px; }
-        .chat-input-area button { padding: 8px 14px; border-radius: 18px; border: none; background: linear-gradient(135deg, #ff6b9d, #e84393); color: white; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .chat-input-area { display: flex; gap: 5px; padding: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
+        .chat-input-area button { padding: 6px 12px; border-radius: 15px; border: none; background: linear-gradient(135deg, #ff6b9d, #e84393); color: white; font-weight: bold; cursor: pointer; font-size: 11px; }
 
         .win-overlay {
             position: fixed;
@@ -203,10 +199,15 @@
 
         @media (max-width: 850px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; margin-top: 15px; max-height: 250px; }
-            .chat-messages { max-height: 150px; min-height: 100px; }
-            .game-title { font-size: 18px; }
-            .tumble-cell { font-size: 2rem; }
+            .chat-sidebar { width: 100%; min-width: auto; margin-top: 10px; max-height: 200px; }
+            .chat-messages { max-height: 100px; min-height: 80px; }
+            .game-title { font-size: 16px; }
+            .cell { font-size: 2.2rem; }
+        }
+
+        @media (max-width: 400px) {
+            .cell { font-size: 1.8rem; border-radius: 0.6rem; }
+            .board { gap: 6px; }
         }
     </style>
 </head>
@@ -214,18 +215,18 @@
     <div class="game-shell">
         <div class="game-header">
             <a href="lobby.html" class="back-btn">← Lobby</a>
-            <h1 class="game-title">🎲 Online Tic Tac Tumble</h1>
+            <h1 class="game-title">💕 Online Tic Tac Tumble</h1>
             <div class="players-info">
-                <div class="player-chip you" id="youChip">💕 You (Heart): 0</div>
-                <div class="player-chip opponent" id="opponentChip">💙 Opponent (Ring): 0</div>
+                <div class="player-chip you" id="youChip">💕 You: 0</div>
+                <div class="player-chip opponent" id="opponentChip">💍 Opponent: 0</div>
             </div>
         </div>
 
         <div class="main-layout">
             <div class="game-area">
                 <div class="turn-indicator" id="turnIndicator">Loading...</div>
-                <div class="board-wrap" id="boardWrap">
-                    <div class="tumble-board" id="tumbleBoard"></div>
+                <div class="board-wrap">
+                    <div class="board" id="board"></div>
                 </div>
                 <div class="info-bar">
                     <div class="info-pill">💕 You are Heart</div>
@@ -237,7 +238,7 @@
             <div class="chat-sidebar">
                 <div class="chat-header">💬 Chat</div>
                 <div class="chat-messages" id="chatMessages">
-                    <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 12px; padding: 20px 0;">💕 Start chatting!</div>
+                    <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 11px; padding: 15px 0;">💕 Start chatting!</div>
                 </div>
                 <div class="chat-input-area">
                     <input type="text" id="chatInput" placeholder="Type message...">
@@ -267,41 +268,26 @@
         const auth = firebase.auth();
         const database = firebase.database();
 
-        const WIN_PATTERNS = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],
-            [0, 4, 8], [2, 4, 6]
-        ];
-
-        let roomId = null;
-        let myPlayerId = null;
-        let opponentId = null;
-        let myName = '';
-        let opponentName = '';
-        let isHost = false;
-        let gameStarted = false;
-        let mySymbol = 'pink';
-        let currentTurn = 'pink';
+        const WIN_PATTERNS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
+        let isHost = false, gameStarted = false, mySymbol = 'pink', currentTurn = 'pink';
+        let myScore = 0, opponentScore = 0;
         let board = Array(9).fill(null);
-        let myScore = 0;
-        let opponentScore = 0;
         let winningCells = [];
         let gameOver = false;
+        let listenersAttached = false;
 
         function init() {
             auth.onAuthStateChanged((user) => {
                 if (!user) { window.location.href = 'login.html'; return; }
-
                 database.ref('users/' + user.uid).once('value').then((snapshot) => {
                     const data = snapshot.val();
                     myName = data ? data.username : user.email.split('@')[0];
                     document.getElementById('youChip').textContent = `💕 ${myName}: 0`;
                 });
-
                 const params = new URLSearchParams(window.location.search);
                 roomId = params.get('match') || params.get('team');
                 myPlayerId = user.uid;
-
                 if (!roomId) { window.location.href = 'lobby.html'; return; }
                 setupRoom();
             });
@@ -309,16 +295,11 @@
 
         function setupRoom() {
             database.ref('matchmaking/' + roomId).once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    setupFromRoomData(snapshot.val(), 'matchmaking');
-                } else {
+                if (snapshot.exists()) setupFromRoomData(snapshot.val(), 'matchmaking');
+                else {
                     database.ref('teams/' + roomId).once('value').then((teamSnap) => {
-                        if (teamSnap.exists()) {
-                            setupFromRoomData(teamSnap.val(), 'teams');
-                        } else {
-                            alert('Room not found!');
-                            window.location.href = 'lobby.html';
-                        }
+                        if (teamSnap.exists()) setupFromRoomData(teamSnap.val(), 'teams');
+                        else { alert('Room not found!'); window.location.href = 'lobby.html'; }
                     });
                 }
             });
@@ -326,28 +307,23 @@
 
         function setupFromRoomData(roomData, collection) {
             if (roomData.player1 === myPlayerId) {
-                isHost = true;
-                mySymbol = 'pink';
+                isHost = true; mySymbol = 'pink';
                 opponentId = roomData.player2 || null;
                 opponentName = roomData.player2Name || 'Opponent';
             } else {
-                isHost = false;
-                mySymbol = 'blue';
+                isHost = false; mySymbol = 'lavender';
                 opponentId = roomData.player1 || null;
                 opponentName = roomData.player1Name || 'Opponent';
             }
-
-            document.getElementById('opponentChip').textContent = `💙 ${opponentName}: 0`;
-
-            if (opponentId) {
-                startGame();
-            } else {
+            document.getElementById('opponentChip').textContent = `💍 ${opponentName}: 0`;
+            if (opponentId) startGame();
+            else {
                 database.ref(collection + '/' + roomId).on('value', (snap) => {
                     const data = snap.val();
                     if (data && data.player2) {
                         opponentId = data.player2;
                         opponentName = data.player2Name || 'Opponent';
-                        document.getElementById('opponentChip').textContent = `💙 ${opponentName}: 0`;
+                        document.getElementById('opponentChip').textContent = `💍 ${opponentName}: 0`;
                         startGame();
                     }
                 });
@@ -359,38 +335,27 @@
             renderBoard();
             updateTurnIndicator();
 
-            if (isHost) {
-                database.ref('gameRooms/' + roomId + '/tumbleBoard').set(board);
-                database.ref('gameRooms/' + roomId + '/tumbleTurn').set('pink');
+            if (!listenersAttached) {
+                listenersAttached = true;
+                database.ref('gameRooms/' + roomId + '/tttBoard').on('value', (snap) => {
+                    const data = snap.val();
+                    if (data && !isHost) { board = data; renderBoard(); }
+                });
+                database.ref('gameRooms/' + roomId + '/tttTurn').on('value', (snap) => {
+                    const turn = snap.val();
+                    if (turn) { currentTurn = turn; updateTurnIndicator(); }
+                });
+                database.ref('gameRooms/' + roomId + '/tttGameOver').on('value', (snap) => {
+                    const data = snap.val();
+                    if (data) { gameOver = true; winningCells = data.winningCells || []; renderBoard(); showWin(data.winner); }
+                });
+                setupChat();
             }
 
-            database.ref('gameRooms/' + roomId + '/tumbleBoard').on('value', (snap) => {
-                const data = snap.val();
-                if (data && !isHost) {
-                    board = data;
-                    renderBoard();
-                }
-            });
-
-            database.ref('gameRooms/' + roomId + '/tumbleTurn').on('value', (snap) => {
-                const turn = snap.val();
-                if (turn) {
-                    currentTurn = turn;
-                    updateTurnIndicator();
-                }
-            });
-
-            database.ref('gameRooms/' + roomId + '/tumbleGameOver').on('value', (snap) => {
-                const data = snap.val();
-                if (data) {
-                    gameOver = true;
-                    winningCells = data.winningCells || [];
-                    renderBoard();
-                    showWin(data.winner);
-                }
-            });
-
-            setupChat();
+            if (isHost) {
+                database.ref('gameRooms/' + roomId + '/tttBoard').set(board);
+                database.ref('gameRooms/' + roomId + '/tttTurn').set('pink');
+            }
         }
 
         function updateTurnIndicator() {
@@ -400,7 +365,7 @@
                 indicator.textContent = '💕 Your Turn!';
                 indicator.className = 'turn-indicator your-turn';
             } else {
-                indicator.textContent = '💙 Opponent\'s Turn...';
+                indicator.textContent = '💍 Opponent\'s Turn...';
                 indicator.className = 'turn-indicator opponent-turn';
             }
         }
@@ -411,34 +376,30 @@
             if (board[index] !== null) return;
 
             board[index] = mySymbol;
-            
             const winCells = checkWin(mySymbol);
+            
             if (winCells) {
                 gameOver = true;
                 winningCells = winCells;
-                database.ref('gameRooms/' + roomId + '/tumbleGameOver').set({
-                    winner: mySymbol,
-                    winningCells: winCells
-                });
+                database.ref('gameRooms/' + roomId + '/tttBoard').set(board);
+                database.ref('gameRooms/' + roomId + '/tttGameOver').set({ winner: mySymbol, winningCells: winCells });
                 renderBoard();
                 showWin(mySymbol);
                 return;
             }
-
+            
             if (board.every(cell => cell !== null)) {
                 gameOver = true;
-                database.ref('gameRooms/' + roomId + '/tumbleGameOver').set({
-                    winner: 'tie',
-                    winningCells: []
-                });
+                database.ref('gameRooms/' + roomId + '/tttBoard').set(board);
+                database.ref('gameRooms/' + roomId + '/tttGameOver').set({ winner: 'tie', winningCells: [] });
                 renderBoard();
                 showWin('tie');
                 return;
             }
 
-            currentTurn = currentTurn === 'pink' ? 'blue' : 'pink';
-            database.ref('gameRooms/' + roomId + '/tumbleBoard').set(board);
-            database.ref('gameRooms/' + roomId + '/tumbleTurn').set(currentTurn);
+            currentTurn = currentTurn === 'pink' ? 'lavender' : 'pink';
+            database.ref('gameRooms/' + roomId + '/tttBoard').set(board);
+            database.ref('gameRooms/' + roomId + '/tttTurn').set(currentTurn);
             renderBoard();
             updateTurnIndicator();
         }
@@ -452,19 +413,14 @@
         }
 
         function renderBoard() {
-            const boardEl = document.getElementById('tumbleBoard');
+            const boardEl = document.getElementById('board');
             boardEl.innerHTML = '';
             for (let i = 0; i < 9; i++) {
                 const cell = document.createElement('div');
-                cell.className = 'tumble-cell';
+                cell.className = 'cell';
                 cell.dataset.index = i;
-                if (board[i] === 'pink') {
-                    cell.textContent = '💕';
-                    cell.classList.add('pink');
-                } else if (board[i] === 'blue') {
-                    cell.textContent = '💍';
-                    cell.classList.add('blue');
-                }
+                if (board[i] === 'pink') { cell.textContent = '💕'; cell.classList.add('pink'); }
+                else if (board[i] === 'lavender') { cell.textContent = '💍'; cell.classList.add('lavender'); }
                 if (winningCells.includes(i)) cell.classList.add('win');
                 cell.addEventListener('click', () => makeMove(i));
                 boardEl.appendChild(cell);
@@ -477,7 +433,7 @@
             let emoji, title;
             if (winner === 'tie') { emoji = '🤝'; title = 'It\'s a Tie!'; }
             else if (winner === mySymbol) { emoji = '🎉'; title = 'You Win!'; }
-            else { emoji = '💙'; title = 'Opponent Wins!'; }
+            else { emoji = '💍'; title = 'Opponent Wins!'; }
             overlay.innerHTML = `
                 <div class="win-content">
                     <div class="win-emoji">${emoji}</div>
@@ -502,8 +458,7 @@
             const message = input.value.trim();
             if (message && roomId) {
                 database.ref('gameRooms/' + roomId + '/chat').push({
-                    sender: myName,
-                    message: message,
+                    sender: myName, message: message,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
                 input.value = '';
@@ -512,9 +467,7 @@
 
         function displayMessage(sender, message, isYou) {
             const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages.querySelector('div[style*="padding: 20px"]')) {
-                chatMessages.innerHTML = '';
-            }
+            if (chatMessages.querySelector('div[style*="padding: 15px"]')) chatMessages.innerHTML = '';
             const div = document.createElement('div');
             div.className = `chat-message ${isYou ? 'you' : 'opponent'}`;
             div.innerHTML = `<span class="sender">${sender}</span><span class="text">${message}</span>`;

@@ -5,21 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Chess ♟️ | UsBlog Games</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
         :root {
+            --rose-gold: #b76e79;
+            --blush-pink: #ffd1dc;
+            --soft-lavender: #e6e6fa;
+            --amethyst: #9c27b0;
             --primary: #ff6b9d;
             --blue: #74b9ff;
             --gold: #fdcb6e;
             --dark: #1a1a2e;
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --white: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
-            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 30%, #9d174d 60%, #f472b6 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 30%, #4a2d6b 60%, #1a1a2e 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -28,106 +31,93 @@
             overflow-x: hidden;
         }
 
-        .game-shell {
-            background: rgba(30, 27, 75, 0.9);
+        .game-container {
+            background: rgba(26, 26, 46, 0.95);
             backdrop-filter: blur(20px);
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
             border-radius: 2rem;
-            padding: 1.25rem;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
+            padding: 1.5rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            max-width: 1000px;
             width: 100%;
-            max-width: 1100px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .game-header {
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
             justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
         .back-btn {
-            color: white;
+            color: #ffd1dc;
             text-decoration: none;
-            padding: 8px 16px;
+            padding: 10px 20px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            font-size: 13px;
+            border-radius: 25px;
+            font-size: 14px;
             font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 209, 220, 0.3);
+            transition: all 0.3s;
         }
 
         .game-title {
-            font-size: 22px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f9a8d4, #f472b6, #e879f9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffd1dc;
         }
 
         .players-info { display: flex; gap: 8px; flex-wrap: wrap; }
-
-        .player-chip {
-            padding: 6px 14px;
-            border-radius: 18px;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
+        .player-chip { padding: 6px 14px; border-radius: 18px; font-size: 12px; font-weight: 600; }
         .player-chip.you { background: rgba(255, 107, 157, 0.2); border: 1px solid #ff6b9d; color: #ff6b9d; }
-        .player-chip.opponent { background: rgba(116, 185, 255, 0.2); border: 1px solid #74b9ff; color: #74b9ff; }
+        .player-chip.opponent { background: rgba(156, 39, 176, 0.2); border: 1px solid #9c27b0; color: #ce93d8; }
 
-        .main-layout { display: flex; gap: 15px; align-items: flex-start; }
-        .game-area { flex: 1; min-width: 0; }
-
-        .turn-indicator {
+        .status-bar {
             text-align: center;
-            padding: 10px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            font-size: 13px;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #ffd1dc;
+            font-weight: 600;
+            margin-bottom: 1rem;
         }
 
-        .turn-indicator.your-turn { background: rgba(255, 107, 157, 0.2); color: #ff6b9d; border: 1px solid #ff6b9d; }
-        .turn-indicator.opponent-turn { background: rgba(116, 185, 255, 0.2); color: #74b9ff; border: 1px solid #74b9ff; }
-
-        .board-wrap {
-            position: relative;
-            border-radius: 1.25rem;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            background: #0a0a1a;
-            padding: 15px;
+        .main-layout {
             display: flex;
-            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .board-section {
+            flex: 1;
+            min-width: 280px;
         }
 
         .chess-board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
-            width: 100%;
-            max-width: 460px;
             aspect-ratio: 1;
-            border-radius: 8px;
+            border-radius: 0.75rem;
             overflow: hidden;
             border: 3px solid rgba(183, 110, 121, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
 
         .square {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 1.8rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             position: relative;
+            user-select: none;
         }
 
         .square.light { background: #ffd1dc; }
@@ -152,98 +142,101 @@
             border: 3px solid rgba(255, 0, 0, 0.5);
         }
 
-        .piece { cursor: pointer; font-size: 2rem; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .piece.rose { filter: drop-shadow(0 0 6px rgba(255, 105, 180, 0.6)); }
-        .piece.amethyst { filter: drop-shadow(0 0 6px rgba(156, 39, 176, 0.6)); }
+        .piece { font-size: 1.8rem; cursor: pointer; }
+        .piece.rose { filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.6)); }
+        .piece.amethyst { filter: drop-shadow(0 0 8px rgba(156, 39, 176, 0.6)); }
 
-        .info-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; justify-content: center; }
-        .info-pill { font-size: 11px; color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06); padding: 6px 12px; border-radius: 15px; }
-
-        .chat-sidebar {
-            width: 260px;
-            min-width: 260px;
+        .sidebar {
+            width: 220px;
+            min-width: 180px;
             display: flex;
             flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .chat-box {
+            flex: 1;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 1.25rem;
+            border-radius: 1rem;
+            padding: 0.75rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            max-height: 550px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .chat-header {
-            padding: 12px 15px;
-            background: rgba(255, 107, 157, 0.15);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .chat-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1rem;
+            color: #ffd1dc;
             text-align: center;
-            font-weight: bold;
-            color: #ff6b9d;
-            font-size: 14px;
+            margin-bottom: 0.5rem;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 10px; min-height: 200px; max-height: 400px; }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 150px;
+            max-height: 300px;
+        }
+
         .chat-messages::-webkit-scrollbar { width: 4px; }
         .chat-messages::-webkit-scrollbar-thumb { background: rgba(255, 107, 157, 0.5); border-radius: 2px; }
 
         .chat-message {
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 12px;
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 11px;
         }
 
-        .chat-message.you { background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(255, 107, 157, 0.3); margin-left: 20px; }
-        .chat-message.opponent { background: rgba(116, 185, 255, 0.15); border: 1px solid rgba(116, 185, 255, 0.3); margin-right: 20px; }
-        .chat-message .sender { font-weight: bold; font-size: 10px; display: block; margin-bottom: 3px; }
+        .chat-message.you { background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(255, 107, 157, 0.3); }
+        .chat-message.opponent { background: rgba(156, 39, 176, 0.15); border: 1px solid rgba(156, 39, 176, 0.3); }
+        .chat-message .sender { font-weight: bold; font-size: 9px; display: block; }
         .chat-message.you .sender { color: #ff6b9d; }
-        .chat-message.opponent .sender { color: #74b9ff; }
-        .chat-message .text { color: rgba(255, 255, 255, 0.9); }
+        .chat-message.opponent .sender { color: #ce93d8; }
+        .chat-message .text { color: rgba(255, 255, 255, 0.85); }
 
-        .chat-input-area { display: flex; gap: 6px; padding: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-        .chat-input-area input { flex: 1; padding: 8px 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 12px; }
-        .chat-input-area button { padding: 8px 14px; border-radius: 18px; border: none; background: linear-gradient(135deg, #ff6b9d, #e84393); color: white; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .chat-input-area { display: flex; gap: 4px; margin-top: 0.5rem; }
+        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
+        .chat-input-area button { padding: 6px 12px; border-radius: 15px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 11px; }
 
-        @media (max-width: 850px) {
+        @media (max-width: 700px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; margin-top: 15px; max-height: 250px; }
-            .chat-messages { max-height: 150px; min-height: 100px; }
-            .game-title { font-size: 18px; }
-            .piece { font-size: 1.5rem; }
+            .sidebar { width: 100%; }
+            .chat-messages { max-height: 120px; min-height: 80px; }
+            .piece { font-size: 1.3rem; }
+            .square { font-size: 1.3rem; }
+            .game-title { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
-    <div class="game-shell">
+    <div class="game-container">
         <div class="game-header">
             <a href="lobby.html" class="back-btn">← Lobby</a>
-            <h1 class="game-title">♟️ Online Chess</h1>
+            <h1 class="game-title">👑 Online Chess</h1>
             <div class="players-info">
                 <div class="player-chip you" id="youChip">💕 You (Rose)</div>
-                <div class="player-chip opponent" id="opponentChip">💙 Opponent (Amethyst)</div>
+                <div class="player-chip opponent" id="opponentChip">💜 Opponent (Amethyst)</div>
             </div>
         </div>
 
-        <div class="main-layout">
-            <div class="game-area">
-                <div class="turn-indicator" id="turnIndicator">Loading...</div>
-                <div class="board-wrap" id="boardWrap">
-                    <div class="chess-board" id="chessBoard"></div>
-                </div>
-                <div class="info-bar">
-                    <div class="info-pill">💕 You are Rose</div>
-                    <div class="info-pill">💜 Opponent is Amethyst</div>
-                    <div class="info-pill">🌐 Real-Time 1vs1</div>
-                </div>
-            </div>
+        <div class="status-bar" id="statusBar">Loading...</div>
 
-            <div class="chat-sidebar">
-                <div class="chat-header">💬 Chat</div>
-                <div class="chat-messages" id="chatMessages">
-                    <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 12px; padding: 20px 0;">💕 Start chatting!</div>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Type message...">
-                    <button onclick="sendMessage()">Send</button>
+        <div class="main-layout">
+            <div class="board-section">
+                <div class="chess-board" id="chessBoard"></div>
+            </div>
+            <div class="sidebar">
+                <div class="chat-box">
+                    <div class="chat-title">💬 Chat</div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 11px; padding: 10px 0;">💕 Start chatting!</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" placeholder="Message...">
+                        <button onclick="sendMessage()">Send</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -269,23 +262,21 @@
         const auth = firebase.auth();
         const database = firebase.database();
 
+        const pieces = {
+            rose: { king: '🤴', queen: '👸', rook: '🏰', bishop: '🕊️', knight: '🦄', pawn: '❤️' },
+            amethyst: { king: '🧝', queen: '🧚', rook: '🏯', bishop: '🏹', knight: '🐉', pawn: '💜' }
+        };
+
         let roomId = null;
         let myPlayerId = null;
         let opponentId = null;
         let myName = '';
         let opponentName = '';
         let isHost = false;
-        let gameStarted = false;
         let myColor = 'rose';
         let currentTurn = 'rose';
         let selectedSquare = null;
         let validMoves = [];
-
-        const pieces = {
-            rose: { king: '🤴', queen: '👸', rook: '🏰', bishop: '🕊️', knight: '🦄', pawn: '❤️' },
-            amethyst: { king: '🧝', queen: '🧚', rook: '🏯', bishop: '🏹', knight: '🐉', pawn: '💜' }
-        };
-
         let board = [];
 
         function initBoard() {
@@ -348,7 +339,7 @@
                 opponentName = roomData.player1Name || 'Opponent';
             }
 
-            document.getElementById('opponentChip').textContent = `💙 ${opponentName} (Amethyst)`;
+            document.getElementById('opponentChip').textContent = `💜 ${opponentName} (Amethyst)`;
 
             if (opponentId) {
                 startGame();
@@ -358,7 +349,7 @@
                     if (data && data.player2) {
                         opponentId = data.player2;
                         opponentName = data.player2Name || 'Opponent';
-                        document.getElementById('opponentChip').textContent = `💙 ${opponentName} (Amethyst)`;
+                        document.getElementById('opponentChip').textContent = `💜 ${opponentName} (Amethyst)`;
                         startGame();
                     }
                 });
@@ -366,46 +357,41 @@
         }
 
         function startGame() {
-            gameStarted = true;
             initBoard();
             renderBoard();
-            updateTurnIndicator();
+            updateStatus();
 
-            // Host initializes board
             if (isHost) {
                 database.ref('gameRooms/' + roomId + '/chessBoard').set(board);
                 database.ref('gameRooms/' + roomId + '/chessTurn').set('rose');
             }
 
-            // Listen for board
             database.ref('gameRooms/' + roomId + '/chessBoard').on('value', (snap) => {
                 const data = snap.val();
                 if (data && !isHost) {
                     board = data;
                     renderBoard();
+                    updateStatus();
                 }
             });
 
-            // Listen for turn
             database.ref('gameRooms/' + roomId + '/chessTurn').on('value', (snap) => {
                 const turn = snap.val();
                 if (turn) {
                     currentTurn = turn;
-                    updateTurnIndicator();
+                    updateStatus();
                 }
             });
 
             setupChat();
         }
 
-        function updateTurnIndicator() {
-            const indicator = document.getElementById('turnIndicator');
+        function updateStatus() {
+            const statusBar = document.getElementById('statusBar');
             if (currentTurn === myColor) {
-                indicator.textContent = '💕 Your Turn!';
-                indicator.className = 'turn-indicator your-turn';
+                statusBar.textContent = '💕 Your Turn! Click a piece to move';
             } else {
-                indicator.textContent = '💙 Opponent\'s Turn...';
-                indicator.className = 'turn-indicator opponent-turn';
+                statusBar.textContent = '💜 Opponent\'s Turn...';
             }
         }
 
@@ -426,12 +412,10 @@
 
         function getPawnMoves(row, col, side, moves) {
             const dir = side === 'rose' ? -1 : 1;
+            const startRow = side === 'rose' ? 6 : 1;
             if (row + dir >= 0 && row + dir < 8 && !board[row + dir][col]) {
                 moves.push({ row: row + dir, col });
-                const startRow = side === 'rose' ? 6 : 1;
-                if (row === startRow && !board[row + 2*dir][col]) {
-                    moves.push({ row: row + 2*dir, col });
-                }
+                if (row === startRow && !board[row + 2*dir][col]) moves.push({ row: row + 2*dir, col });
             }
             for (const dc of [-1, 1]) {
                 const nc = col + dc;
@@ -488,7 +472,7 @@
         }
 
         function handleSquareClick(row, col) {
-            if (!gameStarted || currentTurn !== myColor) return;
+            if (currentTurn !== myColor) return;
             const piece = board[row][col];
 
             if (selectedSquare) {
@@ -528,7 +512,7 @@
             database.ref('gameRooms/' + roomId + '/chessTurn').set(currentTurn);
             
             renderBoard();
-            updateTurnIndicator();
+            updateStatus();
         }
 
         function renderBoard() {
@@ -580,7 +564,7 @@
 
         function displayMessage(sender, message, isYou) {
             const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages.querySelector('div[style*="padding: 20px"]')) {
+            if (chatMessages.querySelector('div[style*="padding: 10px"]')) {
                 chatMessages.innerHTML = '';
             }
             const div = document.createElement('div');

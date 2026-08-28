@@ -3,115 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Connect Four 🔴 | UsBlog Games</title>
+    <title>Online Connect Four 💕 | UsBlog Games</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
         :root {
-            --primary: #ff6b9d;
-            --blue: #74b9ff;
+            --midnight: #1a1a2e;
+            --pink: #ff6b9d;
+            --pink-light: #f8bbd0;
             --gold: #fdcb6e;
-            --dark: #1a1a2e;
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
+            --blue: #74b9ff;
             --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
-            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 30%, #9d174d 60%, #f472b6 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 30%, #4a2d6b 60%, #1a1a2e 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
             overflow-x: hidden;
         }
 
-        .game-shell {
-            background: rgba(30, 27, 75, 0.9);
+        .game-container {
+            background: rgba(26, 26, 46, 0.95);
             backdrop-filter: blur(20px);
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
             border-radius: 2rem;
             padding: 1.25rem;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            max-width: 1000px;
             width: 100%;
-            max-width: 1100px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .game-header {
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
             justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 15px;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
         }
 
         .back-btn {
-            color: white;
+            color: #ff6b9d;
             text-decoration: none;
             padding: 8px 16px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 107, 157, 0.3);
         }
 
         .game-title {
-            font-size: 22px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f9a8d4, #f472b6, #e879f9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ff6b9d;
         }
 
         .players-info { display: flex; gap: 8px; flex-wrap: wrap; }
-        .player-chip { padding: 6px 14px; border-radius: 18px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+        .player-chip { padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; white-space: nowrap; }
         .player-chip.you { background: rgba(255, 107, 157, 0.2); border: 1px solid #ff6b9d; color: #ff6b9d; }
         .player-chip.opponent { background: rgba(116, 185, 255, 0.2); border: 1px solid #74b9ff; color: #74b9ff; }
 
-        .main-layout { display: flex; gap: 15px; align-items: flex-start; }
+        .status-bar {
+            text-align: center;
+            padding: 0.6rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #ff6b9d;
+            font-weight: 600;
+        }
+
+        .main-layout { display: flex; gap: 12px; align-items: flex-start; }
         .game-area { flex: 1; min-width: 0; }
 
-        .turn-indicator {
-            text-align: center;
-            padding: 10px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            font-size: 13px;
-        }
-        .turn-indicator.your-turn { background: rgba(255, 107, 157, 0.2); color: #ff6b9d; border: 1px solid #ff6b9d; }
-        .turn-indicator.opponent-turn { background: rgba(116, 185, 255, 0.2); color: #74b9ff; border: 1px solid #74b9ff; }
-
-        .board-wrap {
+        .board-wrapper {
             position: relative;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
             border-radius: 1.25rem;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            background: rgba(33, 150, 243, 0.1);
-            padding: 20px;
-            display: flex;
-            justify-content: center;
+            padding: 0.75rem;
+            border: 2px solid var(--glass-border);
         }
 
-        .connect-four-board {
+        .board {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            width: 100%;
-            max-width: 460px;
+            gap: 6px;
             aspect-ratio: 7/6;
         }
 
         .column {
             display: grid;
             grid-template-rows: repeat(6, 1fr);
-            gap: 8px;
+            gap: 6px;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -119,137 +116,112 @@
         .column:hover { transform: translateY(-3px); }
 
         .cell {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
             transition: all 0.3s;
         }
 
         .cell.pink {
-            background: radial-gradient(circle, #f8bbd0, #ff6b9d, #e84393);
+            background: radial-gradient(circle at 30% 30%, #f8bbd0, #ff6b9d, #e84393);
             border-color: #ff6b9d;
             box-shadow: 0 0 15px rgba(255, 107, 157, 0.6);
             animation: dropIn 0.4s ease;
         }
 
         .cell.blue {
-            background: radial-gradient(circle, #a8d8ff, #74b9ff, #4a90e2);
+            background: radial-gradient(circle at 30% 30%, #a8d8ff, #74b9ff, #4a90e2);
             border-color: #74b9ff;
             box-shadow: 0 0 15px rgba(116, 185, 255, 0.6);
             animation: dropIn 0.4s ease;
         }
 
         @keyframes dropIn {
-            0% { transform: translateY(-50px); opacity: 0; }
+            0% { transform: translateY(-200px); opacity: 0; }
             60% { transform: translateY(5px); }
             100% { transform: translateY(0); opacity: 1; }
         }
 
-        .info-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; justify-content: center; }
-        .info-pill { font-size: 11px; color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06); padding: 6px 12px; border-radius: 15px; }
-
         .chat-sidebar {
-            width: 260px;
-            min-width: 260px;
+            width: 220px;
+            min-width: 220px;
             display: flex;
             flex-direction: column;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 1.25rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
-            max-height: 550px;
+            max-height: 450px;
         }
 
         .chat-header {
-            padding: 12px 15px;
+            padding: 10px;
             background: rgba(255, 107, 157, 0.15);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
             font-weight: bold;
             color: #ff6b9d;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 10px; min-height: 200px; max-height: 400px; }
-        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 150px; max-height: 300px; }
+        .chat-messages::-webkit-scrollbar { width: 3px; }
         .chat-messages::-webkit-scrollbar-thumb { background: rgba(255, 107, 157, 0.5); border-radius: 2px; }
 
-        .chat-message { margin-bottom: 10px; padding: 8px 12px; border-radius: 12px; font-size: 12px; }
-        .chat-message.you { background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(255, 107, 157, 0.3); margin-left: 20px; }
-        .chat-message.opponent { background: rgba(116, 185, 255, 0.15); border: 1px solid rgba(116, 185, 255, 0.3); margin-right: 20px; }
-        .chat-message .sender { font-weight: bold; font-size: 10px; display: block; margin-bottom: 3px; }
+        .chat-message { margin-bottom: 8px; padding: 6px 10px; border-radius: 10px; font-size: 11px; }
+        .chat-message.you { background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(255, 107, 157, 0.3); margin-left: 15px; }
+        .chat-message.opponent { background: rgba(116, 185, 255, 0.15); border: 1px solid rgba(116, 185, 255, 0.3); margin-right: 15px; }
+        .chat-message .sender { font-weight: bold; font-size: 9px; display: block; margin-bottom: 2px; }
         .chat-message.you .sender { color: #ff6b9d; }
         .chat-message.opponent .sender { color: #74b9ff; }
         .chat-message .text { color: rgba(255, 255, 255, 0.9); }
 
-        .chat-input-area { display: flex; gap: 6px; padding: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-        .chat-input-area input { flex: 1; padding: 8px 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 12px; }
-        .chat-input-area button { padding: 8px 14px; border-radius: 18px; border: none; background: linear-gradient(135deg, #ff6b9d, #e84393); color: white; font-weight: bold; cursor: pointer; font-size: 12px; }
-
-        .win-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 100;
-        }
-
-        .win-content {
-            text-align: center;
-            background: rgba(26,26,46,0.95);
-            padding: 2rem;
-            border-radius: 1.5rem;
-            border: 2px solid #ff6b9d;
-        }
-
-        .win-emoji { font-size: 3rem; margin-bottom: 0.5rem; }
-        .win-title { font-size: 1.5rem; font-weight: bold; color: #ff6b9d; margin-bottom: 0.5rem; }
+        .chat-input-area { display: flex; gap: 5px; padding: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
+        .chat-input-area button { padding: 6px 10px; border-radius: 15px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 11px; }
 
         @media (max-width: 850px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; margin-top: 15px; max-height: 250px; }
-            .chat-messages { max-height: 150px; min-height: 100px; }
-            .game-title { font-size: 18px; }
-            .cell { font-size: 1rem; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 200px; }
+            .chat-messages { max-height: 100px; min-height: 80px; }
+        }
+
+        @media (max-width: 500px) {
+            .game-container { padding: 0.5rem; border-radius: 1.25rem; }
+            .game-title { font-size: 1.2rem; }
+            .board { gap: 4px; }
+            .column { gap: 4px; }
+            .cell { border-width: 1px; }
         }
     </style>
 </head>
 <body>
-    <div class="game-shell">
+    <div class="game-container">
         <div class="game-header">
             <a href="lobby.html" class="back-btn">← Lobby</a>
-            <h1 class="game-title">🔴 Online Connect Four</h1>
+            <h1 class="game-title">💕 Online Connect Four</h1>
             <div class="players-info">
-                <div class="player-chip you" id="youChip">💕 You (Pink)</div>
-                <div class="player-chip opponent" id="opponentChip">💙 Opponent (Blue)</div>
+                <div class="player-chip you" id="youChip">💕 You</div>
+                <div class="player-chip opponent" id="opponentChip">💙 Opponent</div>
             </div>
         </div>
 
+        <div class="status-bar" id="statusBar">Loading...</div>
+
         <div class="main-layout">
             <div class="game-area">
-                <div class="turn-indicator" id="turnIndicator">Loading...</div>
-                <div class="board-wrap" id="boardWrap">
-                    <div class="connect-four-board" id="board"></div>
-                </div>
-                <div class="info-bar">
-                    <div class="info-pill">💕 You are Pink</div>
-                    <div class="info-pill">💙 Opponent is Blue</div>
-                    <div class="info-pill">🌐 Real-Time 1vs1</div>
+                <div class="board-wrapper">
+                    <div class="board" id="board"></div>
                 </div>
             </div>
 
             <div class="chat-sidebar">
                 <div class="chat-header">💬 Chat</div>
                 <div class="chat-messages" id="chatMessages">
-                    <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 12px; padding: 20px 0;">💕 Start chatting!</div>
+                    <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 11px; padding: 15px 0;">💕 Start chatting!</div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Type message...">
+                    <input type="text" id="chatInput" placeholder="Type...">
                     <button onclick="sendMessage()">Send</button>
                 </div>
             </div>
@@ -301,7 +273,7 @@
                 database.ref('users/' + user.uid).once('value').then((snapshot) => {
                     const data = snapshot.val();
                     myName = data ? data.username : user.email.split('@')[0];
-                    document.getElementById('youChip').textContent = `💕 ${myName} (Pink)`;
+                    document.getElementById('youChip').textContent = `💕 ${myName}`;
                 });
 
                 const params = new URLSearchParams(window.location.search);
@@ -316,11 +288,11 @@
         function setupRoom() {
             database.ref('matchmaking/' + roomId).once('value').then((snapshot) => {
                 if (snapshot.exists()) {
-                    setupFromRoomData(snapshot.val(), 'matchmaking');
+                    setupFromRoomData(snapshot.val());
                 } else {
                     database.ref('teams/' + roomId).once('value').then((teamSnap) => {
                         if (teamSnap.exists()) {
-                            setupFromRoomData(teamSnap.val(), 'teams');
+                            setupFromRoomData(teamSnap.val());
                         } else {
                             alert('Room not found!');
                             window.location.href = 'lobby.html';
@@ -330,7 +302,10 @@
             });
         }
 
-        function setupFromRoomData(roomData, collection) {
+        function setupFromRoomData(roomData) {
+            const collection = roomData.player1 === myPlayerId || roomData.player2 === myPlayerId ? 
+                (database.ref('matchmaking/' + roomId).key ? 'matchmaking' : 'teams') : 'teams';
+
             if (roomData.player1 === myPlayerId) {
                 isHost = true;
                 myColor = 'pink';
@@ -343,17 +318,21 @@
                 opponentName = roomData.player1Name || 'Opponent';
             }
 
-            document.getElementById('opponentChip').textContent = `💙 ${opponentName} (Blue)`;
+            document.getElementById('opponentChip').textContent = `💙 ${opponentName}`;
 
             if (opponentId) {
                 startGame();
             } else {
-                database.ref(collection + '/' + roomId).on('value', (snap) => {
+                const ref = roomData.player1 === myPlayerId ? 
+                    database.ref('matchmaking/' + roomId) : 
+                    database.ref('teams/' + roomId);
+                
+                ref.on('value', (snap) => {
                     const data = snap.val();
                     if (data && data.player2) {
                         opponentId = data.player2;
                         opponentName = data.player2Name || 'Opponent';
-                        document.getElementById('opponentChip').textContent = `💙 ${opponentName} (Blue)`;
+                        document.getElementById('opponentChip').textContent = `💙 ${opponentName}`;
                         startGame();
                     }
                 });
@@ -364,7 +343,7 @@
             gameStarted = true;
             initBoard();
             renderBoard();
-            updateTurnIndicator();
+            updateStatus();
 
             if (isHost) {
                 database.ref('gameRooms/' + roomId + '/cfBoard').set(board);
@@ -383,30 +362,30 @@
                 const turn = snap.val();
                 if (turn) {
                     currentTurn = turn;
-                    updateTurnIndicator();
+                    updateStatus();
                 }
             });
 
             database.ref('gameRooms/' + roomId + '/cfGameOver').on('value', (snap) => {
-                const data = snap.val();
-                if (data) {
+                if (snap.val()) {
                     gameOver = true;
-                    showWin(data.winner);
+                    const winner = snap.val().winner;
+                    showWin(winner);
                 }
             });
 
             setupChat();
         }
 
-        function updateTurnIndicator() {
-            const indicator = document.getElementById('turnIndicator');
+        function updateStatus() {
+            const statusBar = document.getElementById('statusBar');
             if (gameOver) return;
             if (currentTurn === myColor) {
-                indicator.textContent = '💕 Your Turn! Drop a disc';
-                indicator.className = 'turn-indicator your-turn';
+                statusBar.textContent = '💕 Your Turn! Drop a disc';
+                statusBar.style.color = '#ff6b9d';
             } else {
-                indicator.textContent = '💙 Opponent\'s Turn...';
-                indicator.className = 'turn-indicator opponent-turn';
+                statusBar.textContent = '💙 Opponent\'s Turn...';
+                statusBar.style.color = '#74b9ff';
             }
         }
 
@@ -423,15 +402,17 @@
             if (winCells) {
                 gameOver = true;
                 database.ref('gameRooms/' + roomId + '/cfGameOver').set({ winner: myColor });
+                database.ref('gameRooms/' + roomId + '/cfBoard').set(board);
+                renderBoard();
                 showWin(myColor);
+                return;
             }
 
             currentTurn = currentTurn === 'pink' ? 'blue' : 'pink';
             database.ref('gameRooms/' + roomId + '/cfBoard').set(board);
             database.ref('gameRooms/' + roomId + '/cfTurn').set(currentTurn);
-
             renderBoard();
-            updateTurnIndicator();
+            updateStatus();
         }
 
         function findLowestEmptyRow(col) {
@@ -443,6 +424,7 @@
 
         function checkWin(row, col) {
             const player = board[row][col];
+            if (!player) return null;
             const directions = [[[0,1],[0,-1]],[[1,0],[-1,0]],[[1,1],[-1,-1]],[[1,-1],[-1,1]]];
             for (const [dir1, dir2] of directions) {
                 const cells = [{row, col}];
@@ -467,7 +449,6 @@
             for (let col = 0; col < COLS; col++) {
                 const column = document.createElement('div');
                 column.className = 'column';
-                column.dataset.col = col;
                 column.addEventListener('click', () => dropDisc(col));
                 for (let row = 0; row < ROWS; row++) {
                     const cell = document.createElement('div');
@@ -482,14 +463,13 @@
 
         function showWin(winner) {
             const overlay = document.createElement('div');
-            overlay.className = 'win-overlay';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:100;';
             const isWinner = winner === myColor;
             overlay.innerHTML = `
-                <div class="win-content">
-                    <div class="win-emoji">${isWinner ? '🎉' : '💙'}</div>
-                    <div class="win-title">${isWinner ? 'You Win!' : 'Opponent Wins!'}</div>
-                    <div style="color: white; font-size: 0.9rem; margin-bottom: 1rem;">Four in a row!</div>
-                    <button onclick="location.href='lobby.html'" style="padding: 10px 20px; border-radius: 20px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer;">Back to Lobby</button>
+                <div style="text-align:center;background:rgba(26,26,46,0.95);padding:2rem;border-radius:1.5rem;border:2px solid #ff6b9d;">
+                    <div style="font-size:3rem;margin-bottom:0.5rem;">${isWinner ? '🎉' : '💙'}</div>
+                    <div style="font-size:1.5rem;font-weight:bold;color:#ff6b9d;margin-bottom:0.5rem;">${isWinner ? 'You Win!' : 'Opponent Wins!'}</div>
+                    <button onclick="location.href='lobby.html'" style="padding:10px 20px;border-radius:20px;border:none;background:#ff6b9d;color:white;font-weight:bold;cursor:pointer;margin-top:1rem;">Back to Lobby</button>
                 </div>
             `;
             document.body.appendChild(overlay);
@@ -519,7 +499,7 @@
 
         function displayMessage(sender, message, isYou) {
             const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages.querySelector('div[style*="padding: 20px"]')) {
+            if (chatMessages.querySelector('div[style*="padding: 15px"]')) {
                 chatMessages.innerHTML = '';
             }
             const div = document.createElement('div');
