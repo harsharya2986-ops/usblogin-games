@@ -1,0 +1,20 @@
+# UsBlog Games - Robots.txt
+# https://www.usblog.in
+
+User-agent: *
+Allow: /
+
+# Disallow sensitive pages
+Disallow: /online/lobby.html
+Disallow: /online/login.html
+Disallow: /online/game-room.html
+Disallow: /online/game-room-ping-pong.html
+Disallow: /online/game-room-rps.html
+Disallow: /online/game-room-tic-tac-toe.html
+Disallow: /online/game-room-chess.html
+Disallow: /online/game-room-connect-four.html
+Disallow: /online/game-room-tumble.html
+Disallow: /online/game-room-dots.html
+
+# Sitemap location
+Sitemap: https://www.usblog.in/sitemap.xml
