@@ -1,10 +1,9 @@
 {
-  "name": "usblog-games",
+  "name": "usblogin-games",
   "version": "1.0.0",
   "description": "UsBlog Games - Romantic Gaming Platform",
   "private": true,
   "scripts": {
-    "build": "echo 'Static site - No build required'",
-    "vercel-build": "echo 'Static site - No build required'"
+    "build": "echo 'No build step required'"
   }
 }
