@@ -7,7 +7,7 @@
     <style>
         :root {
             --primary: #ff6b9d;
-            --secondary: #c44569;
+            --secondary: #e84393;
             --accent: #f8b500;
             --bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --glass: rgba(255, 255, 255, 0.1);
@@ -22,7 +22,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
             background: var(--bg);
             min-height: 100vh;
             display: flex;
@@ -99,16 +99,8 @@
             border: 1px solid rgba(255, 107, 157, 0.3);
         }
 
-        .game-emoji {
-            font-size: 2.5rem;
-        }
-
-        .game-name {
-            color: var(--primary);
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-top: 0.25rem;
-        }
+        .game-emoji { font-size: 2.5rem; }
+        .game-name { color: var(--primary); font-weight: bold; font-size: 1.1rem; margin-top: 0.25rem; }
 
         .section-title {
             text-align: center;
@@ -133,14 +125,8 @@
             margin-bottom: 1.25rem;
         }
 
-        .btn-find:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-find:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+        .btn-find:hover { transform: translateY(-2px); }
+        .btn-find:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .team-display {
             text-align: center;
@@ -156,10 +142,7 @@
             margin-bottom: 0.75rem;
         }
 
-        .team-display.show {
-            display: block;
-            animation: popIn 0.3s ease;
-        }
+        .team-display.show { display: block; animation: popIn 0.3s ease; }
 
         @keyframes popIn {
             from { transform: scale(0.8); opacity: 0; }
@@ -179,10 +162,7 @@
             font-size: 0.85rem;
         }
 
-        .join-section {
-            display: flex;
-            gap: 0.5rem;
-        }
+        .join-section { display: flex; gap: 0.5rem; }
 
         .join-section input {
             flex: 1;
@@ -198,10 +178,6 @@
             outline: none;
         }
 
-        .join-section input:focus {
-            border-color: var(--accent);
-        }
-
         .btn-join {
             padding: 0.7rem 1.25rem;
             border-radius: 1.5rem;
@@ -213,7 +189,6 @@
             white-space: nowrap;
         }
 
-        /* Status Overlay */
         .overlay {
             display: none;
             position: fixed;
@@ -227,9 +202,7 @@
             justify-content: center;
         }
 
-        .overlay.show {
-            display: flex;
-        }
+        .overlay.show { display: flex; }
 
         .overlay-content {
             text-align: center;
@@ -256,33 +229,12 @@
             100% { transform: rotate(360deg); }
         }
 
-        .countdown {
-            font-size: 3.5rem;
-            font-weight: bold;
-            color: var(--accent);
-            margin: 0.5rem 0;
-        }
-
-        .status-text {
-            color: white;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .btn-cancel {
-            padding: 0.6rem 1.5rem;
-            border-radius: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: transparent;
-            color: white;
-            cursor: pointer;
-        }
+        .countdown { font-size: 3.5rem; font-weight: bold; color: var(--accent); margin: 0.5rem 0; }
+        .status-text { color: white; font-size: 0.9rem; margin-bottom: 1rem; }
+        .btn-cancel { padding: 0.6rem 1.5rem; border-radius: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.3); background: transparent; color: white; cursor: pointer; }
 
         @media (max-width: 400px) {
-            .lobby-container {
-                padding: 1rem;
-                border-radius: 1.25rem;
-            }
+            .lobby-container { padding: 1rem; border-radius: 1.25rem; }
         }
     </style>
 </head>
@@ -306,18 +258,14 @@
         <button class="btn-find" id="findBtn" onclick="findRandomMatch()">🎲 Find Random Match</button>
 
         <div class="section-title">💕 Play with Friend</div>
-        
         <div class="team-display" id="teamDisplay"></div>
-        
         <button class="btn-create" onclick="createTeam()">✨ Create Team Code</button>
-        
         <div class="join-section">
             <input type="text" id="joinInput" placeholder="ENTER CODE" maxlength="6">
             <button class="btn-join" onclick="joinTeam()">🔑 Join</button>
         </div>
     </div>
 
-    <!-- Overlay -->
     <div class="overlay" id="overlay">
         <div class="overlay-content">
             <div class="spinner" id="spinner"></div>
@@ -327,7 +275,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
@@ -355,14 +302,14 @@
         let countdownTimer = null;
 
         const games = {
-            'dino-run': { name: 'Dino Run', emoji: '🦖' },
-            'ping-pong': { name: 'Ping Pong', emoji: '🏓' },
-            'rock-paper-scissors': { name: 'Rock Paper Scissors', emoji: '✂️' },
-            'tic-tac-toe': { name: 'Tic Tac Toe', emoji: '⭕' },
-            'chess': { name: 'Chess', emoji: '♟️' },
-            'connect-four': { name: 'Connect Four', emoji: '🔴' },
-            'tic-tac-tumble': { name: 'Tic Tac Tumble', emoji: '🎲' },
-            'dots-boxes': { name: 'Dots and Boxes', emoji: '📦' }
+            'dino-run': { name: 'Dino Run', emoji: '🦖', room: 'game-room.html' },
+            'ping-pong': { name: 'Ping Pong', emoji: '🏓', room: 'game-room-ping-pong.html' },
+            'rock-paper-scissors': { name: 'Rock Paper Scissors', emoji: '✂️', room: 'game-room-rps.html' },
+            'tic-tac-toe': { name: 'Tic Tac Toe', emoji: '⭕', room: 'game-room-tic-tac-toe.html' },
+            'chess': { name: 'Chess', emoji: '♟️', room: 'game-room-chess.html' },
+            'connect-four': { name: 'Connect Four', emoji: '🔴', room: 'game-room-connect-four.html' },
+            'tic-tac-tumble': { name: 'Tic Tac Tumble', emoji: '🎲', room: 'game-room-tumble.html' },
+            'dots-boxes': { name: 'Dots and Boxes', emoji: '📦', room: 'game-room-dots.html' }
         };
 
         function init() {
@@ -399,10 +346,7 @@
 
         function hideOverlay() {
             document.getElementById('overlay').classList.remove('show');
-            if (countdownTimer) {
-                clearInterval(countdownTimer);
-                countdownTimer = null;
-            }
+            if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
         }
 
         function findRandomMatch() {
@@ -413,17 +357,12 @@
 
             const matchmakingRef = database.ref('matchmaking');
 
-            // First, check for existing waiting players
             matchmakingRef.once('value').then((snapshot) => {
                 let found = false;
 
                 snapshot.forEach((child) => {
                     const match = child.val();
-                    if (!found && 
-                        match.gameType === selectedGame && 
-                        match.status === 'waiting' && 
-                        match.player1 !== currentUser.uid) {
-                        
+                    if (!found && match.gameType === selectedGame && match.status === 'waiting' && match.player1 !== currentUser.uid) {
                         found = true;
                         joinMatch(child.key, match);
                     }
@@ -446,7 +385,6 @@
                 status: 'waiting',
                 createdAt: firebase.database.ServerValue.TIMESTAMP
             }).then(() => {
-                // Listen for opponent joining
                 newMatchRef.on('value', (snapshot) => {
                     const match = snapshot.val();
                     if (match && match.status === 'matched' && match.player2) {
@@ -458,7 +396,6 @@
 
         function joinMatch(matchId, match) {
             myMatchRef = matchId;
-
             database.ref('matchmaking/' + matchId).update({
                 player2: currentUser.uid,
                 player2Name: currentUsername,
@@ -490,7 +427,8 @@
                     clearInterval(countdownTimer);
                     countdownTimer = null;
                     hideOverlay();
-                    window.location.href = `game-room.html?match=${matchId}&game=${selectedGame}`;
+                    const gameRoom = games[selectedGame].room;
+                    window.location.href = `${gameRoom}?match=${matchId}&game=${selectedGame}`;
                 }
             }, 1000);
         }
@@ -507,14 +445,9 @@
         function createTeam() {
             let code = generateCode();
 
-            // Check if code exists
             database.ref('teams/' + code).once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    // Generate new code
-                    code = generateCode();
-                }
+                if (snapshot.exists()) { code = generateCode(); }
 
-                // Create team
                 return database.ref('teams/' + code).set({
                     gameType: selectedGame,
                     host: currentUser.uid,
@@ -523,12 +456,10 @@
                     createdAt: firebase.database.ServerValue.TIMESTAMP
                 });
             }).then(() => {
-                // Show code
                 const display = document.getElementById('teamDisplay');
                 display.textContent = code;
                 display.classList.add('show');
 
-                // Listen for partner
                 database.ref('teams/' + code).on('value', (snapshot) => {
                     const team = snapshot.val();
                     if (team && team.status === 'ready' && team.partner) {
@@ -570,6 +501,7 @@
                     status: 'ready'
                 });
             }).then(() => {
+                const code = document.getElementById('joinInput').value.toUpperCase().trim();
                 if (code && code.length === 6) {
                     startCountdown(code);
                 }

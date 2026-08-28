@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Chess ♟️ | UsBlog Games</title>
+    <style>
+        :root {
+            --primary: #ff6b9d;
+            --secondary: #e84393;
+            --blue: #74b9ff;
+            --gold: #fdcb6e;
+            --dark: #1a1a2e;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 30%, #9d174d 60%, #f472b6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .game-shell {
+            background: rgba(30, 27, 75, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-radius: 2rem;
+            padding: 1.25rem;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .game-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .game-title {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f9a8d4, #f472b6, #e879f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .players-info {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .player-chip {
+            padding: 6px 14px;
+            border-radius: 18px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .player-chip.you {
+            background: rgba(255, 107, 157, 0.2);
+            border: 1px solid #ff6b9d;
+            color: #ff6b9d;
+        }
+
+        .player-chip.opponent {
+            background: rgba(116, 185, 255, 0.2);
+            border: 1px solid #74b9ff;
+            color: #74b9ff;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .game-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .board-wrap {
+            position: relative;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background: #0a0a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: 100%;
+            max-width: 480px;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 3px solid rgba(183, 110, 121, 0.5);
+        }
+
+        .square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            user-select: none;
+        }
+
+        .square.light { background: #ffd1dc; }
+        .square.dark { background: #e6e6fa; }
+
+        .square.selected {
+            box-shadow: inset 0 0 20px rgba(183, 110, 121, 0.8);
+        }
+
+        .square.valid-move::after {
+            content: '';
+            position: absolute;
+            width: 25%;
+            height: 25%;
+            border-radius: 50%;
+            background: rgba(76, 175, 80, 0.6);
+        }
+
+        .square.valid-capture::after {
+            content: '';
+            position: absolute;
+            width: 85%;
+            height: 85%;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 0, 0, 0.5);
+        }
+
+        .piece {
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            font-size: 2rem;
+        }
+
+        .piece:hover { transform: scale(1.15); }
+
+        .piece.rose { filter: drop-shadow(0 0 6px rgba(255, 105, 180, 0.6)); }
+        .piece.amethyst { filter: drop-shadow(0 0 6px rgba(156, 39, 176, 0.6)); }
+
+        .info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .info-pill {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 6px 12px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-sidebar {
+            width: 260px;
+            min-width: 260px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            max-height: 550px;
+        }
+
+        .chat-header {
+            padding: 12px 15px;
+            background: rgba(255, 107, 157, 0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-weight: bold;
+            color: #ff6b9d;
+            font-size: 14px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            min-height: 200px;
+            max-height: 400px;
+        }
+
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255, 107, 157, 0.5); border-radius: 2px; }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            animation: messageIn 0.3s ease;
+        }
+
+        @keyframes messageIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-message.you {
+            background: rgba(255, 107, 157, 0.15);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            margin-left: 20px;
+        }
+
+        .chat-message.opponent {
+            background: rgba(116, 185, 255, 0.15);
+            border: 1px solid rgba(116, 185, 255, 0.3);
+            margin-right: 20px;
+        }
+
+        .chat-message .sender { font-weight: bold; font-size: 10px; display: block; margin-bottom: 3px; }
+        .chat-message.you .sender { color: #ff6b9d; }
+        .chat-message.opponent .sender { color: #74b9ff; }
+        .chat-message .text { color: rgba(255, 255, 255, 0.9); word-wrap: break-word; }
+        .chat-message .time { font-size: 9px; color: rgba(255, 255, 255, 0.4); display: block; margin-top: 3px; text-align: right; }
+
+        .chat-input-area {
+            display: flex;
+            gap: 6px;
+            padding: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            outline: none;
+            font-size: 12px;
+        }
+
+        .chat-input-area input:focus { border-color: #ff6b9d; }
+
+        .chat-input-area button {
+            padding: 8px 14px;
+            border-radius: 18px;
+            border: none;
+            background: linear-gradient(135deg, #ff6b9d, #e84393);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .waiting-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            border-radius: 1.25rem;
+        }
+
+        .waiting-content { text-align: center; color: white; }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid #ff6b9d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .turn-indicator {
+            text-align: center;
+            padding: 8px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .turn-indicator.your-turn {
+            background: rgba(255, 107, 157, 0.2);
+            color: #ff6b9d;
+            border: 1px solid #ff6b9d;
+        }
+
+        .turn-indicator.opponent-turn {
+            background: rgba(116, 185, 255, 0.2);
+            color: #74b9ff;
+            border: 1px solid #74b9ff;
+        }
+
+        @media (max-width: 850px) {
+            .main-layout { flex-direction: column; }
+            .chat-sidebar { width: 100%; min-width: auto; margin-top: 15px; max-height: 250px; }
+            .chat-messages { max-height: 150px; min-height: 100px; }
+            .game-title { font-size: 18px; }
+            .piece { font-size: 1.5rem; }
+            .square { font-size: 1.5rem; }
+        }
+
+        @media (max-width: 500px) {
+            .piece { font-size: 1.2rem; }
+            .square { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-shell">
+        <div class="game-header">
+            <a href="lobby.html" class="back-btn">← Lobby</a>
+            <h1 class="game-title">♟️ Online Chess</h1>
+            <div class="players-info">
+                <div class="player-chip you" id="youChip">💕 You (Rose)</div>
+                <div class="player-chip opponent" id="opponentChip">💙 Opponent (Amethyst)</div>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <div class="game-area">
+                <div class="turn-indicator" id="turnIndicator">Waiting for opponent...</div>
+                <div class="board-wrap" id="boardWrap">
+                    <div class="chess-board" id="chessBoard"></div>
+                    <div class="waiting-overlay" id="waitingOverlay">
+                        <div class="waiting-content">
+                            <div class="spinner"></div>
+                            <p>Waiting for opponent...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-bar">
+                    <div class="info-pill">♟️ Click piece to select</div>
+                    <div class="info-pill">💕 You are Rose</div>
+                    <div class="info-pill">🌐 Real-Time 1vs1</div>
+                </div>
+            </div>
+
+            <div class="chat-sidebar">
+                <div class="chat-header">💬 Chat</div>
+                <div class="chat-messages" id="chatMessages">
+                    <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 12px; padding: 20px 0;">💕 Start chatting!</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Type message...">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaR33cAwHFTNdSlBuuzoju9yzah8szBmQ",
+            authDomain: "usblog-games.firebaseapp.com",
+            databaseURL: "https://usblog-games-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "usblog-games",
+            storageBucket: "usblog-games.firebasestorage.app",
+            messagingSenderId: "568211981446",
+            appId: "1:568211981446:web:0e75688bb9a28c2df97d07",
+            measurementId: "G-BDKRR8E565"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // ============ CHESS GAME STATE ============
+        let roomId = null;
+        let myPlayerId = null;
+        let opponentId = null;
+        let myName = '';
+        let opponentName = '';
+        let isHost = false;
+        let gameStarted = false;
+        let myColor = 'rose'; // 'rose' or 'amethyst'
+        let currentTurn = 'rose';
+        let selectedSquare = null;
+        let validMoves = [];
+
+        const pieces = {
+            rose: { king: '🤴', queen: '👸', rook: '🏰', bishop: '🕊️', knight: '🦄', pawn: '❤️' },
+            amethyst: { king: '🧝', queen: '🧚', rook: '🏯', bishop: '🏹', knight: '🐉', pawn: '💜' }
+        };
+
+        let board = [];
+
+        function initBoard() {
+            board = Array(8).fill(null).map(() => Array(8).fill(null));
+            const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
+            
+            for (let col = 0; col < 8; col++) {
+                board[7][col] = { type: backRow[col], side: 'rose' };
+                board[6][col] = { type: 'pawn', side: 'rose' };
+                board[0][col] = { type: backRow[col], side: 'amethyst' };
+                board[1][col] = { type: 'pawn', side: 'amethyst' };
+            }
+        }
+
+        function init() {
+            auth.onAuthStateChanged((user) => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                database.ref('users/' + user.uid).once('value').then((snapshot) => {
+                    const data = snapshot.val();
+                    myName = data ? data.username : user.email.split('@')[0];
+                    document.getElementById('youChip').textContent = `💕 ${myName} (Rose)`;
+                });
+
+                const params = new URLSearchParams(window.location.search);
+                roomId = params.get('match') || params.get('team');
+                myPlayerId = user.uid;
+
+                if (!roomId) {
+                    window.location.href = 'lobby.html';
+                    return;
+                }
+
+                setupRoom();
+            });
+        }
+
+        function setupRoom() {
+            const roomRef = database.ref('matchmaking/' + roomId);
+            
+            roomRef.once('value').then((snapshot) => {
+                const roomData = snapshot.val();
+                if (!roomData) {
+                    database.ref('teams/' + roomId).once('value').then((teamSnap) => {
+                        const teamData = teamSnap.val();
+                        if (!teamData) { window.location.href = 'lobby.html'; return; }
+                        setupFromRoomData(teamData, 'teams');
+                    });
+                    return;
+                }
+                setupFromRoomData(roomData, 'matchmaking');
+            });
+        }
+
+        function setupFromRoomData(roomData, collection) {
+            if (roomData.player1 === myPlayerId) {
+                isHost = true;
+                myColor = 'rose';
+                opponentId = roomData.player2 || null;
+                opponentName = roomData.player2Name || 'Opponent';
+            } else {
+                isHost = false;
+                myColor = 'amethyst';
+                opponentId = roomData.player1 || null;
+                opponentName = roomData.player1Name || 'Opponent';
+            }
+
+            document.getElementById('opponentChip').textContent = `💙 ${opponentName} (Amethyst)`;
+
+            if (opponentId) {
+                startGame();
+            } else {
+                database.ref(collection + '/' + roomId).on('value', (snap) => {
+                    const data = snap.val();
+                    if (data && data.player2) {
+                        opponentId = data.player2;
+                        opponentName = data.player2Name || 'Opponent';
+                        document.getElementById('opponentChip').textContent = `💙 ${opponentName} (Amethyst)`;
+                        startGame();
+                    }
+                });
+            }
+        }
+
+        function startGame() {
+            gameStarted = true;
+            document.getElementById('waitingOverlay').style.display = 'none';
+            initBoard();
+            renderBoard();
+            updateTurnIndicator();
+
+            // Host syncs board
+            if (isHost) {
+                database.ref('gameRooms/' + roomId + '/chessBoard').set(board);
+            }
+
+            // Listen for board updates from host
+            database.ref('gameRooms/' + roomId + '/chessBoard').on('value', (snap) => {
+                const data = snap.val();
+                if (data && !isHost) {
+                    board = data;
+                    renderBoard();
+                    updateTurnIndicator();
+                }
+            });
+
+            // Listen for turn changes
+            database.ref('gameRooms/' + roomId + '/turn').on('value', (snap) => {
+                const turn = snap.val();
+                if (turn) {
+                    currentTurn = turn;
+                    updateTurnIndicator();
+                }
+            });
+
+            setupChat();
+        }
+
+        function updateTurnIndicator() {
+            const indicator = document.getElementById('turnIndicator');
+            if (!gameStarted) {
+                indicator.textContent = 'Waiting for opponent...';
+                indicator.className = 'turn-indicator';
+                return;
+            }
+            
+            if (currentTurn === myColor) {
+                indicator.textContent = '💕 Your Turn!';
+                indicator.className = 'turn-indicator your-turn';
+            } else {
+                indicator.textContent = '💙 Opponent\'s Turn...';
+                indicator.className = 'turn-indicator opponent-turn';
+            }
+        }
+
+        function getValidMoves(row, col) {
+            const piece = board[row][col];
+            if (!piece) return [];
+            const moves = [];
+
+            switch (piece.type) {
+                case 'pawn':
+                    getPawnMoves(row, col, piece.side, moves);
+                    break;
+                case 'knight':
+                    getKnightMoves(row, col, piece.side, moves);
+                    break;
+                case 'bishop':
+                    getBishopMoves(row, col, piece.side, moves);
+                    break;
+                case 'rook':
+                    getRookMoves(row, col, piece.side, moves);
+                    break;
+                case 'queen':
+                    getBishopMoves(row, col, piece.side, moves);
+                    getRookMoves(row, col, piece.side, moves);
+                    break;
+                case 'king':
+                    getKingMoves(row, col, piece.side, moves);
+                    break;
+            }
+
+            return moves;
+        }
+
+        function getPawnMoves(row, col, side, moves) {
+            const dir = side === 'rose' ? -1 : 1;
+            if (row + dir >= 0 && row + dir < 8 && !board[row + dir][col]) {
+                moves.push({ row: row + dir, col });
+            }
+            for (const dc of [-1, 1]) {
+                const nc = col + dc;
+                if (nc >= 0 && nc < 8 && row + dir >= 0 && row + dir < 8) {
+                    const target = board[row + dir][nc];
+                    if (target && target.side !== side) {
+                        moves.push({ row: row + dir, col: nc });
+                    }
+                }
+            }
+        }
+
+        function getKnightMoves(row, col, side, moves) {
+            const offsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+            for (const [dr, dc] of offsets) {
+                const nr = row + dr, nc = col + dc;
+                if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                    const target = board[nr][nc];
+                    if (!target || target.side !== side) moves.push({ row: nr, col: nc });
+                }
+            }
+        }
+
+        function getBishopMoves(row, col, side, moves) {
+            for (const [dr, dc] of [[1,1],[1,-1],[-1,1],[-1,-1]]) {
+                let nr = row + dr, nc = col + dc;
+                while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                    const target = board[nr][nc];
+                    if (!target) moves.push({ row: nr, col: nc });
+                    else { if (target.side !== side) moves.push({ row: nr, col: nc }); break; }
+                    nr += dr; nc += dc;
+                }
+            }
+        }
+
+        function getRookMoves(row, col, side, moves) {
+            for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+                let nr = row + dr, nc = col + dc;
+                while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                    const target = board[nr][nc];
+                    if (!target) moves.push({ row: nr, col: nc });
+                    else { if (target.side !== side) moves.push({ row: nr, col: nc }); break; }
+                    nr += dr; nc += dc;
+                }
+            }
+        }
+
+        function getKingMoves(row, col, side, moves) {
+            for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
+                const nr = row + dr, nc = col + dc;
+                if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                    const target = board[nr][nc];
+                    if (!target || target.side !== side) moves.push({ row: nr, col: nc });
+                }
+            }
+        }
+
+        function handleSquareClick(row, col) {
+            if (!gameStarted || currentTurn !== myColor) return;
+
+            const piece = board[row][col];
+
+            if (selectedSquare) {
+                const isValid = validMoves.some(m => m.row === row && m.col === col);
+                if (isValid) {
+                    makeMove(selectedSquare.row, selectedSquare.col, row, col);
+                    return;
+                }
+                if (piece && piece.side === myColor) {
+                    selectSquare(row, col);
+                    return;
+                }
+                deselectSquare();
+                return;
+            }
+
+            if (piece && piece.side === myColor) {
+                selectSquare(row, col);
+            }
+        }
+
+        function selectSquare(row, col) {
+            selectedSquare = { row, col };
+            validMoves = getValidMoves(row, col);
+            renderBoard();
+        }
+
+        function deselectSquare() {
+            selectedSquare = null;
+            validMoves = [];
+            renderBoard();
+        }
+
+        function makeMove(fromRow, fromCol, toRow, toCol) {
+            board[toRow][toCol] = board[fromRow][fromCol];
+            board[fromRow][fromCol] = null;
+            selectedSquare = null;
+            validMoves = [];
+            
+            currentTurn = currentTurn === 'rose' ? 'amethyst' : 'rose';
+            
+            if (isHost) {
+                database.ref('gameRooms/' + roomId + '/chessBoard').set(board);
+                database.ref('gameRooms/' + roomId + '/turn').set(currentTurn);
+            } else {
+                // Send move to host
+                database.ref('gameRooms/' + roomId + '/chessBoard').set(board);
+                database.ref('gameRooms/' + roomId + '/turn').set(currentTurn);
+            }
+            
+            renderBoard();
+            updateTurnIndicator();
+        }
+
+        function renderBoard() {
+            const boardEl = document.getElementById('chessBoard');
+            boardEl.innerHTML = '';
+
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
+                    square.dataset.row = row;
+                    square.dataset.col = col;
+
+                    const piece = board[row][col];
+                    if (piece) {
+                        square.textContent = pieces[piece.side][piece.type];
+                        square.classList.add('piece', piece.side);
+                    }
+
+                    if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) {
+                        square.classList.add('selected');
+                    }
+
+                    if (validMoves.some(m => m.row === row && m.col === col)) {
+                        if (board[row][col]) {
+                            square.classList.add('valid-capture');
+                        } else {
+                            square.classList.add('valid-move');
+                        }
+                    }
+
+                    square.addEventListener('click', () => handleSquareClick(row, col));
+                    boardEl.appendChild(square);
+                }
+            }
+        }
+
+        // Chat
+        function setupChat() {
+            database.ref('gameRooms/' + roomId + '/chat').on('child_added', (snap) => {
+                const msg = snap.val();
+                displayMessage(msg.sender, msg.message, msg.sender === myName, msg.timestamp);
+            });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (message) {
+                database.ref('gameRooms/' + roomId + '/chat').push({
+                    sender: myName,
+                    message: message,
+                    timestamp: Date.now()
+                });
+                input.value = '';
+            }
+        }
+
+        function displayMessage(sender, message, isYou, timestamp) {
+            const chatMessages = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `chat-message ${isYou ? 'you' : 'opponent'}`;
+            const time = timestamp ? new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+            div.innerHTML = `<span class="sender">${sender}</span><span class="text">${message}</span><span class="time">${time}</span>`;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
