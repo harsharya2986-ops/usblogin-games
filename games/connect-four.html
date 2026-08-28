@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romantic Connect Four 💕 | UsBlog Games</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+        :root {
+            --midnight: #1a1a2e;
+            --lavender-dark: #2d1b69;
+            --pink: #ff6b9d;
+            --pink-light: #f8bbd0;
+            --gold: #fdcb6e;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 30%, #4a2d6b 60%, #1a1a2e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating hearts background */
+        .bg-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-heart {
+            position: absolute;
+            bottom: -30px;
+            animation: floatUp linear infinite;
+            opacity: 0.15;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 0.2; }
+            90% { opacity: 0.1; }
+            100% {
+                transform: translateY(-110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .game-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            max-width: 700px;
+            width: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            color: #ff6b9d;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 107, 157, 0.2);
+        }
+
+        .game-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ff6b9d;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .status-bar {
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1rem;
+            color: #ff6b9d;
+            font-weight: 600;
+        }
+
+        .scoreboard {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .score-chip {
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .score-chip.pink { color: #ff6b9d; border: 1px solid rgba(255, 107, 157, 0.3); }
+        .score-chip.gold { color: #fdcb6e; border: 1px solid rgba(253, 203, 110, 0.3); }
+
+        .board-wrapper {
+            position: relative;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            border: 2px solid var(--glass-border);
+            margin-bottom: 1.5rem;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            aspect-ratio: 7/6;
+        }
+
+        .column {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr);
+            gap: 8px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .column:hover {
+            transform: translateY(-5px);
+        }
+
+        .column.full {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .column.full:hover {
+            transform: none;
+        }
+
+        .cell {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .cell.pink {
+            background: radial-gradient(circle at 30% 30%, #f8bbd0, #ff6b9d, #e84393);
+            border-color: #ff6b9d;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.6);
+            animation: dropIn 0.4s ease;
+        }
+
+        .cell.gold {
+            background: radial-gradient(circle at 30% 30%, #ffeaa7, #fdcb6e, #f39c12);
+            border-color: #fdcb6e;
+            box-shadow: 0 0 20px rgba(253, 203, 110, 0.6);
+            animation: dropIn 0.4s ease;
+        }
+
+        .cell.win {
+            animation: winPulse 0.8s ease infinite;
+            border-color: #fff;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+        }
+
+        @keyframes dropIn {
+            0% {
+                transform: translateY(-300px);
+                opacity: 0.5;
+            }
+            60% {
+                transform: translateY(10px);
+            }
+            80% {
+                transform: translateY(-5px);
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes winPulse {
+            0%, 100% {
+                border-color: #fff;
+                box-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+            }
+            50% {
+                border-color: #ffd700;
+                box-shadow: 0 0 50px rgba(255, 215, 0, 1);
+            }
+        }
+
+        .preview-token {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .column:hover .preview-token {
+            opacity: 1;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #ff6b9d, #e84393);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-reset:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .overlay-content {
+            text-align: center;
+            background: rgba(26, 26, 46, 0.95);
+            padding: 2rem 3rem;
+            border-radius: 2rem;
+            border: 2px solid rgba(255, 107, 157, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .overlay-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: #ff6b9d;
+            margin-bottom: 1rem;
+        }
+
+        .overlay-emoji {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @media (max-width: 500px) {
+            .game-container {
+                padding: 0.75rem;
+                border-radius: 1.25rem;
+            }
+            .game-title {
+                font-size: 1.5rem;
+            }
+            .board {
+                gap: 4px;
+            }
+            .column {
+                gap: 4px;
+            }
+            .cell {
+                border-width: 1px;
+            }
+            .preview-token {
+                font-size: 1.5rem;
+                top: -30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-hearts" id="bgHearts"></div>
+    
+    <div class="game-container">
+        <div class="game-header">
+            <a href="../index.html" class="back-btn">← Back</a>
+            <h1 class="game-title">💕 Romantic Connect Four</h1>
+            <div style="width: 80px;"></div>
+        </div>
+
+        <div class="status-bar" id="statusBar">💕 Your turn! Drop a heart</div>
+
+        <div class="scoreboard">
+            <div class="score-chip pink">💕 You: <span id="playerScore">0</span></div>
+            <div class="score-chip gold">💍 Partner: <span id="aiScore">0</span></div>
+        </div>
+
+        <div class="board-wrapper">
+            <div class="board" id="board"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-reset" onclick="game.resetMatch()">🔄 Reset Match</button>
+        </div>
+    </div>
+
+    <script src="../js/games/connect-four.js"></script>
+</body>
+</html>

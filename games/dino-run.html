@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romantic Dino Run 💕 | UsBlog Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 30%, #9d174d 60%, #f472b6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .bg-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .bg-heart {
+            position: absolute;
+            bottom: -50px;
+            animation: floatUp linear infinite;
+            opacity: 0.15;
+        }
+        
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 0.2; }
+            90% { opacity: 0.1; }
+            100% {
+                transform: translateY(-110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .game-shell {
+            position: relative;
+            z-index: 10;
+            background: rgba(30, 27, 75, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), 0 0 80px rgba(244, 114, 182, 0.2);
+            width: 100%;
+            max-width: 880px;
+        }
+        
+        .game-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-3px);
+        }
+        
+        .game-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f9a8d4, #f472b6, #e879f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+        
+        .scoreboard {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .score-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 1.25rem;
+            padding: 10px 18px;
+            min-width: 90px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        
+        .score-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .score-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.65);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .score-value {
+            font-size: 22px;
+            font-weight: 800;
+            display: block;
+        }
+        
+        .pink { color: #f9a8d4; text-shadow: 0 0 15px rgba(244, 114, 182, 0.6); }
+        .blue { color: #93c5fd; text-shadow: 0 0 15px rgba(96, 165, 250, 0.6); }
+        .gold { color: #fcd34d; text-shadow: 0 0 15px rgba(252, 211, 77, 0.6); }
+        
+        .canvas-wrap {
+            position: relative;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            background: #0a0a1a;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        
+        .info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .info-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 8px 15px;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            min-width: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5);
+        }
+        
+        .btn-pause {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+        }
+        
+        @media (max-width: 600px) {
+            .game-shell {
+                padding: 10px;
+                border-radius: 1.25rem;
+            }
+            
+            .game-title {
+                font-size: 20px;
+            }
+            
+            .score-card {
+                padding: 8px 12px;
+                min-width: 70px;
+            }
+            
+            .score-value {
+                font-size: 18px;
+            }
+            
+            .btn {
+                padding: 10px 18px;
+                font-size: 13px;
+                min-width: 90px;
+            }
+            
+            .info-pill {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-hearts" id="bgHearts"></div>
+    
+    <div class="game-shell">
+        <div class="game-header">
+            <a href="../index.html" class="back-btn">← Back</a>
+            <h1 class="game-title">💕 Romantic Dino Run</h1>
+            <div class="scoreboard">
+                <div class="score-card">
+                    <span class="score-label">Your Score</span>
+                    <span class="score-value pink" id="playerScore">0</span>
+                </div>
+                <div class="score-card">
+                    <span class="score-label">Partner</span>
+                    <span class="score-value blue" id="aiScore">0</span>
+                </div>
+                <div class="score-card">
+                    <span class="score-label">High Score</span>
+                    <span class="score-value gold" id="highScore">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="canvas-wrap" id="canvasWrap">
+            <canvas id="gameCanvas" width="850" height="400"></canvas>
+        </div>
+        
+        <div class="info-bar">
+            <div class="info-pill">⌨️ Space / Click to Jump</div>
+            <div class="info-pill">💗 Collect Hearts (+100)</div>
+            <div class="info-pill">🤖 AI Partner Auto-Runs</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-start" id="startBtn">💕 Start Game</button>
+            <button class="btn btn-pause" id="pauseBtn">⏸️ Pause</button>
+            <button class="btn btn-reset" id="resetBtn">🔄 Reset</button>
+        </div>
+    </div>
+    
+    <script src="../js/games/dino-run.js"></script>
+</body>
+</html>

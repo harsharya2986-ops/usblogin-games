@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romantic Fairytale Chess 👑 | UsBlog Games</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+        :root {
+            --rose-gold: #b76e79;
+            --blush-pink: #ffd1dc;
+            --soft-lavender: #e6e6fa;
+            --amethyst: #9c27b0;
+            --midnight-lavender: #4a2d6b;
+            --frosted-pink: #ffd1dc;
+            --cream: #fff9f0;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 30%, #4a2d6b 60%, #1a1a2e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(183, 110, 121, 0.2);
+            max-width: 900px;
+            width: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            color: #ffd1dc;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 209, 220, 0.3);
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 209, 220, 0.2);
+        }
+
+        .game-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffd1dc;
+            text-shadow: 0 0 20px rgba(255, 209, 220, 0.5);
+        }
+
+        .status-bar {
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1rem;
+            color: #ffd1dc;
+            font-weight: 600;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .board-section {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            aspect-ratio: 1;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 3px solid rgba(183, 110, 121, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+
+        .square.light {
+            background: #ffd1dc;
+        }
+
+        .square.dark {
+            background: #e6e6fa;
+        }
+
+        .square.selected {
+            box-shadow: inset 0 0 20px rgba(183, 110, 121, 0.8);
+            animation: pulse 1s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: inset 0 0 20px rgba(183, 110, 121, 0.8); }
+            50% { box-shadow: inset 0 0 35px rgba(183, 110, 121, 1); }
+        }
+
+        .square.valid-move::after {
+            content: '';
+            position: absolute;
+            width: 25%;
+            height: 25%;
+            border-radius: 50%;
+            background: rgba(76, 175, 80, 0.6);
+            animation: glowDot 1s ease infinite;
+        }
+
+        @keyframes glowDot {
+            0%, 100% { box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(76, 175, 80, 1); }
+        }
+
+        .square.valid-capture::after {
+            content: '';
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 0, 0, 0.6);
+            animation: capturePulse 1s ease infinite;
+        }
+
+        @keyframes capturePulse {
+            0%, 100% { border-color: rgba(255, 0, 0, 0.4); }
+            50% { border-color: rgba(255, 0, 0, 0.8); }
+        }
+
+        .piece {
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .piece:hover {
+            transform: scale(1.15);
+        }
+
+        .piece.rose {
+            filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.6));
+        }
+
+        .piece.amethyst {
+            filter: drop-shadow(0 0 8px rgba(156, 39, 176, 0.6));
+        }
+
+        .sidebar {
+            width: 200px;
+            min-width: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .chronicle {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .chronicle-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.1rem;
+            color: #ffd1dc;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .chronicle-entry {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0.25rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1rem;
+            border-radius: 1.5rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #ff6b9d, #e84393);
+            color: white;
+        }
+
+        .btn-flip {
+            background: linear-gradient(135deg, #9c27b0, #6a1b9a);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 700px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .chronicle {
+                max-height: 150px;
+                flex: 1;
+                min-width: 200px;
+            }
+            .controls {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .piece {
+                font-size: 1.3rem;
+            }
+            .square {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <a href="../index.html" class="back-btn">← Back</a>
+            <h1 class="game-title">👑 Romantic Fairytale Chess</h1>
+            <div style="width: 80px;"></div>
+        </div>
+
+        <div class="status-bar" id="statusBar">🌹 Rose Gold Turn to Woo</div>
+
+        <div class="main-layout">
+            <div class="board-section">
+                <div class="chess-board" id="chessBoard"></div>
+            </div>
+            <div class="sidebar">
+                <div class="chronicle">
+                    <div class="chronicle-title">💕 The Love Chronicle</div>
+                    <div id="chronicleList"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-reset" onclick="game.resetMatch()">🔄 Reset Match</button>
+                    <button class="btn btn-flip" onclick="game.flipBoard()">🔄 Flip Board</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/games/chess.js"></script>
+</body>
+</html>

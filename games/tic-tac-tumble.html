@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe 💕 | UsBlog Games</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+        :root {
+            --dark-bg: #1a1a2e;
+            --purple-dark: #2d1b69;
+            --pink: #ff6b9d;
+            --pink-glow: rgba(255, 107, 157, 0.6);
+            --lavender: #a29bfe;
+            --lavender-glow: rgba(162, 155, 254, 0.6);
+            --glass-bg: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --gold: #ffd700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 40%, #4a2d6b 70%, #1a1a2e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating hearts */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .floating-heart {
+            position: absolute;
+            bottom: -30px;
+            animation: floatUp linear infinite;
+            opacity: 0.15;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.2; }
+            90% { opacity: 0.1; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        .game-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 107, 157, 0.15);
+            max-width: 500px;
+            width: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .back-btn {
+            color: #ff6b9d;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 107, 157, 0.2);
+        }
+
+        .game-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ff6b9d;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .status-bar {
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1rem;
+            color: #ff6b9d;
+            font-weight: 600;
+        }
+
+        .scoreboard {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-chip {
+            padding: 0.5rem 1.2rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .score-chip.pink { color: #ff6b9d; border: 1px solid rgba(255, 107, 157, 0.3); }
+        .score-chip.lavender { color: #a29bfe; border: 1px solid rgba(162, 155, 254, 0.3); }
+
+        .board-wrapper {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            border: 2px solid var(--glass-border);
+            margin-bottom: 1.5rem;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            aspect-ratio: 1;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+
+        .cell:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 107, 157, 0.5);
+            box-shadow: 0 0 25px rgba(255, 107, 157, 0.3);
+            transform: scale(1.05);
+        }
+
+        .cell.filled {
+            cursor: not-allowed;
+        }
+
+        .cell.filled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .cell.pink {
+            animation: popIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 0 25px rgba(255, 107, 157, 0.9);
+        }
+
+        .cell.lavender {
+            animation: popIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 0 25px rgba(162, 155, 254, 0.9);
+        }
+
+        .cell.win {
+            animation: winPulse 0.7s ease infinite;
+            border-color: var(--gold);
+            box-shadow: 0 0 35px rgba(255, 215, 0, 0.9);
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            50% { transform: scale(1.25) rotate(10deg); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        @keyframes winPulse {
+            0%, 100% {
+                border-color: var(--gold);
+                box-shadow: 0 0 35px rgba(255, 215, 0, 0.9);
+            }
+            50% {
+                border-color: #fff;
+                box-shadow: 0 0 55px rgba(255, 255, 255, 1);
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #ff6b9d, #e84393);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-reset:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .overlay-content {
+            text-align: center;
+            background: rgba(26, 26, 46, 0.95);
+            padding: 2rem 3rem;
+            border-radius: 2rem;
+            border: 2px solid rgba(255, 107, 157, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .overlay-emoji {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .overlay-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            color: #ff6b9d;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 500px) {
+            .game-container {
+                padding: 1rem;
+                border-radius: 1.25rem;
+            }
+            .game-title {
+                font-size: 1.4rem;
+            }
+            .cell {
+                font-size: 2.5rem;
+                border-radius: 0.75rem;
+            }
+            .board {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-hearts" id="floatingHearts"></div>
+    
+    <div class="game-container">
+        <div class="game-header">
+            <a href="../index.html" class="back-btn">← Back</a>
+            <h1 class="game-title">💕 Tic Tac Toe</h1>
+            <div style="width: 60px;"></div>
+        </div>
+
+        <div class="status-bar" id="statusBar">💕 Your turn! Place your heart</div>
+
+        <div class="scoreboard">
+            <div class="score-chip pink">💕 You: <span id="playerScore">0</span></div>
+            <div class="score-chip lavender">💍 Partner: <span id="aiScore">0</span></div>
+        </div>
+
+        <div class="board-wrapper">
+            <div class="board" id="board"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-reset" onclick="game.resetGame()">🔄 Reset Game</button>
+        </div>
+    </div>
+
+    <script src="../js/games/tic-tac-tumble.js"></script>
+</body>
+</html>

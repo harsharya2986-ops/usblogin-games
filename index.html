@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UsBlog Games - Romantic Gaming Experience for Couples</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Play romantic multiplayer games with your partner. Enjoy Dino Run, Chess, Ping Pong and more on UsBlog Games. Free online gaming for couples. 8+ romantic games for couples to play together online.">
+    <meta name="keywords" content="couple games, romantic games, multiplayer games, online games, dino run, chess, ping pong, tic tac toe, connect four, dots and boxes, couples gaming, relationship games">
+    <meta name="author" content="UsBlog">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="UsBlog Games - Romantic Gaming for Couples">
+    <meta property="og:description" content="Play romantic multiplayer games with your special someone. 8+ games available for free!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.usblog.in">
+    <meta property="og:image" content="https://www.usblog.in/assets/images/og-image.jpg">
+    
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="UsBlog Games - Romantic Gaming for Couples">
+    <meta name="twitter:description" content="Play romantic multiplayer games with your special someone!">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.usblog.in/">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4375560410614397"
+     crossorigin="anonymous"></script>
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "UsBlog Games",
+        "url": "https://www.usblog.in",
+        "description": "Romantic multiplayer gaming platform for couples with 8+ free online games",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://www.usblog.in/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2d3436;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* ===== HEADER - Black Blur ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 0.75rem 1.5rem;
+            background: rgba(48, 47, 47, 0.8);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 1rem;
+        }
+        
+        .logo a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #ff6b9d;
+        }
+        
+        .auth-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .auth-btn:hover {
+            background: rgba(255, 107, 157, 0.3);
+            border-color: #ff6b9d;
+        }
+        
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 107, 157, 0.2);
+            border: 1px solid #ff6b9d;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        
+        .logout-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        /* ===== HAMBURGER ===== */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+            background: none;
+            border: none;
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        
+        /* ===== SIDEBAR ===== */
+        .mobile-sidebar {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 290px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1001;
+            transition: right 0.3s;
+            padding: 4.5rem 1.25rem 2rem;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+        }
+        
+        .mobile-sidebar.open {
+            right: 0;
+        }
+        
+        .close-sidebar {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+            padding: 0.85rem 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.3s;
+            margin-bottom: 0.4rem;
+        }
+        
+        .sidebar-nav-link:hover {
+            background: rgba(255, 107, 157, 0.15);
+        }
+        
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+        }
+        
+        /* ===== GAMES GRID ===== */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.25rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+        
+        .game-thumbnail-img {
+            width: 100%;
+            aspect-ratio: 16/10;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+        
+        .game-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #ff6b9d, #e84393);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .game-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .user-profile { display: none; }
+            .hamburger { display: flex; }
+            .mobile-sidebar { display: block; }
+            .games-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header - Black Blur -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <a href="/">
+                    <span>💕</span>
+                    <span>UsBlog Games</span>
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="pages/about.html">About</a>
+                <a href="pages/contact.html">Contact</a>
+            </div>
+            <div class="user-profile" id="userProfile"></div>
+            <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <button class="close-sidebar" onclick="toggleSidebar()">✕</button>
+        <div id="sidebarHeader" style="margin-bottom: 1rem; color: white;"></div>
+        <a href="/" class="sidebar-nav-link" onclick="toggleSidebar()"><span>🏠</span><span>Home</span></a>
+        <a href="#games" class="sidebar-nav-link" onclick="toggleSidebar()"><span>🎮</span><span>Games</span></a>
+        <a href="pages/about.html" class="sidebar-nav-link" onclick="toggleSidebar()"><span>ℹ️</span><span>About Us</span></a>
+        <a href="pages/contact.html" class="sidebar-nav-link" onclick="toggleSidebar()"><span>📞</span><span>Contact</span></a>
+        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 0.75rem 0;"></div>
+        <a href="#how-it-works" class="sidebar-nav-link" onclick="toggleSidebar()"><span>❓</span><span>How It Works</span></a>
+        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 0.75rem 0;"></div>
+        <div id="sidebarAuth"></div>
+    </div>
+
+    <!-- Hero -->
+    <section style="padding: 100px 1.5rem 50px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div style="max-width: 700px; margin: 0 auto;">
+            <h1 style="font-size: 2.2rem; color: white; margin-bottom: 1rem;">Play Romantic Games With Your Special Someone 💑</h1>
+            <p style="font-size: 1rem; color: rgba(255,255,255,0.9); margin-bottom: 1.5rem;">Experience the joy of gaming together. 8+ romantic multiplayer games for couples.</p>
+            <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                <a href="#games" style="padding: 10px 22px; border-radius: 25px; background: #ff6b9d; color: white; text-decoration: none; font-weight: bold;">Browse Games</a>
+                <a href="#how-it-works" style="padding: 10px 22px; border-radius: 25px; border: 2px solid white; color: white; text-decoration: none; font-weight: bold;">How It Works</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Games -->
+    <section id="games" style="padding: 40px 1rem; max-width: 1200px; margin: 0 auto;">
+        <h2 style="text-align: center; font-size: 1.8rem; margin-bottom: 1.5rem; color: white;">Choose Your Game Mode</h2>
+        <div style="display: flex; justify-content: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+            <button class="tab-btn active" data-mode="computer" onclick="switchMode('computer')" style="padding: 10px 20px; border-radius: 25px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer;">🤖 Play with Computer</button>
+            <button class="tab-btn" data-mode="online" onclick="switchMode('online')" style="padding: 10px 20px; border-radius: 25px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer;">🌐 Play Online</button>
+        </div>
+        <div class="games-grid" id="gamesGrid"></div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" style="padding: 40px 1rem; background: rgba(0,0,0,0.3);">
+        <h2 style="text-align: center; color: white; font-size: 1.8rem; margin-bottom: 2rem;">How To Play With Your Partner</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; max-width: 900px; margin: 0 auto;">
+            <div style="text-align: center; padding: 1.25rem; background: rgba(255,255,255,0.1); border-radius: 16px;">
+                <div style="width: 40px; height: 40px; background: #ff6b9d; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; font-weight: bold;">1</div>
+                <h3 style="color: white; font-size: 1rem;">Choose Game</h3>
+                <p style="color: rgba(255,255,255,0.8); font-size: 0.8rem;">Select from 8+ games</p>
+            </div>
+            <div style="text-align: center; padding: 1.25rem; background: rgba(255,255,255,0.1); border-radius: 16px;">
+                <div style="width: 40px; height: 40px; background: #ff6b9d; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; font-weight: bold;">2</div>
+                <h3 style="color: white; font-size: 1rem;">Select Mode</h3>
+                <p style="color: rgba(255,255,255,0.8); font-size: 0.8rem;">Computer or Online</p>
+            </div>
+            <div style="text-align: center; padding: 1.25rem; background: rgba(255,255,255,0.1); border-radius: 16px;">
+                <div style="width: 40px; height: 40px; background: #ff6b9d; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; font-weight: bold;">3</div>
+                <h3 style="color: white; font-size: 1rem;">Invite Partner</h3>
+                <p style="color: rgba(255,255,255,0.8); font-size: 0.8rem;">Share team code</p>
+            </div>
+            <div style="text-align: center; padding: 1.25rem; background: rgba(255,255,255,0.1); border-radius: 16px;">
+                <div style="width: 40px; height: 40px; background: #ff6b9d; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; font-weight: bold;">4</div>
+                <h3 style="color: white; font-size: 1rem;">Play & Enjoy</h3>
+                <p style="color: rgba(255,255,255,0.8); font-size: 0.8rem;">Create memories</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Section - 1500+ Words -->
+    <section style="max-width: 850px; margin: 40px auto; padding: 2rem; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <article>
+            <h1 style="font-size: 1.8rem; margin-bottom: 1.5rem; color: #2d3436; text-align: center;">Welcome to UsBlog Games - Your Ultimate Romantic Gaming Destination for Couples</h1>
+            
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">UsBlog Games is a revolutionary online gaming platform meticulously designed for couples who want to strengthen their bond through interactive entertainment. Our platform offers an unparalleled blend of romance, competition, and fun, allowing you and your partner to connect deeply while enjoying engaging games together. Whether you're in the same room or separated by thousands of miles, UsBlog Games bridges the distance through the power of play and shared experiences.</p>
+            
+            <h2 style="font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: #c44569;">Why Choose UsBlog Games for Your Relationship?</h2>
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">In today's fast-paced digital world, maintaining a strong emotional connection with your partner is more important than ever. Research consistently shows that couples who engage in shared activities together report higher relationship satisfaction and deeper emotional bonds. UsBlog Games provides the perfect digital space for couples to spend quality time together, communicate effectively, and create lasting memories through the universal language of play. Our platform transforms ordinary gaming into meaningful shared experiences that nurture your relationship and bring you closer together.</p>
+            
+            <h2 style="font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: #c44569;">Our Comprehensive Collection of Romantic Games</h2>
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">We proudly offer an extensive library of eight unique games, each carefully crafted with romantic themes and couple-friendly mechanics. From the adrenaline-pumping Dino Run to the intellectually stimulating Chess, our diverse collection ensures there's something for every couple's preference. Our games include Retro Ping Pong for active couples who enjoy fast-paced competition, Rock Paper Scissors for quick and fun decision-making, Super Tic Tac Toe for strategic thinkers, Connect Four for pattern lovers, Tic Tac Tumble for 3D enthusiasts, and Dots and Boxes for puzzle aficionados. Each game is designed with beautiful romantic aesthetics featuring soft pinks, dreamy purples, and warm gold tones.</p>
+            
+            <h2 style="font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: #c44569;">Advanced Real-Time Multiplayer Technology</h2>
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">Our cutting-edge multiplayer system leverages Firebase's real-time database technology to deliver seamless, lag-free gaming experiences. With instant matchmaking algorithms, private team codes for intimate sessions, and integrated chat features, staying connected with your partner has never been easier. Our robust infrastructure ensures that every move, every victory, and every romantic moment is synchronized perfectly across devices. Whether you're playing on a desktop computer or a smartphone, the experience remains smooth and responsive.</p>
+            
+            <h2 style="font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: #c44569;">Stunning Visual Design & User Experience</h2>
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">We've invested significantly in creating a visually breathtaking platform that combines modern design principles with romantic aesthetics. Our games feature sophisticated glassmorphism effects, smooth claymorphism elements, and carefully curated color palettes featuring soft pinks, dreamy lavenders, and warm rose golds. Every interaction is designed to feel smooth, intuitive, and delightful, ensuring that your gaming experience is as beautiful as it is fun. The floating hearts, glowing effects, and elegant animations create an atmosphere of romance and warmth.</p>
+            
+            <h2 style="font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: #c44569;">Complete Mobile & Desktop Compatibility</h2>
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">Understanding that modern couples are always on the move, we've engineered our platform to work flawlessly across all devices. Whether you're playing on a desktop computer during lunch break or on your smartphone while commuting, UsBlog Games delivers a consistent, high-quality gaming experience. Our responsive design automatically adjusts to your screen size, ensuring optimal gameplay on any device. The touch-friendly controls and mobile-optimized layouts make it easy to play on the go.</p>
+            
+            <h2 style="font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: #c44569;">Secure & Private Gaming Environment</h2>
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">Your privacy and security are paramount at UsBlog Games. We employ industry-standard encryption protocols and secure authentication methods, including Google Sign-In integration, to protect your personal information. Our platform is designed with privacy-by-default principles, ensuring that your romantic gaming sessions remain private and secure. You can focus entirely on having fun with your partner without any security concerns. We never share your data with third parties and maintain strict privacy policies.</p>
+            
+            <h2 style="font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: #c44569;">Building a Community of Gaming Couples</h2>
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">Join our growing community of thousands of couples who have discovered the joy of gaming together. Share your experiences, exchange tips, and connect with like-minded individuals who understand the value of shared entertainment in relationships. Our platform fosters a welcoming, inclusive environment where love and gaming go hand in hand. Participate in tournaments, share your high scores, and celebrate your victories with a community that celebrates love.</p>
+            
+            <h2 style="font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: #c44569;">Perfect for Long-Distance Relationships</h2>
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">For couples separated by distance, UsBlog Games serves as a virtual bridge that keeps the spark alive. Our real-time multiplayer features and integrated chat system allow you to share moments of joy and competition regardless of geographical separation. Whether you're in different cities or different continents, you can always find time to play together. The shared experience of gaming creates a sense of togetherness that transcends physical distance.</p>
+            
+            <h2 style="font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: #c44569;">The Science Behind Gaming and Relationships</h2>
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">Numerous studies have demonstrated that couples who play games together experience improved communication, increased trust, and stronger emotional bonds. Gaming provides a structured environment for couples to work together, solve problems, and celebrate victories. The release of dopamine during gameplay creates positive associations with your partner, strengthening your connection. At UsBlog Games, we've harnessed this power to create experiences specifically designed to strengthen relationships through play.</p>
+            
+            <h2 style="font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: #c44569;">Start Your Romantic Gaming Adventure Today</h2>
+            <p style="margin-bottom: 1.2rem; color: #555; line-height: 1.8;">Ready to transform your relationship through the power of play? Browse our extensive collection of romantic games, choose your favorite, and start playing with your special someone today. Whether you're looking for a quick game of Rock Paper Scissors or an intense Chess match, UsBlog Games has something for every couple. Remember, at UsBlog Games, it's never about winning or losing - it's about the quality time spent together, the laughter shared, and the love that grows stronger with every game played. Join us today and discover a new way to connect with your loved one through the joy of gaming.</p>
+        </article>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: rgba(0,0,0,0.7); color: white; padding: 2rem 1rem 1rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto;">
+            <div>
+                <h3 style="margin-bottom: 0.75rem;">UsBlog Games</h3>
+                <p style="font-size: 0.85rem;">Your destination for romantic gaming experiences.</p>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 0.75rem;">Quick Links</h3>
+                <a href="pages/about.html" style="display: block; color: rgba(255,255,255,0.8); text-decoration: none; margin-bottom: 0.4rem; font-size: 0.85rem;">About Us</a>
+                <a href="pages/contact.html" style="display: block; color: rgba(255,255,255,0.8); text-decoration: none; margin-bottom: 0.4rem; font-size: 0.85rem;">Contact</a>
+                <a href="pages/privacy-policy.html" style="display: block; color: rgba(255,255,255,0.8); text-decoration: none; margin-bottom: 0.4rem; font-size: 0.85rem;">Privacy Policy</a>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 0.75rem;">Follow Us</h3>
+                <a href="#" style="display: block; color: rgba(255,255,255,0.8); text-decoration: none; margin-bottom: 0.4rem; font-size: 0.85rem;">Facebook</a>
+                <a href="#" style="display: block; color: rgba(255,255,255,0.8); text-decoration: none; margin-bottom: 0.4rem; font-size: 0.85rem;">Twitter</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem;">
+            <p>&copy; 2024 UsBlog Games. All rights reserved. | www.usblog.in</p>
+        </div>
+    </footer>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaR33cAwHFTNdSlBuuzoju9yzah8szBmQ",
+            authDomain: "usblog-games.firebaseapp.com",
+            databaseURL: "https://usblog-games-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "usblog-games",
+            storageBucket: "usblog-games.firebasestorage.app",
+            messagingSenderId: "568211981446",
+            appId: "1:568211981446:web:0e75688bb9a28c2df97d07",
+            measurementId: "G-BDKRR8E565"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        const games = [
+            { id: 'dino-run', name: 'Dino Run', image: 'assests/images/games-thumbnails/dino-run.jpg', badge: 'Popular', desc: 'Run and jump with your partner in this exciting endless adventure!' },
+            { id: 'ping-pong', name: 'Retro Ping Pong', image: 'assests/images/games-thumbnails/ping-pong.jpg', badge: 'Classic', desc: 'Classic table tennis with a romantic neon twist!' },
+            { id: 'rock-paper-scissors', name: 'Rock Paper Scissors', image: 'assests/images/games-thumbnails/rps.jpg', badge: 'Quick Play', desc: 'Test your luck in this classic game of choice!' },
+            { id: 'tic-tac-toe', name: 'Super Tic Tac Toe', image: 'assests/images/games-thumbnails/tic-tac-toe.jpg', badge: 'Strategy', desc: 'Strategic tic tac toe with a romantic twist!' },
+            { id: 'chess', name: 'Chess', image: 'assests/images/games-thumbnails/chess.jpg', badge: 'Classic', desc: 'Battle of minds with your loved one!' },
+            { id: 'connect-four', name: 'Connect Four', image: 'assests/images/games-thumbnails/connect-four.jpg', badge: 'Fun', desc: 'Connect four hearts in a row to win!' },
+            { id: 'tic-tac-tumble', name: 'Tic Tac Tumble', image: 'assests/images/games-thumbnails/tic-tac-tumble.jpg', badge: 'New', desc: 'Exciting 3D tic tac toe with romantic tokens!' },
+            { id: 'dots-boxes', name: 'Dots and Boxes', image: 'assests/images/games-thumbnails/dots-boxes.jpg', badge: 'Puzzle', desc: 'Connect dots to make boxes and win hearts!' }
+        ];
+        
+        let currentMode = 'computer';
+        
+        function renderGames() {
+            const gamesGrid = document.getElementById('gamesGrid');
+            gamesGrid.innerHTML = '';
+            
+            games.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `
+                    <div style="position: relative; margin-bottom: 1rem;">
+                        <img src="${game.image}" alt="${game.name}" class="game-thumbnail-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; align-items: center; justify-content: center; font-size: 4rem; aspect-ratio: 16/10; border-radius: 15px; background: linear-gradient(135deg, #f8bbd0, #e1bee7);">🎮</div>
+                        <span class="game-badge">${game.badge}</span>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem; font-weight: 700;">${game.name}</h3>
+                        <p style="color: #636e72; font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.5;">${game.desc}</p>
+                        <div style="display: flex; gap: 0.75rem;">
+                            ${currentMode === 'computer' ? `
+                                <button onclick="startGame('${game.id}', 'computer')" style="flex: 1; padding: 12px; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; background: linear-gradient(135deg, #4a90e2, #357abd); color: white;">🤖 vs Computer</button>
+                            ` : `
+                                <button onclick="startGame('${game.id}', 'online')" style="flex: 1; padding: 12px; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; background: linear-gradient(135deg, #f8b500, #f39c12); color: #333;">🌐 Play Online</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+                gamesGrid.appendChild(card);
+            });
+        }
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                    btn.style.background = '#ff6b9d';
+                    btn.style.color = 'white';
+                    btn.style.border = 'none';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'white';
+                    btn.style.border = '2px solid white';
+                }
+            });
+            renderGames();
+        }
+        
+        function startGame(gameId, mode) {
+            if (mode === 'computer') {
+                window.location.href = `games/${gameId}.html?mode=computer`;
+            } else {
+                const user = auth.currentUser;
+                if (user) {
+                    window.location.href = `online/lobby.html?game=${gameId}`;
+                } else {
+                    window.location.href = 'online/login.html';
+                }
+            }
+        }
+        
+        function updateUserUI(user) {
+            const userProfile = document.getElementById('userProfile');
+            const sidebarHeader = document.getElementById('sidebarHeader');
+            const sidebarAuth = document.getElementById('sidebarAuth');
+            
+            if (user) {
+                database.ref('users/' + user.uid).once('value').then((snapshot) => {
+                    const userData = snapshot.val();
+                    const username = userData ? userData.username : user.email.split('@')[0];
+                    
+                    userProfile.innerHTML = `<div class="user-badge"><span>💕</span><span>${username}</span><button class="logout-btn" onclick="logout()">⏻</button></div>`;
+                    sidebarHeader.innerHTML = `<div style="display: flex; align-items: center; gap: 10px; padding: 1rem;"><div style="width: 45px; height: 45px; border-radius: 50%; background: #ff6b9d; display: flex; align-items: center; justify-content: center;">💕</div><div><div style="font-weight: bold;">${username}</div><div style="font-size: 0.7rem; opacity: 0.7;">${user.email}</div></div></div>`;
+                    sidebarAuth.innerHTML = `<button onclick="logout()" style="width: 100%; padding: 0.85rem; border-radius: 1.5rem; background: rgba(255,68,68,0.2); color: #ff4444; border: 1px solid rgba(255,68,68,0.4); cursor: pointer; font-weight: bold;">🚪 Logout</button>`;
+                });
+            } else {
+                userProfile.innerHTML = `<a href="online/login.html" class="auth-btn">💕 Sign In</a>`;
+                sidebarHeader.innerHTML = `<div style="display: flex; align-items: center; gap: 10px; padding: 1rem;"><div style="width: 45px; height: 45px; border-radius: 50%; background: #ff6b9d; display: flex; align-items: center; justify-content: center;">👋</div><div><div style="font-weight: bold;">Guest Player</div></div></div>`;
+                sidebarAuth.innerHTML = `<a href="online/login.html" style="display: block; text-align: center; padding: 0.85rem; border-radius: 1.5rem; background: #ff6b9d; color: white; text-decoration: none; font-weight: bold;">💕 Sign In / Register</a>`;
+            }
+        }
+        
+        function logout() {
+            auth.signOut();
+        }
+        
+        function toggleSidebar() {
+            document.getElementById('mobileSidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
+            document.getElementById('hamburgerBtn').classList.toggle('active');
+        }
+        
+        auth.onAuthStateChanged((user) => updateUserUI(user));
+        document.addEventListener('DOMContentLoaded', renderGames);
+    </script>
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Dino Run 💕 | UsBlog Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 30%, #9d174d 60%, #f472b6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .game-shell {
+            position: relative;
+            z-index: 10;
+            background: rgba(30, 27, 75, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), 0 0 80px rgba(244, 114, 182, 0.2);
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .game-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .game-title {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f9a8d4, #f472b6, #e879f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .players-info {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .player-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .player-chip.you {
+            background: rgba(255, 107, 157, 0.2);
+            border: 1px solid #ff6b9d;
+            color: #ff6b9d;
+        }
+
+        .player-chip.opponent {
+            background: rgba(116, 185, 255, 0.2);
+            border: 1px solid #74b9ff;
+            color: #74b9ff;
+        }
+
+        .canvas-wrap {
+            position: relative;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            background: #0a0a1a;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .chat-section {
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        .chat-messages {
+            height: 120px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 0.5rem;
+        }
+
+        .chat-message {
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.08);
+            font-size: 13px;
+        }
+
+        .chat-message .sender {
+            font-weight: bold;
+            font-size: 11px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .chat-message.you .sender { color: #ff6b9d; }
+        .chat-message.opponent .sender { color: #74b9ff; }
+        .chat-message .text { color: rgba(255, 255, 255, 0.9); }
+
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+        }
+
+        .chat-input-area button {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            background: #ff6b9d;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .info-pill {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 6px 12px;
+            border-radius: 15px;
+        }
+
+        .waiting-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .waiting-content {
+            text-align: center;
+            color: white;
+        }
+
+        .waiting-content .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid #ff6b9d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-shell">
+        <div class="game-header">
+            <a href="lobby.html" class="back-btn">← Lobby</a>
+            <h1 class="game-title">💕 Online Dino Run</h1>
+            <div class="players-info">
+                <div class="player-chip you" id="youChip">💕 You</div>
+                <div class="player-chip opponent" id="opponentChip">💙 Opponent</div>
+            </div>
+        </div>
+
+        <div class="canvas-wrap" id="canvasWrap">
+            <canvas id="gameCanvas" width="850" height="400"></canvas>
+            <div class="waiting-overlay" id="waitingOverlay">
+                <div class="waiting-content">
+                    <div class="spinner"></div>
+                    <p>Waiting for opponent...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Type a message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <div class="info-bar">
+            <div class="info-pill">⌨️ Space / Click to Jump</div>
+            <div class="info-pill">💗 Collect Hearts</div>
+            <div class="info-pill">🌐 Real-Time Multiplayer</div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaR33cAwHFTNdSlBuuzoju9yzah8szBmQ",
+            authDomain: "usblog-games.firebaseapp.com",
+            databaseURL: "https://usblog-games-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "usblog-games",
+            storageBucket: "usblog-games.firebasestorage.app",
+            messagingSenderId: "568211981446",
+            appId: "1:568211981446:web:0e75688bb9a28c2df97d07",
+            measurementId: "G-BDKRR8E565"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // ============ GAME STATE ============
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const W = 850;
+        const H = 400;
+        canvas.width = W;
+        canvas.height = H;
+
+        const GROUND_Y = 320;
+        const GRAVITY = 0.65;
+        const JUMP_FORCE = -12.5;
+        const BASE_SPEED = 5.5;
+        const MAX_SPEED = 12;
+        const HEART_BONUS = 100;
+
+        let roomId = null;
+        let myPlayerId = null;
+        let opponentId = null;
+        let myName = '';
+        let opponentName = '';
+        let isHost = false;
+        let gameStarted = false;
+
+        // Player state
+        let myScore = 0;
+        let opponentScore = 0;
+        let myDino = {
+            x: 110,
+            y: GROUND_Y - 50,
+            width: 42,
+            height: 50,
+            vy: 0,
+            jumping: false,
+            isAlive: true,
+            legFrame: 0
+        };
+
+        let opponentDino = {
+            x: 620,
+            y: GROUND_Y - 50,
+            width: 42,
+            height: 50,
+            vy: 0,
+            jumping: false,
+            isAlive: true,
+            legFrame: 0
+        };
+
+        let obstacles = [];
+        let hearts = [];
+        let myObstacles = [];
+        let opponentObstacles = [];
+        let spawnTimer = 0;
+        let heartSpawnTimer = 0;
+        let speed = BASE_SPEED;
+        let frameCount = 0;
+
+        function init() {
+            auth.onAuthStateChanged((user) => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                database.ref('users/' + user.uid).once('value').then((snapshot) => {
+                    const data = snapshot.val();
+                    myName = data ? data.username : user.email.split('@')[0];
+                    document.getElementById('youChip').textContent = `💕 ${myName}`;
+                });
+
+                // Get room info from URL
+                const params = new URLSearchParams(window.location.search);
+                roomId = params.get('match') || params.get('team');
+                myPlayerId = user.uid;
+
+                if (!roomId) {
+                    window.location.href = 'lobby.html';
+                    return;
+                }
+
+                setupRoom();
+            });
+        }
+
+        function setupRoom() {
+            // Check if this is matchmaking or team
+            const isMatchmaking = roomId.startsWith('-') || !isNaN(roomId.charAt(0));
+            const roomRef = isMatchmaking ? 
+                database.ref('matchmaking/' + roomId) : 
+                database.ref('teams/' + roomId);
+
+            roomRef.once('value').then((snapshot) => {
+                const roomData = snapshot.val();
+                if (!roomData) {
+                    window.location.href = 'lobby.html';
+                    return;
+                }
+
+                if (roomData.player1 === myPlayerId) {
+                    isHost = true;
+                    opponentId = roomData.player2;
+                    opponentName = roomData.player2Name || 'Opponent';
+                } else {
+                    isHost = false;
+                    opponentId = roomData.player1;
+                    opponentName = roomData.player1Name || 'Opponent';
+                }
+
+                document.getElementById('opponentChip').textContent = `💙 ${opponentName}`;
+
+                if (opponentId) {
+                    startGame();
+                } else {
+                    // Wait for opponent
+                    roomRef.on('value', (snap) => {
+                        const data = snap.val();
+                        if (data && data.player2) {
+                            opponentId = data.player2;
+                            opponentName = data.player2Name || 'Opponent';
+                            document.getElementById('opponentChip').textContent = `💙 ${opponentName}`;
+                            startGame();
+                        }
+                    });
+                }
+            });
+        }
+
+        function startGame() {
+            gameStarted = true;
+            document.getElementById('waitingOverlay').style.display = 'none';
+
+            // Host generates obstacles and hearts
+            if (isHost) {
+                setInterval(() => {
+                    if (gameStarted) {
+                        spawnObstacle();
+                    }
+                }, 2000);
+
+                setInterval(() => {
+                    if (gameStarted) {
+                        spawnHeart();
+                    }
+                }, 3000);
+
+                // Sync game state
+                setInterval(() => {
+                    if (gameStarted) {
+                        database.ref('gameRooms/' + roomId + '/obstacles').set(obstacles);
+                        database.ref('gameRooms/' + roomId + '/hearts').set(hearts);
+                        database.ref('gameRooms/' + roomId + '/speed').set(speed);
+                    }
+                }, 100);
+            } else {
+                // Listen to host's obstacles
+                database.ref('gameRooms/' + roomId + '/obstacles').on('value', (snap) => {
+                    const data = snap.val();
+                    if (data) {
+                        obstacles = data;
+                    }
+                });
+
+                database.ref('gameRooms/' + roomId + '/hearts').on('value', (snap) => {
+                    const data = snap.val();
+                    if (data) {
+                        hearts = data;
+                    }
+                });
+
+                database.ref('gameRooms/' + roomId + '/speed').on('value', (snap) => {
+                    const data = snap.val();
+                    if (data) {
+                        speed = data;
+                    }
+                });
+            }
+
+            // Sync my position
+            setInterval(() => {
+                if (gameStarted) {
+                    database.ref('gameRooms/' + roomId + '/players/' + myPlayerId).set({
+                        x: myDino.x,
+                        y: myDino.y,
+                        jumping: myDino.jumping,
+                        isAlive: myDino.isAlive,
+                        score: myScore
+                    });
+                }
+            }, 50);
+
+            // Listen to opponent position
+            database.ref('gameRooms/' + roomId + '/players/' + opponentId).on('value', (snap) => {
+                const data = snap.val();
+                if (data) {
+                    opponentDino.y = data.y || opponentDino.y;
+                    opponentDino.jumping = data.jumping || false;
+                    opponentDino.isAlive = data.isAlive !== false;
+                    opponentScore = data.score || 0;
+                }
+            });
+
+            gameLoop();
+        }
+
+        function spawnObstacle() {
+            const type = Math.random() > 0.55 ? 'cactus' : 'rock';
+            let w = type === 'cactus' ? 22 + Math.random() * 10 : 28 + Math.random() * 14;
+            let h = type === 'cactus' ? 38 + Math.random() * 25 : 18 + Math.random() * 14;
+
+            obstacles.push({
+                x: W + 40,
+                y: GROUND_Y - h,
+                width: w,
+                height: h,
+                type: type
+            });
+        }
+
+        function spawnHeart() {
+            hearts.push({
+                x: W + 40,
+                y: Math.random() * 130 + 70,
+                width: 24,
+                height: 24,
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+
+        function jump() {
+            if (!gameStarted) return;
+            if (!myDino.isAlive) return;
+
+            if (!myDino.jumping) {
+                myDino.vy = JUMP_FORCE;
+                myDino.jumping = true;
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.key === 'ArrowUp' || e.key === 'w') {
+                e.preventDefault();
+                jump();
+            }
+        });
+
+        canvas.addEventListener('click', jump);
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            jump();
+        });
+
+        function update() {
+            if (!gameStarted) return;
+
+            frameCount++;
+            if (isHost) {
+                speed = Math.min(MAX_SPEED, BASE_SPEED + frameCount * 0.0015);
+            }
+
+            // My dino physics
+            if (myDino.jumping) {
+                myDino.vy += GRAVITY;
+                myDino.y += myDino.vy;
+                if (myDino.y >= GROUND_Y - myDino.height) {
+                    myDino.y = GROUND_Y - myDino.height;
+                    myDino.jumping = false;
+                    myDino.vy = 0;
+                }
+            }
+
+            if (frameCount % 8 === 0) {
+                myDino.legFrame = (myDino.legFrame + 1) % 2;
+                opponentDino.legFrame = (opponentDino.legFrame + 1) % 2;
+            }
+
+            // Move obstacles (host only updates, both render)
+            if (isHost) {
+                for (let i = obstacles.length - 1; i >= 0; i--) {
+                    obstacles[i].x -= speed;
+                    if (obstacles[i].x + obstacles[i].width < 0) {
+                        obstacles.splice(i, 1);
+                    }
+                }
+
+                for (let i = hearts.length - 1; i >= 0; i--) {
+                    hearts[i].x -= speed * 0.85;
+                    if (hearts[i].x < -30) {
+                        hearts.splice(i, 1);
+                    }
+                }
+            }
+
+            // Collision detection (local)
+            if (myDino.isAlive) {
+                for (let i = obstacles.length - 1; i >= 0; i--) {
+                    if (rectCollide(myDino, obstacles[i])) {
+                        myDino.isAlive = false;
+                        if (isHost) {
+                            obstacles.splice(i, 1);
+                        }
+                    }
+                }
+
+                for (let i = hearts.length - 1; i >= 0; i--) {
+                    if (rectCollide(myDino, hearts[i])) {
+                        myScore += HEART_BONUS;
+                        if (isHost) {
+                            hearts.splice(i, 1);
+                        }
+                    }
+                }
+            }
+
+            // Score over time
+            if (myDino.isAlive) {
+                myScore += speed * 0.1;
+            }
+
+            // Update score display
+            document.getElementById('youChip').textContent = `💕 ${myName}: ${Math.floor(myScore)}`;
+            document.getElementById('opponentChip').textContent = `💙 ${opponentName}: ${Math.floor(opponentScore)}`;
+        }
+
+        function rectCollide(a, b) {
+            return a.x < b.x + b.width &&
+                a.x + a.width > b.x &&
+                a.y < b.y + b.height &&
+                a.y + a.height > b.y;
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, W, H);
+
+            // Sky
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+            skyGrad.addColorStop(0, '#0a0a1a');
+            skyGrad.addColorStop(0.35, '#1a1a3e');
+            skyGrad.addColorStop(0.7, '#4a2d6b');
+            skyGrad.addColorStop(0.9, '#e8a87c');
+            skyGrad.addColorStop(1, '#f4c4a8');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, W, GROUND_Y);
+
+            // Ground
+            ctx.fillStyle = '#2d3436';
+            ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+            ctx.strokeStyle = '#e8a87c';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, GROUND_Y);
+            ctx.lineTo(W, GROUND_Y);
+            ctx.stroke();
+
+            // Obstacles
+            for (let obs of obstacles) {
+                if (obs.type === 'cactus') {
+                    ctx.fillStyle = '#4CAF50';
+                    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                } else {
+                    ctx.fillStyle = '#795548';
+                    ctx.beginPath();
+                    ctx.arc(obs.x + obs.width / 2, obs.y + obs.height, obs.width / 2, Math.PI, 0);
+                    ctx.fill();
+                }
+            }
+
+            // Hearts
+            for (let h of hearts) {
+                ctx.font = '24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('💗', h.x + 12, h.y + 12);
+            }
+
+            // My dino (pink)
+            if (myDino.isAlive) {
+                drawDino(ctx, myDino, '#f472b6', '💕');
+            }
+
+            // Opponent dino (blue)
+            if (opponentDino.isAlive) {
+                drawDino(ctx, opponentDino, '#60a5fa', '💙');
+            }
+
+            // Connection line
+            if (myDino.isAlive && opponentDino.isAlive) {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(244,114,182,0.3)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(myDino.x + myDino.width / 2, myDino.y + myDino.height / 2);
+                ctx.lineTo(opponentDino.x + opponentDino.width / 2, opponentDino.y + opponentDino.height / 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.restore();
+            }
+        }
+
+        function drawDino(ctx, dino, color, emoji) {
+            ctx.fillStyle = color;
+            ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.25)';
+            ctx.fillRect(dino.x + 10, dino.y + 20, dino.width - 20, dino.height - 25);
+            
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(dino.x + dino.width - 15, dino.y + 14, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.arc(dino.x + dino.width - 13, dino.y + 15, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = color;
+            const lo = dino.legFrame === 0 ? 0 : 6;
+            ctx.fillRect(dino.x + 10, dino.y + dino.height - 4, 10, 18 + lo);
+            ctx.fillRect(dino.x + dino.width - 20, dino.y + dino.height - 4, 10, 18 - lo);
+            
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(emoji, dino.x + dino.width / 2, dino.y + dino.height / 2 + 6);
+        }
+
+        // Chat
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (message) {
+                database.ref('gameRooms/' + roomId + '/chat').push({
+                    sender: myName,
+                    message: message,
+                    timestamp: Date.now()
+                });
+                input.value = '';
+            }
+        }
+
+        database.ref('gameRooms/' + roomId + '/chat').on('child_added', (snap) => {
+            const msg = snap.val();
+            displayChatMessage(msg.sender, msg.message, msg.sender === myName);
+        });
+
+        function displayChatMessage(sender, message, isYou) {
+            const chatMessages = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `chat-message ${isYou ? 'you' : 'opponent'}`;
+            div.innerHTML = `<span class="sender">${sender}</span><span class="text">${message}</span>`;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
