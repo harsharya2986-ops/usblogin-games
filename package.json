@@ -1,0 +1,30 @@
+{
+  "name": "usblog-games",
+  "version": "1.0.0",
+  "description": "UsBlog Games - Romantic Gaming Platform for Couples",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Static site - no build required'",
+    "start": "echo 'Open index.html directly'",
+    "dev": "echo 'Use Live Server or open index.html'"
+  },
+  "keywords": [
+    "games",
+    "romantic",
+    "couples",
+    "multiplayer",
+    "online-games",
+    "dino-run",
+    "chess",
+    "ping-pong",
+    "tic-tac-toe",
+    "connect-four"
+  ],
+  "author": "UsBlog Games",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

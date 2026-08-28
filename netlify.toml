@@ -1,11 +1,22 @@
+# Netlify Configuration for Static Site
 [build]
   command = ""
   publish = "."
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "18.17.0"
+  SKIP_DEPENDENCY_INSTALL = "true"
 
+# SPA redirect - all routes to index
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
