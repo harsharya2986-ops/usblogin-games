@@ -4,4 +4,4 @@
 
 [build.environment]
   NODE_VERSION = "18.17.0"
-  SKIP_DEPENDENCY_INSTALL = "true"
+  SKIP_DEPENDENCY_INSTALL = "true" No newline at end of file
