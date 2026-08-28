@@ -1,0 +1,5 @@
+# Security.txt for usblog.in
+Contact: mailto:security@usblog.in
+Preferred-Languages: en
+Canonical: https://www.usblog.in/security.txt
+Policy: https://www.usblog.in/pages/privacy-policy.html

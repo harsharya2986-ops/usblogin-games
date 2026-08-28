@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found 💔 | UsBlog Games</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .error-container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 30px;
+            padding: 3rem;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .error-emoji { font-size: 5rem; margin-bottom: 1rem; }
+        .error-code { font-size: 3rem; font-weight: bold; color: #ff6b9d; margin-bottom: 0.5rem; }
+        .error-title { font-size: 1.5rem; color: #2d3436; margin-bottom: 1rem; }
+        .error-text { font-size: 0.9rem; color: #636e72; margin-bottom: 2rem; line-height: 1.6; }
+        .home-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #ff6b9d, #e84393);
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .home-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,107,157,0.4); }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-emoji">💔</div>
+        <div class="error-code">404</div>
+        <div class="error-title">Oops! Page Not Found</div>
+        <div class="error-text">The page you're looking for seems to have wandered off. Let's get you back to the games!</div>
+        <a href="/" class="home-btn">💕 Back to Home</a>
+    </div>
+</body>
+</html>
