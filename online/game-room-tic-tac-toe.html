@@ -70,10 +70,7 @@
             margin-bottom: 8px;
             font-weight: bold;
             font-size: 13px;
-            background: rgba(255,255,255,0.1);
-            color: white;
         }
-
         .turn-indicator.your-turn { background: rgba(255,107,157,0.25); color: #ff6b9d; border: 1px solid #ff6b9d; }
         .turn-indicator.opponent-turn { background: rgba(116,185,255,0.2); color: #74b9ff; border: 1px solid #74b9ff; }
 
@@ -137,52 +134,93 @@
             cursor: pointer;
             aspect-ratio: 1;
             border: 1px solid rgba(255,255,255,0.08);
-            transition: all 0.2s;
         }
 
         .mini-cell:hover { background: rgba(255,255,255,0.15); }
-        .mini-cell.pink { color: #ff6b9d; text-shadow: 0 0 8px rgba(255,107,157,0.7); }
-        .mini-cell.blue { color: #74b9ff; text-shadow: 0 0 8px rgba(116,185,255,0.7); }
+        .mini-cell.pink { color: #ff6b9d; }
+        .mini-cell.blue { color: #74b9ff; }
 
         .chat-sidebar {
-            width: 220px;
-            min-width: 220px;
+            width: 230px;
+            min-width: 230px;
             display: flex;
             flex-direction: column;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.08);
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
             overflow: hidden;
             max-height: 380px;
         }
 
         .chat-header {
-            padding: 8px;
-            background: rgba(255,107,157,0.15);
+            padding: 10px;
+            background: rgba(255,107,157,0.2);
             text-align: center;
             color: #ff6b9d;
             font-weight: bold;
             font-size: 12px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 100px; max-height: 220px; }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            min-height: 150px;
+            max-height: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
         .chat-messages::-webkit-scrollbar { width: 3px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
 
-        .chat-message { margin-bottom: 5px; padding: 5px 8px; border-radius: 8px; font-size: 11px; }
-        .chat-message.you { background: rgba(255,107,157,0.15); margin-left: 10px; }
-        .chat-message.opponent { background: rgba(116,185,255,0.15); margin-right: 10px; }
+        .chat-message {
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            max-width: 90%;
+        }
+        .chat-message.you {
+            background: rgba(255,107,157,0.2);
+            border: 1px solid rgba(255,107,157,0.3);
+            align-self: flex-end;
+        }
+        .chat-message.opponent {
+            background: rgba(116,185,255,0.15);
+            border: 1px solid rgba(116,185,255,0.25);
+            align-self: flex-start;
+        }
         .chat-message .sender { font-weight: bold; font-size: 9px; display: block; }
+        .chat-message.you .sender { color: #ff6b9d; }
+        .chat-message.opponent .sender { color: #74b9ff; }
 
-        .chat-input-area { display: flex; gap: 4px; padding: 6px; }
-        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
-        .chat-input-area button { padding: 6px 12px; border-radius: 14px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 10px; }
+        .chat-input-area { display: flex; gap: 5px; padding: 8px; }
+        .chat-input-area input {
+            flex: 1;
+            padding: 7px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.08);
+            color: white;
+            outline: none;
+            font-size: 11px;
+        }
+        .chat-input-area button {
+            padding: 7px 14px;
+            border-radius: 16px;
+            border: none;
+            background: #ff6b9d;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 10px;
+        }
 
         @media (max-width: 800px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; max-height: 130px; }
-            .chat-messages { max-height: 50px; min-height: 30px; }
-            .game-title { font-size: 14px; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 150px; }
+            .chat-messages { max-height: 70px; min-height: 40px; }
         }
     </style>
 </head>
@@ -240,6 +278,7 @@
         let gameStarted = false, gameOver = false;
         let macroBoard = Array(9).fill(null);
         let miniBoards = Array(9).fill(null).map(() => Array(9).fill(null));
+        let listenersAttached = false;
 
         function init() {
             auth.onAuthStateChanged(user => {
@@ -302,7 +341,7 @@
             gameStarted = true;
             document.getElementById('statusChip').textContent = '🟢 LIVE';
             
-            // Initialize fresh board
+            // Reset board
             macroBoard = Array(9).fill(null);
             miniBoards = Array(9).fill(null).map(() => Array(9).fill(null));
             currentTurn = 'pink';
@@ -311,40 +350,38 @@
             updateTurnIndicator();
             setupChat();
 
-            // Firebase Listeners - CRITICAL: Both players listen
-            db.ref('gameRooms/' + roomId + '/sttBoard').on('value', snap => {
-                const data = snap.val();
-                if (data) {
-                    macroBoard = data.macro || Array(9).fill(null);
-                    miniBoards = data.mini || Array(9).fill(null).map(() => Array(9).fill(null));
-                    renderBoard();
-                }
-            });
-
-            db.ref('gameRooms/' + roomId + '/sttTurn').on('value', snap => {
-                const turn = snap.val();
-                if (turn) {
-                    currentTurn = turn;
-                    updateTurnIndicator();
-                }
-            });
-
-            db.ref('gameRooms/' + roomId + '/sttGameOver').on('value', snap => {
-                const winner = snap.val();
-                if (winner) {
-                    gameOver = true;
-                    renderBoard();
-                    showWin(winner);
-                }
-            });
-
-            // Initial board set by host
-            if (data) {
-                db.ref('gameRooms/' + roomId + '/sttBoard').set({
-                    macro: macroBoard,
-                    mini: miniBoards
+            if (!listenersAttached) {
+                listenersAttached = true;
+                
+                // SINGLE LISTENER for combined board state
+                db.ref('gameRooms/' + roomId + '/tttState').on('value', snap => {
+                    const data = snap.val();
+                    if (data) {
+                        macroBoard = data.macro || Array(9).fill(null);
+                        miniBoards = data.mini || Array(9).fill(null).map(() => Array(9).fill(null));
+                        currentTurn = data.turn || 'pink';
+                        renderBoard();
+                        updateTurnIndicator();
+                    }
                 });
-                db.ref('gameRooms/' + roomId + '/sttTurn').set('pink');
+
+                db.ref('gameRooms/' + roomId + '/tttWinner').on('value', snap => {
+                    const winner = snap.val();
+                    if (winner) {
+                        gameOver = true;
+                        renderBoard();
+                        showWin(winner);
+                    }
+                });
+            }
+
+            // Host initializes
+            if (myColor === 'pink') {
+                db.ref('gameRooms/' + roomId + '/tttState').set({
+                    macro: macroBoard,
+                    mini: miniBoards,
+                    turn: 'pink'
+                });
             }
         }
 
@@ -355,7 +392,7 @@
                 ind.textContent = '💕 YOUR TURN!';
                 ind.className = 'turn-indicator your-turn';
             } else {
-                ind.textContent = '💙 OPPONENT\'S TURN...';
+                ind.textContent = '💙 ' + opponentName + '\'S TURN...';
                 ind.className = 'turn-indicator opponent-turn';
             }
         }
@@ -384,8 +421,8 @@
         function makeMove(macroIdx, miniIdx) {
             if (!gameStarted || gameOver) return;
             if (currentTurn !== myColor) return;
-            if (miniBoards[macroIdx][miniIdx] !== null) return;
             if (macroBoard[macroIdx] !== null) return;
+            if (miniBoards[macroIdx][miniIdx] !== null) return;
 
             miniBoards[macroIdx][miniIdx] = myColor;
             
@@ -394,25 +431,24 @@
             else if (isMiniFull(macroIdx)) macroBoard[macroIdx] = 'tie';
 
             const gw = checkMacroWin();
+            
+            currentTurn = currentTurn === 'pink' ? 'blue' : 'pink';
+
+            // SINGLE SYNC - combined state
+            db.ref('gameRooms/' + roomId + '/tttState').set({
+                macro: macroBoard,
+                mini: miniBoards,
+                turn: currentTurn
+            });
+
             if (gw) {
                 gameOver = true;
-                // SYNC before showing win
-                db.ref('gameRooms/' + roomId + '/sttBoard').set({ macro: macroBoard, mini: miniBoards });
-                db.ref('gameRooms/' + roomId + '/sttGameOver').set(gw);
+                db.ref('gameRooms/' + roomId + '/tttWinner').set(gw);
                 renderBoard();
                 showWin(gw);
                 return;
             }
 
-            currentTurn = currentTurn === 'pink' ? 'blue' : 'pink';
-            
-            // CRITICAL: Sync board AND turn together
-            db.ref('gameRooms/' + roomId + '/sttBoard').set({
-                macro: macroBoard,
-                mini: miniBoards
-            });
-            db.ref('gameRooms/' + roomId + '/sttTurn').set(currentTurn);
-            
             renderBoard();
             updateTurnIndicator();
         }
@@ -441,12 +477,12 @@
                     for (let si = 0; si < 9; si++) {
                         const sc = document.createElement('div');
                         sc.className = 'mini-cell';
-                        sc.dataset.macro = mi;
-                        sc.dataset.mini = si;
                         const val = miniBoards[mi] ? miniBoards[mi][si] : null;
                         if (val === 'pink') { sc.textContent = '💕'; sc.classList.add('pink'); }
                         else if (val === 'blue') { sc.textContent = '💙'; sc.classList.add('blue'); }
-                        sc.addEventListener('click', () => makeMove(mi, si));
+                        sc.addEventListener('click', (function(m, s) {
+                            return function() { makeMove(m, s); };
+                        })(mi, si));
                         mb.appendChild(sc);
                     }
                     mc.appendChild(mb);
@@ -462,8 +498,8 @@
             overlay.innerHTML = `
                 <div style="text-align:center;background:rgba(26,26,46,0.95);padding:2rem;border-radius:1rem;border:2px solid #ff6b9d;">
                     <div style="font-size:3rem;margin-bottom:0.5rem;">${win ? '🎉' : '💙'}</div>
-                    <div style="font-size:1.5rem;font-weight:bold;color:#ff6b9d;margin-bottom:0.5rem;">${win ? 'YOU WIN!' : 'OPPONENT WINS!'}</div>
-                    <button onclick="location.href='lobby.html'" style="padding:8px 16px;border-radius:16px;border:none;background:#ff6b9d;color:white;font-weight:bold;cursor:pointer;">Back to Lobby</button>
+                    <div style="font-size:1.5rem;font-weight:bold;color:#ff6b9d;margin-bottom:1rem;">${win ? 'YOU WIN!' : opponentName + ' WINS!'}</div>
+                    <button onclick="location.href='lobby.html'" style="padding:10px 20px;border-radius:20px;border:none;background:#ff6b9d;color:white;font-weight:bold;cursor:pointer;">Back to Lobby</button>
                 </div>
             `;
             document.body.appendChild(overlay);
