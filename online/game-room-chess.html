@@ -48,6 +48,7 @@
 
         .players-info { display: flex; gap: 5px; flex-wrap: wrap; }
         .player-chip { padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; }
+        .player-chip.status { color: #fdcb6e; font-size: 9px; }
 
         .status-bar {
             text-align: center;
@@ -155,7 +156,7 @@
             <div class="players-info">
                 <div class="player-chip" id="youChip">💙 You</div>
                 <div class="player-chip" id="opponentChip">❤️ Opp</div>
-                <div class="player-chip" id="statusChip" style="color:#fdcb6e;">Connecting...</div>
+                <div class="player-chip status" id="statusChip">Connecting...</div>
             </div>
         </div>
 
@@ -194,7 +195,6 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // Simple pieces
         const PIECES = {
             blue: { K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙' },
             red: { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞', P: '♟' }
@@ -206,6 +206,7 @@
         let validMoves = [];
         let board = [];
         let gameStarted = false;
+        let isHost = false;
 
         window.chessClick = function(r, c) {
             if (!gameStarted) return;
@@ -233,19 +234,15 @@
         };
 
         function init() {
-            myTeam = Math.random() < 0.5 ? 'blue' : 'red';
-            document.getElementById('youChip').style.color = myTeam === 'blue' ? '#4488ff' : '#ff4444';
-            document.getElementById('youChip').style.border = '1px solid ' + (myTeam === 'blue' ? '#4488ff' : '#ff4444');
-            document.getElementById('opponentChip').style.color = myTeam === 'blue' ? '#ff4444' : '#4488ff';
-            document.getElementById('opponentChip').style.border = '1px solid ' + (myTeam === 'blue' ? '#ff4444' : '#4488ff');
-
             auth.onAuthStateChanged(user => {
                 if (!user) { location.href = 'login.html'; return; }
                 myPlayerId = user.uid;
+                
+                // Get my login username
                 db.ref('users/' + user.uid).once('value').then(s => {
                     myName = s.val()?.username || 'Player';
-                    document.getElementById('youChip').textContent = (myTeam === 'blue' ? '💙 ' : '❤️ ') + myName;
                 });
+                
                 const p = new URLSearchParams(location.search);
                 roomId = p.get('match') || p.get('team');
                 if (!roomId) { location.href = 'lobby.html'; return; }
@@ -264,13 +261,24 @@
         }
 
         function setupPlayers(data) {
-            opponentId = data.player1 === myPlayerId ? data.player2 : data.player1;
-            opponentName = data.player1 === myPlayerId ? (data.player2Name || 'Opponent') : (data.player1Name || 'Opponent');
+            // Determine if I'm player 1 (host) or player 2
+            if (data.player1 === myPlayerId) {
+                isHost = true;
+                myTeam = 'blue';
+                opponentId = data.player2 || null;
+                opponentName = data.player2Name || 'Opponent';
+            } else {
+                isHost = false;
+                myTeam = 'red';
+                opponentId = data.player1 || null;
+                opponentName = data.player1Name || 'Opponent';
+            }
 
+            // Get opponent's actual login username
             if (opponentId) {
                 db.ref('users/' + opponentId).once('value').then(us => {
                     if (us.exists()) opponentName = us.val().username || opponentName;
-                    document.getElementById('opponentChip').textContent = (myTeam === 'blue' ? '❤️ ' : '💙 ') + opponentName;
+                    updateChips();
                 });
                 startGame();
             } else {
@@ -280,12 +288,22 @@
                         opponentId = s.val();
                         db.ref('users/' + opponentId).once('value').then(us => {
                             if (us.exists()) opponentName = us.val().username || 'Opponent';
-                            document.getElementById('opponentChip').textContent = (myTeam === 'blue' ? '❤️ ' : '💙 ') + opponentName;
+                            updateChips();
                             startGame();
                         });
                     }
                 });
             }
+        }
+
+        function updateChips() {
+            document.getElementById('youChip').textContent = (myTeam === 'blue' ? '💙 ' : '❤️ ') + myName;
+            document.getElementById('youChip').style.color = myTeam === 'blue' ? '#4488ff' : '#ff4444';
+            document.getElementById('youChip').style.border = '1px solid ' + (myTeam === 'blue' ? '#4488ff' : '#ff4444');
+            
+            document.getElementById('opponentChip').textContent = (myTeam === 'blue' ? '❤️ ' : '💙 ') + opponentName;
+            document.getElementById('opponentChip').style.color = myTeam === 'blue' ? '#ff4444' : '#4488ff';
+            document.getElementById('opponentChip').style.border = '1px solid ' + (myTeam === 'blue' ? '#ff4444' : '#4488ff');
         }
 
         function initBoard() {
@@ -310,23 +328,28 @@
             updateStatus();
             setupChat();
 
+            // BOTH players listen for board changes
             db.ref('gameRooms/' + roomId + '/board').on('value', snap => {
                 const data = snap.val();
                 if (data) { board = data; renderBoard(); }
             });
+
             db.ref('gameRooms/' + roomId + '/turn').on('value', snap => {
                 const turn = snap.val();
                 if (turn) { currentTurn = turn; updateStatus(); }
             });
 
-            db.ref('gameRooms/' + roomId + '/board').set(board);
-            db.ref('gameRooms/' + roomId + '/turn').set('blue');
+            // Only host sets initial board
+            if (isHost) {
+                db.ref('gameRooms/' + roomId + '/board').set(board);
+                db.ref('gameRooms/' + roomId + '/turn').set('blue');
+            }
         }
 
         function updateStatus() {
             const sb = document.getElementById('statusBar');
             if (currentTurn === myTeam) {
-                sb.textContent = (myTeam === 'blue' ? '💙' : '❤️') + ' YOUR TURN!';
+                sb.textContent = (myTeam === 'blue' ? '💙' : '❤️') + ' ' + myName + ' - YOUR TURN!';
                 sb.style.color = myTeam === 'blue' ? '#4488ff' : '#ff4444';
             } else {
                 sb.textContent = (myTeam === 'blue' ? '❤️' : '💙') + ' ' + opponentName + ' IS THINKING...';
@@ -344,13 +367,13 @@
             if (t === 'P') {
                 const dir = team === 'blue' ? -1 : 1;
                 const startRow = team === 'blue' ? 6 : 1;
-                if (board[r+dir] && !board[r+dir][c]) {
+                if (r + dir >= 0 && r + dir < 8 && board[r+dir] && !board[r+dir][c]) {
                     moves.push({r: r+dir, c: c});
-                    if (r === startRow && !board[r+2*dir][c]) moves.push({r: r+2*dir, c: c});
+                    if (r === startRow && board[r+2*dir] && !board[r+2*dir][c]) moves.push({r: r+2*dir, c: c});
                 }
                 for (const dc of [-1, 1]) {
                     const nc = c + dc;
-                    if (nc >= 0 && nc < 8 && board[r+dir] && board[r+dir][nc] && board[r+dir][nc].team !== team) {
+                    if (nc >= 0 && nc < 8 && r+dir >= 0 && r+dir < 8 && board[r+dir] && board[r+dir][nc] && board[r+dir][nc].team !== team) {
                         moves.push({r: r+dir, c: nc});
                     }
                 }
