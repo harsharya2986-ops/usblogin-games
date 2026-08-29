@@ -5,299 +5,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Ping Pong 🏓 | UsBlog Games</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --pink: #ff6b9d;
+            --blue: #74b9ff;
+            --green: #4CAF50;
+            --orange: #FF9800;
+            --purple: #9c27b0;
+            --gold: #fdcb6e;
+            --dark: #1a1a2e;
+            --glass: rgba(255, 255, 255, 0.08);
+            --white: #ffffff;
+            --red: #ff4444;
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Segoe UI', 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #e94560 100%);
+            background: linear-gradient(135deg, #1e1b4b, #4c1d95, #9d174d);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 10px;
             overflow-x: hidden;
-            position: relative;
         }
-        
-        .floating-hearts {
-            position: fixed;
-            top: 0;
-            left: 0;
+
+        .game-shell {
+            background: rgba(30, 27, 75, 0.95);
+            border-radius: 18px;
+            padding: 12px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
             width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
+            max-width: 1000px;
         }
-        
-        .floating-heart {
-            position: absolute;
-            bottom: -50px;
-            animation: floatHeart linear infinite;
-            opacity: 0.3;
-        }
-        
-        @keyframes floatHeart {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.3; }
-            90% { opacity: 0.2; }
-            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
-        }
-        
-        .game-container {
-            position: relative;
-            z-index: 10;
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 30px;
-            padding: 20px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(233, 69, 96, 0.3);
-            max-width: 900px;
-            width: 100%;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-        
+
         .game-header {
             display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
             align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
         }
-        
+
         .back-btn {
-            color: #ff6b9d;
+            color: white;
             text-decoration: none;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            border: 1px solid rgba(255, 107, 157, 0.3);
-            white-space: nowrap;
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 18px;
+            font-size: 12px;
         }
-        
+
         .game-title {
-            font-size: 22px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ff6b9d, #ff9a9e, #fecfef);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .scoreboard {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .score-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 8px 15px;
-            text-align: center;
-            min-width: 80px;
-        }
-        
-        .score-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 3px;
-        }
-        
-        .score-value {
-            font-size: 24px;
-            font-weight: 800;
-            display: block;
-        }
-        
-        .pink-score { color: #ff6b9d; text-shadow: 0 0 15px rgba(255, 107, 157, 0.6); }
-        .blue-score { color: #74b9ff; text-shadow: 0 0 15px rgba(116, 185, 255, 0.6); }
-        
-        .main-layout {
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
-        }
-        
-        .game-area {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .canvas-wrapper {
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 3px solid rgba(255, 107, 157, 0.3);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-        }
-        
-        #gameCanvas {
-            display: block;
-            width: 100%;
-            height: auto;
-            background: #1a1a2e;
-        }
-        
-        .info-bar {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .info-pill {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.06);
-            padding: 6px 12px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .chat-sidebar {
-            width: 220px;
-            min-width: 220px;
-            display: flex;
-            flex-direction: column;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            max-height: 450px;
-        }
-        
-        .chat-header {
-            padding: 10px;
-            background: rgba(255, 107, 157, 0.15);
-            text-align: center;
+            font-size: 18px;
             font-weight: bold;
             color: #ff6b9d;
-            font-size: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 20px rgba(255,107,157,0.5);
         }
-        
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px;
-            min-height: 150px;
-            max-height: 300px;
-        }
-        
-        .chat-messages::-webkit-scrollbar { width: 3px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255, 107, 157, 0.5); border-radius: 2px; }
-        
-        .chat-message {
-            margin-bottom: 8px;
-            padding: 6px 10px;
-            border-radius: 10px;
+
+        .scoreboard { display: flex; gap: 6px; flex-wrap: wrap; }
+
+        .score-chip {
+            padding: 5px 12px;
+            border-radius: 14px;
             font-size: 11px;
+            font-weight: 600;
         }
-        
-        .chat-message.you {
-            background: rgba(255, 107, 157, 0.15);
-            border: 1px solid rgba(255, 107, 157, 0.3);
-            margin-left: 15px;
+
+        .score-chip.you { background: rgba(255,107,157,0.2); border: 1px solid #ff6b9d; color: #ff6b9d; }
+        .score-chip.opponent { background: rgba(116,185,255,0.2); border: 1px solid #74b9ff; color: #74b9ff; }
+        .score-chip.status { background: rgba(255,255,255,0.1); color: #fdcb6e; font-size: 10px; }
+
+        .main-layout { display: flex; gap: 10px; }
+        .game-area { flex: 1; min-width: 0; }
+
+        .canvas-wrap {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.15);
+            cursor: pointer;
+            background: #0a0a1a;
+            touch-action: none;
         }
-        
-        .chat-message.opponent {
-            background: rgba(116, 185, 255, 0.15);
-            border: 1px solid rgba(116, 185, 255, 0.3);
-            margin-right: 15px;
+
+        canvas { display: block; width: 100%; height: auto; }
+
+        .info-bar { display: flex; gap: 5px; margin-top: 6px; justify-content: center; flex-wrap: wrap; }
+        .info-pill { font-size: 9px; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 8px; }
+
+        .chat-sidebar {
+            width: 200px;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            max-height: 380px;
         }
-        
+
+        .chat-header {
+            padding: 8px;
+            background: rgba(255,107,157,0.15);
+            text-align: center;
+            color: #ff6b9d;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 100px; max-height: 250px; }
+        .chat-messages::-webkit-scrollbar { width: 3px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
+
+        .chat-message { margin-bottom: 5px; padding: 5px 8px; border-radius: 8px; font-size: 11px; }
+        .chat-message.you { background: rgba(255,107,157,0.15); margin-left: 10px; }
+        .chat-message.opponent { background: rgba(116,185,255,0.15); margin-right: 10px; }
         .chat-message .sender { font-weight: bold; font-size: 9px; display: block; }
         .chat-message.you .sender { color: #ff6b9d; }
         .chat-message.opponent .sender { color: #74b9ff; }
-        .chat-message .text { color: rgba(255, 255, 255, 0.9); }
-        
-        .chat-input-area {
-            display: flex;
-            gap: 5px;
-            padding: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .chat-input-area input {
-            flex: 1;
-            padding: 6px 10px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.08);
-            color: white;
-            outline: none;
-            font-size: 11px;
-        }
-        
-        .chat-input-area button {
-            padding: 6px 10px;
-            border-radius: 15px;
-            border: none;
-            background: linear-gradient(135deg, #ff6b9d, #e84393);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 11px;
-        }
-        
-        @media (max-width: 768px) {
+
+        .chat-input-area { display: flex; gap: 4px; padding: 6px; }
+        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
+        .chat-input-area button { padding: 6px 12px; border-radius: 14px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 10px; }
+
+        @media (max-width: 800px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; margin-top: 10px; max-height: 200px; }
-            .chat-messages { max-height: 100px; min-height: 80px; }
-            .game-title { font-size: 18px; }
-            .score-card { min-width: 60px; padding: 6px 10px; }
-            .score-value { font-size: 18px; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 130px; }
+            .chat-messages { max-height: 60px; min-height: 40px; }
+            .game-title { font-size: 14px; }
         }
     </style>
 </head>
 <body>
-    <div class="floating-hearts" id="floatingHearts"></div>
-    
-    <div class="game-container">
+    <div class="game-shell">
         <div class="game-header">
             <a href="lobby.html" class="back-btn">← Lobby</a>
             <h1 class="game-title">🏓 Online Ping Pong</h1>
             <div class="scoreboard">
-                <div class="score-card">
-                    <span class="score-label">You</span>
-                    <span class="score-value pink-score" id="youChip">0</span>
-                </div>
-                <div class="score-card">
-                    <span class="score-label">Opponent</span>
-                    <span class="score-value blue-score" id="opponentChip">0</span>
-                </div>
+                <div class="score-chip you" id="youColorChip">💕 <span id="youName">You</span>: <span id="youScore">0</span></div>
+                <div class="score-chip opponent" id="oppColorChip">💙 <span id="oppName">Opp</span>: <span id="oppScore">0</span></div>
+                <div class="score-chip status" id="statusChip">Connecting...</div>
             </div>
         </div>
 
         <div class="main-layout">
             <div class="game-area">
-                <div class="canvas-wrapper">
-                    <canvas id="gameCanvas" width="800" height="500"></canvas>
+                <div class="canvas-wrap" id="canvasWrap">
+                    <canvas id="gameCanvas" width="800" height="450"></canvas>
                 </div>
                 <div class="info-bar">
-                    <div class="info-pill">🖱️ Mouse / W-S / Arrows</div>
-                    <div class="info-pill">🎯 First to 11</div>
-                    <div class="info-pill">🌐 Real-Time</div>
+                    <div class="info-pill">🖱️ Mouse / Touch / W-S</div>
+                    <div class="info-pill">🎯 First to 25</div>
+                    <div class="info-pill">🌐 LIVE</div>
                 </div>
             </div>
-
             <div class="chat-sidebar">
                 <div class="chat-header">💬 Chat</div>
-                <div class="chat-messages" id="chatMessages">
-                    <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 11px; padding: 15px 0;">💕 Start chatting!</div>
-                </div>
+                <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Type...">
+                    <input type="text" id="chatInput" placeholder="Message...">
                     <button onclick="sendMessage()">Send</button>
                 </div>
             </div>
@@ -316,105 +185,97 @@
             projectId: "usblog-games",
             storageBucket: "usblog-games.firebasestorage.app",
             messagingSenderId: "568211981446",
-            appId: "1:568211981446:web:0e75688bb9a28c2df97d07",
-            measurementId: "G-BDKRR8E565"
+            appId: "1:568211981446:web:0e75688bb9a28c2df97d07"
         };
-
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const database = firebase.database();
+        const db = firebase.database();
 
-        // Create floating hearts
-        const heartsEmojis = ['💕', '💗', '💖', '💘', '💝'];
-        const heartsContainer = document.getElementById('floatingHearts');
-        for (let i = 0; i < 10; i++) {
-            const heart = document.createElement('span');
-            heart.className = 'floating-heart';
-            heart.textContent = heartsEmojis[i % heartsEmojis.length];
-            heart.style.left = Math.random() * 100 + '%';
-            heart.style.fontSize = Math.random() * 18 + 12 + 'px';
-            heart.style.animationDuration = Math.random() * 10 + 8 + 's';
-            heart.style.animationDelay = Math.random() * 10 + 's';
-            heartsContainer.appendChild(heart);
-        }
+        const W = 800, H = 450;
+        const PADDLE_W = 12, PADDLE_H = 90;
+        const TARGET_SCORE = 25;
+        const BALL_SPEED_INITIAL = 5;
 
-        // Game setup
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const W = 800;
-        const H = 500;
         canvas.width = W;
         canvas.height = H;
 
-        let roomId = null;
-        let myPlayerId = null;
-        let opponentId = null;
-        let myName = '';
-        let opponentName = '';
-        let isHost = false;
-        let gameStarted = false;
-        let myScore = 0;
-        let opponentScore = 0;
-        let myPaddleY = H / 2 - 60;
-        let opponentPaddleY = H / 2 - 60;
-        const PADDLE_WIDTH = 12;
-        const PADDLE_HEIGHT = 100;
-        const PADDLE_SPEED = 8;
-        let ball = { x: W / 2, y: H / 2, vx: 0, vy: 0, radius: 10, speed: 6 };
+        const colors = [
+            { name: 'Pink', main: '#ff6b9d' },
+            { name: 'Blue', main: '#74b9ff' },
+            { name: 'Green', main: '#4CAF50' },
+            { name: 'Orange', main: '#FF9800' },
+            { name: 'Purple', main: '#9c27b0' }
+        ];
+
+        let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
+        let isHost = false, gameStarted = false, gameOver = false;
+        let myScore = 0, oppScore = 0;
+        let myPaddleY = H/2 - PADDLE_H/2;
+        let oppPaddleY = H/2 - PADDLE_H/2;
+        let myColor, oppColor;
+        let oppLastSeen = Date.now();
+
+        const ball = { x: W/2, y: H/2, vx: 0, vy: 0, radius: 8, speed: BALL_SPEED_INITIAL };
 
         function init() {
-            auth.onAuthStateChanged((user) => {
-                if (!user) { window.location.href = 'login.html'; return; }
+            const myIdx = Math.floor(Math.random() * colors.length);
+            let oppIdx = Math.floor(Math.random() * colors.length);
+            while (oppIdx === myIdx) oppIdx = Math.floor(Math.random() * colors.length);
+            myColor = colors[myIdx];
+            oppColor = colors[oppIdx];
 
-                database.ref('users/' + user.uid).once('value').then((snapshot) => {
-                    const data = snapshot.val();
-                    myName = data ? data.username : user.email.split('@')[0];
+            document.getElementById('youColorChip').style.borderColor = myColor.main;
+            document.getElementById('youColorChip').style.color = myColor.main;
+            document.getElementById('youColorChip').innerHTML = '💕 <span>' + myName + '</span>: <span id="youScore">0</span>';
+
+            auth.onAuthStateChanged(user => {
+                if (!user) { location.href = 'login.html'; return; }
+                db.ref('users/' + user.uid).once('value').then(s => {
+                    myName = s.val()?.username || user.email.split('@')[0];
+                    document.getElementById('youName').textContent = myName;
                 });
-
-                const params = new URLSearchParams(window.location.search);
-                roomId = params.get('match') || params.get('team');
+                const p = new URLSearchParams(location.search);
+                roomId = p.get('match') || p.get('team');
                 myPlayerId = user.uid;
-
-                if (!roomId) { window.location.href = 'lobby.html'; return; }
+                if (!roomId) { location.href = 'lobby.html'; return; }
                 setupRoom();
             });
         }
 
         function setupRoom() {
-            database.ref('matchmaking/' + roomId).once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    setupFromRoomData(snapshot.val(), 'matchmaking');
-                } else {
-                    database.ref('teams/' + roomId).once('value').then((teamSnap) => {
-                        if (teamSnap.exists()) {
-                            setupFromRoomData(teamSnap.val(), 'teams');
-                        } else {
-                            window.location.href = 'lobby.html';
-                        }
-                    });
-                }
+            db.ref('matchmaking/' + roomId).once('value').then(s => {
+                if (s.exists()) setupPlayers(s.val(), 'matchmaking');
+                else db.ref('teams/' + roomId).once('value').then(ts => {
+                    if (ts.exists()) setupPlayers(ts.val(), 'teams');
+                    else { location.href = 'lobby.html'; }
+                });
             });
         }
 
-        function setupFromRoomData(roomData, collection) {
-            if (roomData.player1 === myPlayerId) {
+        function setupPlayers(data, col) {
+            if (data.player1 === myPlayerId) {
                 isHost = true;
-                opponentId = roomData.player2 || null;
-                opponentName = roomData.player2Name || 'Opponent';
+                opponentId = data.player2 || null;
+                opponentName = data.player2Name || 'Opponent';
             } else {
-                isHost = false;
-                opponentId = roomData.player1 || null;
-                opponentName = roomData.player1Name || 'Opponent';
+                opponentId = data.player1 || null;
+                opponentName = data.player1Name || 'Opponent';
             }
+            document.getElementById('oppName').textContent = opponentName;
+            document.getElementById('oppColorChip').style.borderColor = oppColor.main;
+            document.getElementById('oppColorChip').style.color = oppColor.main;
 
-            if (opponentId) {
-                startGame();
-            } else {
-                database.ref(collection + '/' + roomId).on('value', (snap) => {
-                    const data = snap.val();
-                    if (data && data.player2) {
-                        opponentId = data.player2;
-                        opponentName = data.player2Name || 'Opponent';
+            if (opponentId) startGame();
+            else {
+                document.getElementById('statusChip').textContent = '⏳ Waiting...';
+                db.ref(col + '/' + roomId).on('value', s => {
+                    const d = s.val();
+                    if (d && d.player2) {
+                        opponentId = d.player2;
+                        opponentName = d.player2Name || 'Opponent';
+                        document.getElementById('oppName').textContent = opponentName;
                         startGame();
                     }
                 });
@@ -423,174 +284,194 @@
 
         function startGame() {
             gameStarted = true;
+            oppLastSeen = Date.now();
+            document.getElementById('statusChip').textContent = '🟢 LIVE';
+            setupChat();
+            setupSync();
+            gameLoop();
+        }
 
+        function setupSync() {
             if (isHost) {
                 resetBall();
                 setInterval(() => {
-                    if (gameStarted) {
-                        updateBall();
-                        database.ref('gameRooms/' + roomId + '/ball').set({
-                            x: ball.x, y: ball.y, vx: ball.vx, vy: ball.vy
-                        });
-                        database.ref('gameRooms/' + roomId + '/scores').set({
-                            host: myScore, guest: opponentScore
+                    if (gameStarted && !gameOver) {
+                        updateBallPhysics();
+                        db.ref('gameRooms/' + roomId + '/ppBall').set({
+                            x: ball.x, y: ball.y, vx: ball.vx, vy: ball.vy,
+                            hostScore: myScore, guestScore: oppScore
                         });
                     }
                 }, 16);
             } else {
-                database.ref('gameRooms/' + roomId + '/ball').on('value', (snap) => {
-                    const data = snap.val();
-                    if (data) {
-                        ball.x = data.x; ball.y = data.y;
-                        ball.vx = data.vx; ball.vy = data.vy;
-                    }
-                });
-                database.ref('gameRooms/' + roomId + '/scores').on('value', (snap) => {
-                    const data = snap.val();
-                    if (data) {
-                        myScore = data.guest || 0;
-                        opponentScore = data.host || 0;
-                        updateScore();
+                db.ref('gameRooms/' + roomId + '/ppBall').on('value', s => {
+                    const d = s.val();
+                    if (d) {
+                        ball.x = d.x; ball.y = d.y;
+                        ball.vx = d.vx; ball.vy = d.vy;
+                        myScore = d.guestScore || 0;
+                        oppScore = d.hostScore || 0;
+                        updateScoreDisplay();
                     }
                 });
             }
 
             setInterval(() => {
-                if (gameStarted) {
-                    database.ref('gameRooms/' + roomId + '/paddles/' + myPlayerId).set({ y: myPaddleY });
+                if (gameStarted && !gameOver) {
+                    db.ref('gameRooms/' + roomId + '/ppPaddles/' + myPlayerId).set({
+                        y: myPaddleY, lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
                 }
             }, 30);
 
-            database.ref('gameRooms/' + roomId + '/paddles/' + opponentId).on('value', (snap) => {
-                const data = snap.val();
-                if (data) opponentPaddleY = data.y;
+            db.ref('gameRooms/' + roomId + '/ppPaddles/' + opponentId).on('value', s => {
+                const d = s.val();
+                if (d && d.lastSeen) {
+                    oppLastSeen = Date.now();
+                    oppPaddleY = d.y || oppPaddleY;
+                    document.getElementById('statusChip').textContent = '🟢 LIVE';
+                }
             });
 
-            setupChat();
-            gameLoop();
+            setInterval(() => {
+                if (gameStarted && !gameOver && Date.now() - oppLastSeen > 8000) {
+                    gameOver = true;
+                    document.getElementById('statusChip').textContent = '💔 Left';
+                    alert(opponentName + ' has left!');
+                    setTimeout(() => { location.href = 'lobby.html'; }, 1500);
+                }
+            }, 3000);
         }
 
         function resetBall() {
             ball.x = W / 2;
             ball.y = H / 2;
-            ball.speed = 6;
-            const angle = (Math.random() * 60 - 30) * Math.PI / 180;
+            ball.speed = BALL_SPEED_INITIAL;
+            const angle = (Math.random() * 50 - 25) * Math.PI / 180;
             const dir = Math.random() > 0.5 ? 1 : -1;
             ball.vx = dir * ball.speed * Math.cos(angle);
             ball.vy = ball.speed * Math.sin(angle);
         }
 
-        function updateBall() {
+        function updateBallPhysics() {
             ball.x += ball.vx;
             ball.y += ball.vy;
 
-            if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= H) {
-                ball.vy = -ball.vy;
-            }
+            if (ball.y - ball.radius <= 0) { ball.y = ball.radius; ball.vy = Math.abs(ball.vy); }
+            if (ball.y + ball.radius >= H) { ball.y = H - ball.radius; ball.vy = -Math.abs(ball.vy); }
 
-            // Host paddle (left)
-            if (ball.vx < 0 && ball.x - ball.radius <= PADDLE_WIDTH + 20 && 
-                ball.y >= myPaddleY && ball.y <= myPaddleY + PADDLE_HEIGHT) {
-                const rel = (myPaddleY + PADDLE_HEIGHT / 2) - ball.y;
-                const norm = rel / (PADDLE_HEIGHT / 2);
+            // Host paddle collision (left)
+            if (ball.vx < 0 && ball.x - ball.radius <= PADDLE_W + 15 &&
+                ball.y >= myPaddleY && ball.y <= myPaddleY + PADDLE_H) {
+                const rel = (myPaddleY + PADDLE_H / 2) - ball.y;
+                const norm = rel / (PADDLE_H / 2);
                 const angle = norm * (Math.PI / 3);
-                ball.speed = Math.min(15, ball.speed * 1.05);
+                ball.speed = Math.min(12, ball.speed * 1.03);
                 ball.vx = Math.abs(ball.speed * Math.cos(angle));
                 ball.vy = -ball.speed * Math.sin(angle);
-                ball.x = PADDLE_WIDTH + 20 + ball.radius;
+                ball.x = PADDLE_W + 15 + ball.radius;
             }
 
-            // Guest paddle (right)
-            if (ball.vx > 0 && ball.x + ball.radius >= W - PADDLE_WIDTH - 20 &&
-                ball.y >= opponentPaddleY && ball.y <= opponentPaddleY + PADDLE_HEIGHT) {
-                const rel = (opponentPaddleY + PADDLE_HEIGHT / 2) - ball.y;
-                const norm = rel / (PADDLE_HEIGHT / 2);
+            // Guest paddle collision (right)
+            if (ball.vx > 0 && ball.x + ball.radius >= W - PADDLE_W - 15 &&
+                ball.y >= oppPaddleY && ball.y <= oppPaddleY + PADDLE_H) {
+                const rel = (oppPaddleY + PADDLE_H / 2) - ball.y;
+                const norm = rel / (PADDLE_H / 2);
                 const angle = norm * (Math.PI / 3);
-                ball.speed = Math.min(15, ball.speed * 1.05);
+                ball.speed = Math.min(12, ball.speed * 1.03);
                 ball.vx = -Math.abs(ball.speed * Math.cos(angle));
                 ball.vy = -ball.speed * Math.sin(angle);
-                ball.x = W - PADDLE_WIDTH - 20 - ball.radius;
+                ball.x = W - PADDLE_W - 15 - ball.radius;
             }
 
-            if (ball.x < -20) { opponentScore++; updateScore(); resetBall(); }
-            if (ball.x > W + 20) { myScore++; updateScore(); resetBall(); }
-        }
-
-        function updateScore() {
-            document.getElementById('youChip').textContent = myScore;
-            document.getElementById('opponentChip').textContent = opponentScore;
-            if (myScore >= 11 || opponentScore >= 11) {
-                alert(`🏆 ${myScore >= 11 ? myName : opponentName} wins!`);
-                location.href = 'lobby.html';
+            // Scoring
+            if (ball.x < -20) {
+                oppScore++;
+                updateScoreDisplay();
+                checkWin();
+                resetBall();
+            }
+            if (ball.x > W + 20) {
+                myScore++;
+                updateScoreDisplay();
+                checkWin();
+                resetBall();
             }
         }
 
-        document.addEventListener('mousemove', (e) => {
+        function updateScoreDisplay() {
+            document.getElementById('youScore').textContent = myScore;
+            document.getElementById('oppScore').textContent = oppScore;
+        }
+
+        function checkWin() {
+            if (myScore >= TARGET_SCORE || oppScore >= TARGET_SCORE) {
+                gameOver = true;
+                const winner = myScore >= TARGET_SCORE;
+                setTimeout(() => {
+                    alert(winner ? '🏆 YOU WIN! Reached 25!' : '💙 OPPONENT WINS!');
+                    location.href = 'lobby.html';
+                }, 500);
+            }
+        }
+
+        document.addEventListener('mousemove', e => {
             const rect = canvas.getBoundingClientRect();
             const scaleY = H / rect.height;
-            myPaddleY = (e.clientY - rect.top) * scaleY - PADDLE_HEIGHT / 2;
+            myPaddleY = (e.clientY - rect.top) * scaleY - PADDLE_H / 2;
             clampPaddle();
         });
 
-        document.addEventListener('touchmove', (e) => {
+        document.addEventListener('touchmove', e => {
             e.preventDefault();
             const rect = canvas.getBoundingClientRect();
             const scaleY = H / rect.height;
-            myPaddleY = (e.touches[0].clientY - rect.top) * scaleY - PADDLE_HEIGHT / 2;
+            myPaddleY = (e.touches[0].clientY - rect.top) * scaleY - PADDLE_H / 2;
             clampPaddle();
         }, { passive: false });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') {
-                myPaddleY -= PADDLE_SPEED;
-                clampPaddle();
-            }
-            if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') {
-                myPaddleY += PADDLE_SPEED;
-                clampPaddle();
-            }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') { myPaddleY -= 10; clampPaddle(); }
+            if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') { myPaddleY += 10; clampPaddle(); }
         });
 
         function clampPaddle() {
             if (myPaddleY < 0) myPaddleY = 0;
-            if (myPaddleY > H - PADDLE_HEIGHT) myPaddleY = H - PADDLE_HEIGHT;
+            if (myPaddleY > H - PADDLE_H) myPaddleY = H - PADDLE_H;
         }
 
         function render() {
             ctx.clearRect(0, 0, W, H);
-            
-            const grad = ctx.createLinearGradient(0, 0, W, H);
+
+            const grad = ctx.createLinearGradient(0, 0, 0, H);
             grad.addColorStop(0, '#1a1a2e');
             grad.addColorStop(1, '#0f3460');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
+            // Center line
             ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-            ctx.lineWidth = 3;
-            ctx.setLineDash([10, 10]);
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 8]);
             ctx.beginPath();
             ctx.moveTo(W / 2, 0);
             ctx.lineTo(W / 2, H);
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // My paddle (pink)
-            ctx.fillStyle = '#ff6b9d';
-            ctx.shadowColor = '#ff6b9d';
+            // My paddle
+            ctx.fillStyle = myColor.main;
+            ctx.shadowColor = myColor.main;
             ctx.shadowBlur = 15;
-            ctx.fillRect(20, myPaddleY, PADDLE_WIDTH, PADDLE_HEIGHT);
+            ctx.fillRect(15, myPaddleY, PADDLE_W, PADDLE_H);
             ctx.shadowBlur = 0;
-            ctx.font = '20px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('💕', 26, myPaddleY + PADDLE_HEIGHT / 2 + 7);
 
-            // Opponent paddle (blue)
-            ctx.fillStyle = '#74b9ff';
-            ctx.shadowColor = '#74b9ff';
+            // Opponent paddle
+            ctx.fillStyle = oppColor.main;
+            ctx.shadowColor = oppColor.main;
             ctx.shadowBlur = 15;
-            ctx.fillRect(W - PADDLE_WIDTH - 20, opponentPaddleY, PADDLE_WIDTH, PADDLE_HEIGHT);
+            ctx.fillRect(W - PADDLE_W - 15, oppPaddleY, PADDLE_W, PADDLE_H);
             ctx.shadowBlur = 0;
-            ctx.fillText('💙', W - 26, opponentPaddleY + PADDLE_HEIGHT / 2 + 7);
 
             // Ball
             ctx.fillStyle = '#ffffff';
@@ -603,40 +484,36 @@
         }
 
         function setupChat() {
-            const chatRef = database.ref('gameRooms/' + roomId + '/chat');
-            chatRef.off();
-            chatRef.limitToLast(50).on('child_added', (snap) => {
-                const msg = snap.val();
-                displayMessage(msg.sender, msg.message, msg.sender === myName);
+            const ref = db.ref('gameRooms/' + roomId + '/chat');
+            ref.off();
+            ref.limitToLast(50).on('child_added', s => {
+                const m = s.val();
+                displayMsg(m.sender, m.message, m.sender === myName);
             });
         }
 
         function sendMessage() {
             const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            if (message && roomId) {
-                database.ref('gameRooms/' + roomId + '/chat').push({
-                    sender: myName,
-                    message: message,
+            const msg = input.value.trim();
+            if (msg && roomId) {
+                db.ref('gameRooms/' + roomId + '/chat').push({
+                    sender: myName, message: msg,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
                 input.value = '';
             }
         }
 
-        function displayMessage(sender, message, isYou) {
-            const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages.querySelector('div[style*="padding: 15px"]')) {
-                chatMessages.innerHTML = '';
-            }
+        function displayMsg(sender, msg, isYou) {
+            const c = document.getElementById('chatMessages');
             const div = document.createElement('div');
-            div.className = `chat-message ${isYou ? 'you' : 'opponent'}`;
-            div.innerHTML = `<span class="sender">${sender}</span><span class="text">${message}</span>`;
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            div.className = 'chat-message ' + (isYou ? 'you' : 'opponent');
+            div.innerHTML = '<span class="sender">' + sender + '</span><span class="text">' + msg + '</span>';
+            c.appendChild(div);
+            c.scrollTop = c.scrollHeight;
         }
 
-        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+        document.getElementById('chatInput').addEventListener('keypress', e => {
             if (e.key === 'Enter') sendMessage();
         });
 
