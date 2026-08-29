@@ -15,6 +15,8 @@
             --glass: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.15);
             --white: #ffffff;
+            --red: #ff4444;
+            --green: #4CAF50;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -76,11 +78,13 @@
         .score-chip.you { background: rgba(255,107,157,0.2); border: 1px solid #ff6b9d; color: #ff6b9d; }
         .score-chip.opponent { background: rgba(116,185,255,0.2); border: 1px solid #74b9ff; color: #74b9ff; }
         .score-chip.status { background: rgba(255,255,255,0.1); color: #fdcb6e; font-size: 10px; }
+        .score-chip.target { background: rgba(253,203,110,0.2); border: 1px solid #fdcb6e; color: #fdcb6e; }
 
         .main-layout { display: flex; gap: 10px; }
         .game-area { flex: 1; min-width: 0; }
 
         .canvas-wrap {
+            position: relative;
             border-radius: 12px;
             overflow: hidden;
             border: 2px solid rgba(255,255,255,0.15);
@@ -90,8 +94,44 @@
 
         canvas { display: block; width: 100%; height: auto; }
 
+        /* Disconnect Overlay */
+        .disconnect-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .disconnect-overlay.show { display: flex; }
+
+        .disconnect-content {
+            text-align: center;
+            background: rgba(26, 26, 46, 0.95);
+            padding: 2rem 3rem;
+            border-radius: 20px;
+            border: 2px solid #ff4444;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .disconnect-emoji { font-size: 4rem; margin-bottom: 1rem; }
+        .disconnect-title { font-size: 1.5rem; font-weight: bold; color: #ff4444; margin-bottom: 0.5rem; }
+        .disconnect-text { font-size: 1rem; color: white; margin-bottom: 1rem; }
+        .disconnect-countdown { font-size: 3rem; font-weight: bold; color: #fdcb6e; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
         .info-bar { display: flex; gap: 6px; margin-top: 8px; justify-content: center; flex-wrap: wrap; }
         .info-pill { font-size: 10px; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 10px; }
+        .info-pill.warning { color: #fdcb6e; background: rgba(253,203,110,0.1); }
 
         .chat-sidebar {
             width: 220px;
@@ -133,6 +173,7 @@
             .main-layout { flex-direction: column; }
             .chat-sidebar { width: 100%; min-width: auto; max-height: 140px; }
             .chat-messages { max-height: 70px; min-height: 50px; }
+            .game-title { font-size: 14px; }
         }
     </style>
 </head>
@@ -144,6 +185,7 @@
             <div class="scoreboard">
                 <div class="score-chip you">💕 <span id="youName">You</span>: <span id="youScore">0</span></div>
                 <div class="score-chip opponent">💙 <span id="oppName">Opp</span>: <span id="oppScore">0</span></div>
+                <div class="score-chip target">🎯 Target: <span id="targetScore">10000</span></div>
                 <div class="score-chip status" id="statusChip">Connecting...</div>
             </div>
         </div>
@@ -156,6 +198,7 @@
                 <div class="info-bar">
                     <div class="info-pill">⌨️ Space/Click/Tap</div>
                     <div class="info-pill">💗 +100</div>
+                    <div class="info-pill warning">🛡️ 3s Invincible After Hit</div>
                     <div class="info-pill">🌐 LIVE</div>
                 </div>
             </div>
@@ -170,13 +213,23 @@
         </div>
     </div>
 
+    <!-- Disconnect Overlay -->
+    <div class="disconnect-overlay" id="disconnectOverlay">
+        <div class="disconnect-content">
+            <div class="disconnect-emoji">💔</div>
+            <div class="disconnect-title" id="disconnectTitle">Teammate Left!</div>
+            <div class="disconnect-text" id="disconnectText">Redirecting in...</div>
+            <div class="disconnect-countdown" id="disconnectCountdown">5</div>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
 
     <script>
         // =====================================================
-        // FIREBASE
+        // FIREBASE CONFIGURATION
         // =====================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCaR33cAwHFTNdSlBuuzoju9yzah8szBmQ",
@@ -196,12 +249,14 @@
         // =====================================================
         const W = 850, H = 400;
         const GROUND_Y = 320;
-        const GRAVITY = 2200; // pixels per second squared
-        const JUMP_VELOCITY = -750; // pixels per second
-        const BASE_SPEED = 350; // pixels per second
-        const MAX_SPEED = 800;
-        const SPEED_ACCELERATION = 8; // pixels per second squared
+        const GRAVITY = 0.7;
+        const JUMP_FORCE = -13;
+        const BASE_SPEED = 5;
+        const MAX_SPEED = 10;
         const HEART_BONUS = 100;
+        const TARGET_SCORE = 10000;
+        const INVINCIBLE_DURATION = 3000; // 3 seconds in ms
+        const DISCONNECT_REDIRECT_DELAY = 5000; // 5 seconds
 
         // =====================================================
         // CANVAS SETUP
@@ -215,89 +270,36 @@
         // GAME STATE
         // =====================================================
         let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
-        let isHost = false, gameStarted = false;
+        let isHost = false, gameStarted = false, gameOver = false;
         let myScore = 0, oppScore = 0;
         let obstacles = [], hearts = [];
         let speed = BASE_SPEED;
-        let lastTime = 0;
-        let obstaclesSpawned = 0;
+        let frameCount = 0;
+        let invincibleUntil = 0;
+        let disconnectTimer = null;
+        let disconnectCountdownInterval = null;
 
         // =====================================================
-        // PLAYER OBJECTS WITH INTERPOLATION
+        // PLAYER OBJECTS
         // =====================================================
         const myDino = {
-            x: 100,
-            y: GROUND_Y - 50,
-            w: 42,
-            h: 50,
-            vy: 0,
-            jumping: false,
+            x: 100, y: GROUND_Y - 50, w: 42, h: 50,
+            vy: 0, jumping: false, alive: true
+        };
+
+        const oppDino = {
+            x: 620, y: GROUND_Y - 50, w: 42, h: 50,
+            currentY: GROUND_Y - 50, targetY: GROUND_Y - 50,
+            previousY: GROUND_Y - 50,
+            interpolationTime: 0, interpolationDuration: 0.05,
             alive: true
         };
-
-        // Opponent with interpolation support
-        const oppDino = {
-            x: 620,
-            y: GROUND_Y - 50,
-            w: 42,
-            h: 50,
-            currentY: GROUND_Y - 50,
-            targetY: GROUND_Y - 50,
-            previousY: GROUND_Y - 50,
-            alive: true,
-            interpolationTime: 0,
-            interpolationDuration: 0.05 // 50ms smoothing
-        };
-
-        // =====================================================
-        // DELTA-TIME PHYSICS SYSTEM
-        // =====================================================
-        function updateDinoPhysics(dino, dt) {
-            if (dino.jumping) {
-                // Apply gravity
-                dino.vy += GRAVITY * dt;
-                // Update position
-                dino.y += dino.vy * dt;
-                
-                // Ground collision - never fall through
-                if (dino.y >= GROUND_Y - dino.h) {
-                    dino.y = GROUND_Y - dino.h;
-                    dino.vy = 0;
-                    dino.jumping = false;
-                }
-            }
-        }
-
-        // =====================================================
-        // COLLISION DETECTION - AABB with proper bounds
-        // =====================================================
-        function checkCollision(a, b) {
-            return a.x < b.x + b.w && 
-                   a.x + a.w > b.x && 
-                   a.y < b.y + b.h && 
-                   a.y + a.h > b.y;
-        }
-
-        // =====================================================
-        // OPPONENT INTERPOLATION (LERP)
-        // =====================================================
-        function interpolateOpponent(dt) {
-            oppDino.interpolationTime += dt;
-            const t = Math.min(oppDino.interpolationTime / oppDino.interpolationDuration, 1);
-            
-            // Smooth lerp between previous and target position
-            oppDino.y = oppDino.previousY + (oppDino.targetY - oppDino.previousY) * t;
-            
-            if (t >= 1) {
-                oppDino.previousY = oppDino.targetY;
-                oppDino.interpolationTime = 0;
-            }
-        }
 
         // =====================================================
         // INITIALIZATION
         // =====================================================
         function init() {
+            document.getElementById('targetScore').textContent = TARGET_SCORE;
             auth.onAuthStateChanged(user => {
                 if (!user) { location.href = 'login.html'; return; }
                 db.ref('users/' + user.uid).once('value').then(s => {
@@ -353,28 +355,19 @@
             document.getElementById('statusChip').textContent = '🟢 LIVE';
             setupChat();
             setupSync();
-            lastTime = performance.now();
-            requestAnimationFrame(gameLoop);
+            gameLoop();
         }
 
         function setupSync() {
             if (isHost) {
-                // Host spawns obstacles
-                setInterval(() => {
-                    if (gameStarted) spawnObstacle();
-                }, 1500);
-
-                // Host spawns hearts
-                setInterval(() => {
-                    if (gameStarted) spawnHeart();
-                }, 2200);
-
-                // Host syncs state
+                setInterval(() => { if (gameStarted && !gameOver) spawnObstacle(); }, 1600);
+                setInterval(() => { if (gameStarted && !gameOver) spawnHeart(); }, 2400);
                 setInterval(() => {
                     if (gameStarted) {
                         db.ref('gameRooms/' + roomId + '/state').set({
                             obstacles, hearts, speed,
-                            hostScore: Math.floor(myScore)
+                            hostScore: Math.floor(myScore),
+                            hostAlive: myDino.alive
                         });
                     }
                 }, 80);
@@ -386,12 +379,12 @@
                         hearts = d.hearts || [];
                         speed = d.speed || BASE_SPEED;
                         oppScore = d.hostScore || 0;
+                        oppDino.alive = d.hostAlive !== false;
                         document.getElementById('oppScore').textContent = Math.floor(oppScore);
                     }
                 });
             }
 
-            // Sync my position
             setInterval(() => {
                 if (gameStarted) {
                     db.ref('gameRooms/' + roomId + '/players/' + myPlayerId).set({
@@ -401,7 +394,7 @@
                 }
             }, 40);
 
-            // Listen opponent with interpolation
+            // Listen opponent with disconnect detection
             db.ref('gameRooms/' + roomId + '/players/' + opponentId).on('value', s => {
                 const d = s.val();
                 if (d) {
@@ -409,27 +402,62 @@
                     oppDino.alive = d.alive !== false;
                     document.getElementById('statusChip').textContent = '🟢 LIVE';
                 } else {
-                    document.getElementById('statusChip').textContent = '💔 Left';
+                    // Opponent disconnected
+                    handleOpponentDisconnect();
                 }
             });
         }
 
+        // =====================================================
+        // DISCONNECT HANDLING
+        // =====================================================
+        function handleOpponentDisconnect() {
+            if (gameOver) return;
+            gameOver = true;
+            document.getElementById('statusChip').textContent = '💔 Left';
+            
+            const overlay = document.getElementById('disconnectOverlay');
+            const countdownEl = document.getElementById('disconnectCountdown');
+            const titleEl = document.getElementById('disconnectTitle');
+            
+            titleEl.textContent = `${opponentName} has gone!`;
+            overlay.classList.add('show');
+            
+            let countdown = 5;
+            countdownEl.textContent = countdown;
+            
+            disconnectCountdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    countdownEl.textContent = countdown;
+                } else {
+                    clearInterval(disconnectCountdownInterval);
+                    window.location.href = 'lobby.html';
+                }
+            }, 1000);
+        }
+
+        // =====================================================
+        // GAME OBJECTS
+        // =====================================================
         function spawnObstacle() {
             const type = Math.random() > 0.5 ? 'cactus' : 'rock';
             const w = type === 'cactus' ? 22 + Math.random() * 10 : 28 + Math.random() * 14;
             const h = type === 'cactus' ? 35 + Math.random() * 25 : 18 + Math.random() * 14;
             obstacles.push({ x: W + 40, y: GROUND_Y - h, w, h, type });
-            obstaclesSpawned++;
         }
 
         function spawnHeart() {
             hearts.push({ x: W + 40, y: Math.random() * 120 + 70, w: 24, h: 24 });
         }
 
+        // =====================================================
+        // JUMP CONTROL
+        // =====================================================
         function jump() {
-            if (!gameStarted || !myDino.alive) return;
+            if (!gameStarted || gameOver || !myDino.alive) return;
             if (!myDino.jumping) {
-                myDino.vy = JUMP_VELOCITY;
+                myDino.vy = JUMP_FORCE;
                 myDino.jumping = true;
             }
         }
@@ -441,71 +469,100 @@
         canvas.addEventListener('touchstart', e => { e.preventDefault(); jump(); });
 
         // =====================================================
-        // MAIN GAME LOOP WITH DELTA TIME
+        // GAME UPDATE
         // =====================================================
-        function gameLoop(timestamp) {
-            // Calculate delta time in seconds
-            const dt = Math.min((timestamp - lastTime) / 1000, 0.05); // Cap at 50ms
-            lastTime = timestamp;
+        function update() {
+            if (!gameStarted || gameOver) return;
+            frameCount++;
 
-            if (gameStarted) {
-                update(dt);
-            }
-            render();
-            requestAnimationFrame(gameLoop);
-        }
-
-        function update(dt) {
-            // Update speed (host only)
+            // Medium speed progression
             if (isHost) {
-                speed = Math.min(MAX_SPEED, speed + SPEED_ACCELERATION * dt);
+                speed = Math.min(MAX_SPEED, BASE_SPEED + frameCount * 0.001);
             }
 
-            // Update my dino physics with delta time
-            updateDinoPhysics(myDino, dt);
+            // My dino physics
+            if (myDino.jumping) {
+                myDino.vy += GRAVITY;
+                myDino.y += myDino.vy;
+                if (myDino.y >= GROUND_Y - myDino.h) {
+                    myDino.y = GROUND_Y - myDino.h;
+                    myDino.jumping = false;
+                    myDino.vy = 0;
+                }
+            }
 
-            // Interpolate opponent position
-            interpolateOpponent(dt);
+            // Interpolate opponent
+            oppDino.interpolationTime += 0.016; // Approx 60fps dt
+            const t = Math.min(oppDino.interpolationTime / oppDino.interpolationDuration, 1);
+            oppDino.y = oppDino.previousY + (oppDino.targetY - oppDino.previousY) * t;
+            if (t >= 1) {
+                oppDino.previousY = oppDino.targetY;
+                oppDino.interpolationTime = 0;
+            }
 
-            // Move obstacles (host only)
+            // Move obstacles (host)
             if (isHost) {
                 for (let i = obstacles.length - 1; i >= 0; i--) {
-                    obstacles[i].x -= speed * dt;
+                    obstacles[i].x -= speed;
                     if (obstacles[i].x + obstacles[i].w < 0) obstacles.splice(i, 1);
                 }
                 for (let i = hearts.length - 1; i >= 0; i--) {
-                    hearts[i].x -= speed * 0.85 * dt;
+                    hearts[i].x -= speed * 0.85;
                     if (hearts[i].x < -30) hearts.splice(i, 1);
                 }
             }
 
             // Collisions
+            const isInvincible = Date.now() < invincibleUntil;
+            
             if (myDino.alive) {
-                for (const obs of obstacles) {
-                    if (checkCollision(myDino, obs)) {
-                        myDino.alive = false;
-                        setTimeout(() => {
-                            myDino.alive = true;
-                            myDino.y = GROUND_Y - 50;
-                        }, 1500);
-                        break;
+                if (!isInvincible) {
+                    for (const obs of obstacles) {
+                        if (rectCollide(myDino, obs)) {
+                            myDino.alive = false;
+                            setTimeout(() => {
+                                myDino.alive = true;
+                                myDino.y = GROUND_Y - 50;
+                                invincibleUntil = Date.now() + INVINCIBLE_DURATION;
+                            }, 1500);
+                            break;
+                        }
                     }
                 }
+                
                 for (let i = hearts.length - 1; i >= 0; i--) {
-                    if (checkCollision(myDino, hearts[i])) {
+                    if (rectCollide(myDino, hearts[i])) {
                         myScore += HEART_BONUS;
                         if (isHost) hearts.splice(i, 1);
                     }
                 }
             }
 
-            // Score
+            // Score increases only when alive AND not in respawn period
             if (myDino.alive) {
-                myScore += speed * 0.1 * dt * 10;
+                // Medium score speed
+                myScore += speed * 0.15;
             }
             document.getElementById('youScore').textContent = Math.floor(myScore);
+
+            // Check target score
+            if (myScore >= TARGET_SCORE || oppScore >= TARGET_SCORE) {
+                gameOver = true;
+                const isWinner = myScore > oppScore;
+                setTimeout(() => {
+                    alert(isWinner ? '🏆 You reached 10000 first! You Win!' : '💙 Opponent reached 10000 first!');
+                    window.location.href = 'lobby.html';
+                }, 500);
+            }
         }
 
+        function rectCollide(a, b) {
+            return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+        }
+
+        // =====================================================
+        // RENDER
+        // =====================================================
         function render() {
             ctx.clearRect(0, 0, W, H);
 
@@ -534,6 +591,7 @@
                 if (o.type === 'cactus') {
                     ctx.fillStyle = '#4CAF50';
                     ctx.fillRect(o.x, o.y, o.w, o.h);
+                    ctx.fillRect(o.x - 5, o.y + 10, 7, 13);
                 } else {
                     ctx.fillStyle = '#795548';
                     ctx.beginPath();
@@ -561,9 +619,20 @@
                 ctx.setLineDash([]);
             }
 
-            // Dinos
-            if (myDino.alive) drawDino(myDino, '#f472b6', '💕');
-            if (oppDino.alive) drawDino(oppDino, '#60a5fa', '💙');
+            // Draw my dino with blink effect if invincible
+            const isInvincible = Date.now() < invincibleUntil;
+            if (myDino.alive) {
+                if (isInvincible && Math.floor(Date.now() / 100) % 2 === 0) {
+                    ctx.globalAlpha = 0.5;
+                }
+                drawDino(myDino, '#f472b6', '💕');
+                ctx.globalAlpha = 1;
+            }
+
+            // Draw opponent
+            if (oppDino.alive) {
+                drawDino(oppDino, '#60a5fa', '💙');
+            }
         }
 
         function drawDino(d, color, emoji) {
@@ -584,7 +653,9 @@
             ctx.fillText(emoji, d.x + d.w / 2, d.y + d.h / 2 + 5);
         }
 
-        // Chat
+        // =====================================================
+        // CHAT
+        // =====================================================
         function setupChat() {
             const ref = db.ref('gameRooms/' + roomId + '/chat');
             ref.off();
@@ -618,6 +689,15 @@
         document.getElementById('chatInput').addEventListener('keypress', e => {
             if (e.key === 'Enter') sendMessage();
         });
+
+        // =====================================================
+        // GAME LOOP
+        // =====================================================
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
