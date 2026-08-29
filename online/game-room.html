@@ -6,31 +6,79 @@
     <title>Online Dino Run 💕 | UsBlog Games</title>
     <style>
         :root {
-            --primary: #ff6b9d;
+            --pink: #ff6b9d;
+            --pink-light: #f8bbd0;
+            --pink-dark: #e84393;
             --blue: #74b9ff;
+            --blue-light: #a8d8ff;
+            --blue-dark: #4a90e2;
             --gold: #fdcb6e;
+            --gold-light: #ffeaa7;
             --dark: #1a1a2e;
+            --darker: #0a0a1a;
+            --purple: #2d1b69;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --white: #ffffff;
+            --green: #4CAF50;
+            --red: #ff4444;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
-            font-family: 'Segoe UI', 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1e1b4b, #4c1d95, #9d174d);
+            font-family: 'Segoe UI', 'Poppins', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 30%, #9d174d 60%, #f472b6 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 10px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background floating hearts */
+        .bg-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-heart {
+            position: absolute;
+            bottom: -30px;
+            animation: floatUp linear infinite;
+            opacity: 0.1;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.15; }
+            90% { opacity: 0.1; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
         }
 
         .game-shell {
+            position: relative;
+            z-index: 10;
             background: rgba(30, 27, 75, 0.95);
+            backdrop-filter: blur(20px);
             border-radius: 20px;
-            padding: 12px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+            padding: 15px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 107, 157, 0.15);
             width: 100%;
-            max-width: 1100px;
+            max-width: 1150px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .game-header {
@@ -38,131 +86,357 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .back-btn {
-            color: white;
+            color: var(--white);
             text-decoration: none;
-            padding: 6px 14px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 18px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 107, 157, 0.2);
+            border-color: #ff6b9d;
+            transform: translateX(-3px);
         }
 
         .game-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ff6b9d;
-            text-shadow: 0 0 20px rgba(255,107,157,0.5);
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f9a8d4, #f472b6, #e879f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.5px;
         }
 
         .scoreboard {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .score-chip {
-            padding: 5px 12px;
-            border-radius: 14px;
+            padding: 6px 14px;
+            border-radius: 16px;
             font-size: 11px;
             font-weight: 600;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
         }
 
-        .score-chip.you { background: rgba(255,107,157,0.2); border: 1px solid #ff6b9d; color: #ff6b9d; }
-        .score-chip.opponent { background: rgba(116,185,255,0.2); border: 1px solid #74b9ff; color: #74b9ff; }
-        .score-chip.status { background: rgba(255,255,255,0.1); color: #fdcb6e; font-size: 10px; }
+        .score-chip.you {
+            background: rgba(255, 107, 157, 0.2);
+            border: 1px solid #ff6b9d;
+            color: #ff6b9d;
+        }
 
-        .main-layout { display: flex; gap: 10px; }
-        .game-area { flex: 1; min-width: 0; }
+        .score-chip.opponent {
+            background: rgba(116, 185, 255, 0.2);
+            border: 1px solid #74b9ff;
+            color: #74b9ff;
+        }
+
+        .score-chip.status {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fdcb6e;
+            font-size: 10px;
+            animation: statusPulse 2s infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .game-area {
+            flex: 1;
+            min-width: 0;
+        }
 
         .canvas-wrap {
-            border-radius: 12px;
+            position: relative;
+            border-radius: 14px;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.15);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.15);
             cursor: pointer;
             background: #0a0a1a;
+            touch-action: manipulation;
         }
 
-        canvas { display: block; width: 100%; }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
 
-        .info-bar { display: flex; gap: 6px; margin-top: 6px; justify-content: center; flex-wrap: wrap; }
-        .info-pill { font-size: 10px; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 10px; }
+        .game-over-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .game-over-overlay.show {
+            display: flex;
+        }
+
+        .game-over-content {
+            text-align: center;
+            color: white;
+        }
+
+        .game-over-content .emoji {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-over-content .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b9d;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-bar {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .info-pill {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4px 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
         .chat-sidebar {
-            width: 220px;
-            min-width: 220px;
+            width: 230px;
+            min-width: 230px;
             display: flex;
             flex-direction: column;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
-            max-height: 400px;
+            max-height: 420px;
         }
 
         .chat-header {
-            padding: 8px;
-            background: rgba(255,107,157,0.15);
+            padding: 10px;
+            background: rgba(255, 107, 157, 0.15);
             text-align: center;
             color: #ff6b9d;
             font-weight: bold;
             font-size: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 100px; max-height: 250px; }
-        .chat-messages::-webkit-scrollbar { width: 3px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            min-height: 150px;
+            max-height: 270px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
 
-        .chat-message { margin-bottom: 5px; padding: 5px 8px; border-radius: 8px; font-size: 11px; }
-        .chat-message.you { background: rgba(255,107,157,0.15); margin-left: 10px; }
-        .chat-message.opponent { background: rgba(116,185,255,0.15); margin-right: 10px; }
-        .chat-message .sender { font-weight: bold; font-size: 9px; display: block; }
+        .chat-messages::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #ff6b9d;
+            border-radius: 2px;
+        }
+
+        .chat-message {
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: msgIn 0.3s ease;
+        }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-message.you {
+            background: rgba(255, 107, 157, 0.15);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            align-self: flex-end;
+        }
+
+        .chat-message.opponent {
+            background: rgba(116, 185, 255, 0.15);
+            border: 1px solid rgba(116, 185, 255, 0.3);
+            align-self: flex-start;
+        }
+
+        .chat-message .sender {
+            font-weight: bold;
+            font-size: 9px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
         .chat-message.you .sender { color: #ff6b9d; }
         .chat-message.opponent .sender { color: #74b9ff; }
+        .chat-message .text { color: rgba(255, 255, 255, 0.9); }
 
-        .chat-input-area { display: flex; gap: 4px; padding: 6px; }
-        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
-        .chat-input-area button { padding: 6px 12px; border-radius: 14px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 10px; }
+        .chat-input-area {
+            display: flex;
+            gap: 5px;
+            padding: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-        @media (max-width: 900px) {
-            .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; max-height: 150px; }
-            .chat-messages { max-height: 80px; min-height: 50px; }
+        .chat-input-area input {
+            flex: 1;
+            padding: 7px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            outline: none;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #ff6b9d;
+            box-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
+        }
+
+        .chat-input-area button {
+            padding: 7px 14px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, #ff6b9d, #e84393);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.3s;
+        }
+
+        .chat-input-area button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        @media (max-width: 950px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .chat-sidebar {
+                width: 100%;
+                min-width: auto;
+                max-height: 160px;
+            }
+            .chat-messages {
+                max-height: 80px;
+                min-height: 50px;
+            }
+            .game-title {
+                font-size: 15px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="bg-hearts" id="bgHearts"></div>
+
     <div class="game-shell">
         <div class="game-header">
-            <a href="lobby.html" class="back-btn">← Lobby</a>
-            <h1 class="game-title">💕 Online Dino Run</h1>
+            <div class="header-left">
+                <a href="lobby.html" class="back-btn">← Lobby</a>
+                <h1 class="game-title">💕 Online Dino Run</h1>
+            </div>
             <div class="scoreboard">
-                <div class="score-chip you" id="youChip">💕 You: 0</div>
-                <div class="score-chip opponent" id="opponentChip">💙 Opp: 0</div>
-                <div class="score-chip status" id="statusChip">Connecting...</div>
+                <div class="score-chip you" id="youChip">💕 <span id="youName">You</span>: <span id="youScore">0</span></div>
+                <div class="score-chip opponent" id="opponentChip">💙 <span id="oppName">Opp</span>: <span id="oppScore">0</span></div>
+                <div class="score-chip status" id="statusChip">🔗 Connecting...</div>
             </div>
         </div>
 
         <div class="main-layout">
             <div class="game-area">
                 <div class="canvas-wrap" id="canvasWrap">
-                    <canvas id="gameCanvas" width="850" height="380"></canvas>
+                    <canvas id="gameCanvas" width="850" height="400"></canvas>
+                    <div class="game-over-overlay" id="gameOverOverlay">
+                        <div class="game-over-content">
+                            <div class="emoji" id="gameOverEmoji">🏆</div>
+                            <div class="title" id="gameOverTitle">Game Over!</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="info-bar">
-                    <div class="info-pill">⌨️ Space/Click/Tap</div>
-                    <div class="info-pill">💗 +100</div>
-                    <div class="info-pill">🌐 Live</div>
+                    <div class="info-pill">⌨️ Space / Click / Tap to Jump</div>
+                    <div class="info-pill">💗 Collect Hearts +100</div>
+                    <div class="info-pill">🌐 Real-Time 1vs1</div>
+                    <div class="info-pill">⚡ Speed Increases</div>
                 </div>
             </div>
+
             <div class="chat-sidebar">
                 <div class="chat-header">💬 Live Chat</div>
                 <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Message...">
+                    <input type="text" id="chatInput" placeholder="Type message..." maxlength="200">
                     <button onclick="sendMessage()">Send</button>
                 </div>
             </div>
@@ -174,7 +448,9 @@
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
 
     <script>
-        // Firebase
+        // ============================================
+        // FIREBASE INITIALIZATION
+        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyCaR33cAwHFTNdSlBuuzoju9yzah8szBmQ",
             authDomain: "usblog-games.firebaseapp.com",
@@ -182,165 +458,347 @@
             projectId: "usblog-games",
             storageBucket: "usblog-games.firebasestorage.app",
             messagingSenderId: "568211981446",
-            appId: "1:568211981446:web:0e75688bb9a28c2df97d07"
+            appId: "1:568211981446:web:0e75688bb9a28c2df97d07",
+            measurementId: "G-BDKRR8E565"
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // Canvas
+        // ============================================
+        // GAME CONSTANTS
+        // ============================================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const W = 850, H = 380;
-        canvas.width = W; canvas.height = H;
-        const GROUND_Y = 300, GRAVITY = 0.7, JUMP_FORCE = -13;
-        const BASE_SPEED = 6, MAX_SPEED = 14, HEART_BONUS = 100;
+        const W = 850;
+        const H = 400;
+        canvas.width = W;
+        canvas.height = H;
 
-        // State
-        let roomId, myPlayerId, opponentId, myName='', opponentName='';
-        let isHost = false, gameStarted = false;
-        let myScore = 0, oppScore = 0;
-        let obstacles = [], hearts = [];
-        let speed = BASE_SPEED, frame = 0;
-        let myDino = {x:100, y:GROUND_Y-50, w:40, h:50, vy:0, jumping:false, alive:true};
-        let oppDino = {x:600, y:GROUND_Y-50, w:40, h:50, vy:0, jumping:false, alive:true};
+        const GROUND_Y = 320;
+        const GRAVITY = 0.7;
+        const JUMP_FORCE = -13;
+        const BASE_SPEED = 6;
+        const MAX_SPEED = 14;
+        const HEART_BONUS = 100;
+        const WIN_SCORE = 5000;
 
-        // Init
-        function init() {
-            auth.onAuthStateChanged(user => {
-                if (!user) { location.href='login.html'; return; }
-                db.ref('users/'+user.uid).once('value').then(s => {
-                    myName = s.val()?.username || user.email.split('@')[0];
-                    document.getElementById('youChip').textContent = `💕 ${myName}: 0`;
+        // ============================================
+        // GAME STATE
+        // ============================================
+        let roomId = null;
+        let myPlayerId = null;
+        let opponentId = null;
+        let myName = '';
+        let opponentName = '';
+        let isHost = false;
+        let gameStarted = false;
+        let gameOver = false;
+        let myScore = 0;
+        let opponentScore = 0;
+        let obstacles = [];
+        let hearts = [];
+        let particles = [];
+        let clouds = [];
+        let stars = [];
+        let speed = BASE_SPEED;
+        let frameCount = 0;
+        let distance = 0;
+
+        // Player characters
+        const myDino = {
+            x: 100,
+            y: GROUND_Y - 50,
+            w: 42,
+            h: 50,
+            vy: 0,
+            jumping: false,
+            alive: true,
+            legFrame: 0,
+            color: '#f472b6',
+            emoji: '💕'
+        };
+
+        const oppDino = {
+            x: 620,
+            y: GROUND_Y - 50,
+            w: 42,
+            h: 50,
+            vy: 0,
+            jumping: false,
+            alive: true,
+            legFrame: 0,
+            color: '#60a5fa',
+            emoji: '💙'
+        };
+
+        // ============================================
+        // BACKGROUND INITIALIZATION
+        // ============================================
+        function createBackground() {
+            // Stars
+            for (let i = 0; i < 40; i++) {
+                stars.push({
+                    x: Math.random() * W,
+                    y: Math.random() * 200,
+                    size: Math.random() * 2 + 0.5,
+                    phase: Math.random() * Math.PI * 2
                 });
-                const p = new URLSearchParams(location.search);
-                roomId = p.get('match') || p.get('team');
+            }
+            // Clouds
+            for (let i = 0; i < 6; i++) {
+                clouds.push({
+                    x: Math.random() * W,
+                    y: Math.random() * 100 + 20,
+                    w: Math.random() * 70 + 50,
+                    speed: Math.random() * 0.3 + 0.1,
+                    opacity: Math.random() * 0.2 + 0.1
+                });
+            }
+            // Background hearts
+            const bgContainer = document.getElementById('bgHearts');
+            const hearts = ['💕', '💗', '💖', '💘', '💝'];
+            for (let i = 0; i < 10; i++) {
+                const span = document.createElement('span');
+                span.className = 'bg-heart';
+                span.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                span.style.left = Math.random() * 100 + '%';
+                span.style.fontSize = Math.random() * 18 + 12 + 'px';
+                span.style.animationDuration = Math.random() * 12 + 8 + 's';
+                span.style.animationDelay = Math.random() * 10 + 's';
+                bgContainer.appendChild(span);
+            }
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        function init() {
+            createBackground();
+            auth.onAuthStateChanged((user) => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                db.ref('users/' + user.uid).once('value').then((snap) => {
+                    const data = snap.val();
+                    myName = data ? data.username : user.email.split('@')[0];
+                    document.getElementById('youName').textContent = myName;
+                });
+                const params = new URLSearchParams(window.location.search);
+                roomId = params.get('match') || params.get('team');
                 myPlayerId = user.uid;
-                if (!roomId) { location.href='lobby.html'; return; }
+                if (!roomId) {
+                    window.location.href = 'lobby.html';
+                    return;
+                }
                 setupRoom();
             });
         }
 
+        // ============================================
+        // ROOM SETUP
+        // ============================================
         function setupRoom() {
-            db.ref('matchmaking/'+roomId).once('value').then(s => {
-                if (s.exists()) setupPlayers(s.val(), 'matchmaking');
-                else db.ref('teams/'+roomId).once('value').then(ts => {
-                    if (ts.exists()) setupPlayers(ts.val(), 'teams');
-                    else { alert('Room not found'); location.href='lobby.html'; }
-                });
+            db.ref('matchmaking/' + roomId).once('value').then((snap) => {
+                if (snap.exists()) {
+                    setupPlayers(snap.val(), 'matchmaking');
+                } else {
+                    db.ref('teams/' + roomId).once('value').then((teamSnap) => {
+                        if (teamSnap.exists()) {
+                            setupPlayers(teamSnap.val(), 'teams');
+                        } else {
+                            alert('Room not found!');
+                            window.location.href = 'lobby.html';
+                        }
+                    });
+                }
             });
         }
 
-        function setupPlayers(data, col) {
+        function setupPlayers(data, collection) {
             if (data.player1 === myPlayerId) {
                 isHost = true;
                 opponentId = data.player2 || null;
                 opponentName = data.player2Name || 'Opponent';
             } else {
+                isHost = false;
                 opponentId = data.player1 || null;
                 opponentName = data.player1Name || 'Opponent';
             }
-            document.getElementById('opponentChip').textContent = `💙 ${opponentName}: 0`;
+            document.getElementById('oppName').textContent = opponentName;
 
-            if (opponentId) startGame();
-            else {
-                document.getElementById('statusChip').textContent = '⏳ Waiting...';
-                db.ref(col+'/'+roomId).on('value', s => {
-                    const d = s.val();
+            if (opponentId) {
+                startGame();
+            } else {
+                document.getElementById('statusChip').textContent = '⏳ Waiting for opponent...';
+                db.ref(collection + '/' + roomId).on('value', (snap) => {
+                    const d = snap.val();
                     if (d && d.player2) {
                         opponentId = d.player2;
                         opponentName = d.player2Name || 'Opponent';
-                        document.getElementById('opponentChip').textContent = `💙 ${opponentName}: 0`;
+                        document.getElementById('oppName').textContent = opponentName;
                         startGame();
                     }
                 });
             }
         }
 
+        // ============================================
+        // GAME START
+        // ============================================
         function startGame() {
             gameStarted = true;
             document.getElementById('statusChip').textContent = '🟢 LIVE';
             setupChat();
+            setupSync();
+            gameLoop();
+        }
 
-            // Host: spawn and sync
+        function setupSync() {
             if (isHost) {
-                setInterval(() => { if(gameStarted) spawnObstacle(); }, 1600);
-                setInterval(() => { if(gameStarted) spawnHeart(); }, 2300);
+                // Host spawns obstacles
                 setInterval(() => {
-                    if(gameStarted) {
-                        db.ref('gameRooms/'+roomId+'/state').set({
-                            obstacles, hearts, speed, hostScore: Math.floor(myScore)
+                    if (gameStarted && !gameOver) spawnObstacle();
+                }, 1500 + Math.random() * 500);
+
+                // Host spawns hearts
+                setInterval(() => {
+                    if (gameStarted && !gameOver) spawnHeart();
+                }, 2200);
+
+                // Host syncs game state
+                setInterval(() => {
+                    if (gameStarted) {
+                        db.ref('gameRooms/' + roomId + '/state').set({
+                            obstacles: obstacles,
+                            hearts: hearts,
+                            speed: speed,
+                            hostScore: Math.floor(myScore),
+                            hostAlive: myDino.alive
                         });
                     }
                 }, 80);
             } else {
-                db.ref('gameRooms/'+roomId+'/state').on('value', s => {
-                    const d = s.val();
+                // Non-host listens to state
+                db.ref('gameRooms/' + roomId + '/state').on('value', (snap) => {
+                    const d = snap.val();
                     if (d) {
                         obstacles = d.obstacles || [];
                         hearts = d.hearts || [];
                         speed = d.speed || BASE_SPEED;
-                        oppScore = d.hostScore || 0;
-                        document.getElementById('opponentChip').textContent = `💙 ${opponentName}: ${Math.floor(oppScore)}`;
+                        opponentScore = d.hostScore || 0;
+                        oppDino.alive = d.hostAlive !== false;
+                        document.getElementById('oppScore').textContent = Math.floor(opponentScore);
                     }
                 });
             }
 
-            // Sync positions
+            // Sync my position
             setInterval(() => {
-                if(gameStarted) {
-                    db.ref('gameRooms/'+roomId+'/players/'+myPlayerId).set({
-                        y: myDino.y, jumping: myDino.jumping, alive: myDino.alive, score: Math.floor(myScore)
+                if (gameStarted) {
+                    db.ref('gameRooms/' + roomId + '/players/' + myPlayerId).set({
+                        y: myDino.y,
+                        jumping: myDino.jumping,
+                        alive: myDino.alive,
+                        score: Math.floor(myScore)
                     });
                 }
-            }, 50);
+            }, 40);
 
-            // Listen opponent
-            db.ref('gameRooms/'+roomId+'/players/'+opponentId).on('value', s => {
-                const d = s.val();
+            // Listen to opponent position
+            db.ref('gameRooms/' + roomId + '/players/' + opponentId).on('value', (snap) => {
+                const d = snap.val();
                 if (d) {
-                    oppDino.y = d.y ?? oppDino.y;
+                    oppDino.y = d.y !== undefined ? d.y : oppDino.y;
+                    oppDino.jumping = d.jumping || false;
                     oppDino.alive = d.alive !== false;
                     document.getElementById('statusChip').textContent = '🟢 LIVE';
                 } else {
-                    document.getElementById('statusChip').textContent = '💔 Left';
+                    document.getElementById('statusChip').textContent = '💔 Opponent left';
                 }
             });
-
-            gameLoop();
         }
 
+        // ============================================
+        // GAME OBJECTS
+        // ============================================
         function spawnObstacle() {
             const type = Math.random() > 0.5 ? 'cactus' : 'rock';
-            const w = type === 'cactus' ? 22 + Math.random()*10 : 28 + Math.random()*14;
-            const h = type === 'cactus' ? 35 + Math.random()*25 : 18 + Math.random()*14;
-            obstacles.push({x: W+40, y: GROUND_Y-h, w, h, type});
+            const w = type === 'cactus' ? 22 + Math.random() * 10 : 28 + Math.random() * 14;
+            const h = type === 'cactus' ? 35 + Math.random() * 30 : 18 + Math.random() * 15;
+            obstacles.push({
+                x: W + 50,
+                y: GROUND_Y - h,
+                w: w,
+                h: h,
+                type: type
+            });
         }
 
         function spawnHeart() {
-            hearts.push({x: W+40, y: Math.random()*120+70, w: 24, h: 24});
+            hearts.push({
+                x: W + 50,
+                y: Math.random() * 130 + 70,
+                w: 24,
+                h: 24
+            });
         }
 
-        function jump() {
-            if (!gameStarted || !myDino.alive) return;
-            if (!myDino.jumping) {
-                myDino.vy = JUMP_FORCE;
-                myDino.jumping = true;
+        function spawnParticles(x, y, color, count) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: Math.random() * -4 - 1,
+                    life: 25,
+                    maxLife: 25,
+                    color: color,
+                    size: Math.random() * 3 + 2
+                });
             }
         }
 
-        document.addEventListener('keydown', e => {
-            if (e.code==='Space' || e.key==='ArrowUp' || e.key==='w') { e.preventDefault(); jump(); }
-        });
-        canvas.addEventListener('click', jump);
-        canvas.addEventListener('touchstart', e => { e.preventDefault(); jump(); });
+        // ============================================
+        // CONTROLS
+        // ============================================
+        function jump() {
+            if (!gameStarted || gameOver || !myDino.alive) return;
+            if (!myDino.jumping) {
+                myDino.vy = JUMP_FORCE;
+                myDino.jumping = true;
+                spawnParticles(myDino.x + myDino.w / 2, myDino.y + myDino.h, myDino.color, 5);
+            }
+        }
 
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                e.preventDefault();
+                jump();
+            }
+        });
+
+        canvas.addEventListener('click', jump);
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            jump();
+        });
+
+        // ============================================
+        // GAME UPDATE
+        // ============================================
         function update() {
             if (!gameStarted) return;
-            frame++;
-            if (isHost) speed = Math.min(MAX_SPEED, BASE_SPEED + frame*0.002);
+            frameCount++;
+            distance += speed;
+            
+            // Increase speed
+            if (isHost) {
+                speed = Math.min(MAX_SPEED, BASE_SPEED + frameCount * 0.002);
+            }
 
-            // My physics
+            // My dino physics
             if (myDino.jumping) {
                 myDino.vy += GRAVITY;
                 myDino.y += myDino.vy;
@@ -348,70 +806,147 @@
                     myDino.y = GROUND_Y - myDino.h;
                     myDino.jumping = false;
                     myDino.vy = 0;
+                    spawnParticles(myDino.x + myDino.w / 2, myDino.y + myDino.h, myDino.color, 3);
                 }
             }
 
-            // Move (host)
-            if (isHost) {
-                for (let i=obstacles.length-1; i>=0; i--) {
-                    obstacles[i].x -= speed;
-                    if (obstacles[i].x + obstacles[i].w < 0) obstacles.splice(i,1);
+            // Leg animation
+            if (frameCount % 8 === 0) {
+                myDino.legFrame = (myDino.legFrame + 1) % 2;
+                oppDino.legFrame = (oppDino.legFrame + 1) % 2;
+            }
+
+            // Move clouds
+            for (const cloud of clouds) {
+                cloud.x -= cloud.speed;
+                if (cloud.x + cloud.w < 0) {
+                    cloud.x = W + 100;
+                    cloud.y = Math.random() * 100 + 20;
                 }
-                for (let i=hearts.length-1; i>=0; i--) {
-                    hearts[i].x -= speed*0.85;
-                    if (hearts[i].x < -30) hearts.splice(i,1);
+            }
+
+            // Move obstacles (host only)
+            if (isHost) {
+                for (let i = obstacles.length - 1; i >= 0; i--) {
+                    obstacles[i].x -= speed;
+                    if (obstacles[i].x + obstacles[i].w < 0) {
+                        obstacles.splice(i, 1);
+                    }
+                }
+                for (let i = hearts.length - 1; i >= 0; i--) {
+                    hearts[i].x -= speed * 0.85;
+                    if (hearts[i].x < -30) {
+                        hearts.splice(i, 1);
+                    }
+                }
+            }
+
+            // Update particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.15;
+                p.life--;
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
                 }
             }
 
             // Collisions
             if (myDino.alive) {
-                for (const o of obstacles) {
-                    if (rectHit(myDino, o)) {
+                for (const obs of obstacles) {
+                    if (rectCollide(myDino, obs)) {
                         myDino.alive = false;
-                        setTimeout(() => { myDino.alive=true; myDino.y=GROUND_Y-50; }, 1500);
+                        spawnParticles(myDino.x + myDino.w / 2, myDino.y + myDino.h / 2, myDino.color, 20);
+                        setTimeout(() => {
+                            myDino.alive = true;
+                            myDino.y = GROUND_Y - 50;
+                        }, 1500);
                         break;
                     }
                 }
-                for (let i=hearts.length-1; i>=0; i--) {
-                    if (rectHit(myDino, hearts[i])) {
+                for (let i = hearts.length - 1; i >= 0; i--) {
+                    if (rectCollide(myDino, hearts[i])) {
                         myScore += HEART_BONUS;
-                        if (isHost) hearts.splice(i,1);
+                        spawnParticles(hearts[i].x, hearts[i].y, '#ff6b9d', 10);
+                        if (isHost) hearts.splice(i, 1);
                     }
                 }
             }
 
-            if (myDino.alive) myScore += speed*0.1;
-            document.getElementById('youChip').textContent = `💕 ${myName}: ${Math.floor(myScore)}`;
+            // Score
+            if (myDino.alive) {
+                myScore += speed * 0.1;
+            }
+            document.getElementById('youScore').textContent = Math.floor(myScore);
+
+            // Check win
+            if (myScore >= WIN_SCORE || opponentScore >= WIN_SCORE) {
+                gameOver = true;
+                showGameOver();
+            }
         }
 
-        function rectHit(a, b) {
-            return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+        function rectCollide(a, b) {
+            return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
         }
 
+        function showGameOver() {
+            const overlay = document.getElementById('gameOverOverlay');
+            overlay.classList.add('show');
+            const isWinner = myScore > opponentScore;
+            document.getElementById('gameOverEmoji').textContent = isWinner ? '🏆' : '💙';
+            document.getElementById('gameOverTitle').textContent = isWinner ? 'You Win!' : 'Opponent Wins!';
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                window.location.href = 'lobby.html';
+            }, 3000);
+        }
+
+        // ============================================
+        // RENDER
+        // ============================================
         function render() {
             ctx.clearRect(0, 0, W, H);
 
-            // Sky
-            const grad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
-            grad.addColorStop(0, '#0a0a1a');
-            grad.addColorStop(0.4, '#1a1a3e');
-            grad.addColorStop(0.7, '#4a2d6b');
-            grad.addColorStop(0.9, '#e8a87c');
-            grad.addColorStop(1, '#f4c4a8');
-            ctx.fillStyle = grad;
+            // Sky gradient
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+            skyGrad.addColorStop(0, '#0a0a1a');
+            skyGrad.addColorStop(0.35, '#1a1a3e');
+            skyGrad.addColorStop(0.65, '#4a2d6b');
+            skyGrad.addColorStop(0.85, '#e8a87c');
+            skyGrad.addColorStop(1, '#f4c4a8');
+            ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, W, GROUND_Y);
 
-            // Stars
-            for (let i=0; i<20; i++) {
-                ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.5+0.2})`;
+            // Stars with twinkle
+            for (const star of stars) {
+                const twinkle = Math.sin(Date.now() * 0.002 + star.phase) * 0.3 + 0.5;
+                ctx.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
                 ctx.beginPath();
-                ctx.arc((i*45+frame)%W, (i*25)%150, 1.5, 0, Math.PI*2);
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Clouds
+            for (const cloud of clouds) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${cloud.opacity})`;
+                ctx.beginPath();
+                ctx.arc(cloud.x, cloud.y, cloud.w / 2, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.w / 3, cloud.y - 10, cloud.w / 3, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.w / 2, cloud.y, cloud.w / 2.5, 0, Math.PI * 2);
                 ctx.fill();
             }
 
             // Ground
-            ctx.fillStyle = '#2d3436';
-            ctx.fillRect(0, GROUND_Y, W, H-GROUND_Y);
+            const groundGrad = ctx.createLinearGradient(0, GROUND_Y, 0, H);
+            groundGrad.addColorStop(0, '#2d3436');
+            groundGrad.addColorStop(1, '#1e272e');
+            ctx.fillStyle = groundGrad;
+            ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+
+            // Ground line
             ctx.strokeStyle = '#e8a87c';
             ctx.lineWidth = 2;
             ctx.beginPath();
@@ -419,74 +954,139 @@
             ctx.lineTo(W, GROUND_Y);
             ctx.stroke();
 
+            // Ground details
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            for (let i = 0; i < 15; i++) {
+                const gx = (i * 60 + frameCount * 0.5) % W;
+                ctx.fillRect(gx, GROUND_Y + 10, 3, 6);
+            }
+
             // Obstacles
-            for (const o of obstacles) {
-                if (o.type === 'cactus') {
+            for (const obs of obstacles) {
+                if (obs.type === 'cactus') {
                     ctx.fillStyle = '#4CAF50';
-                    ctx.fillRect(o.x, o.y, o.w, o.h);
-                    ctx.fillRect(o.x-5, o.y+10, 7, 13);
-                    ctx.fillRect(o.x+o.w-2, o.y+13, 7, 11);
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    ctx.fillRect(obs.x - 6, obs.y + 12, 8, 16);
+                    ctx.fillRect(obs.x + obs.w - 2, obs.y + 15, 8, 14);
+                    // Flower on cactus
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🌸', obs.x + obs.w / 2, obs.y - 3);
                 } else {
                     ctx.fillStyle = '#795548';
                     ctx.beginPath();
-                    ctx.arc(o.x+o.w/2, o.y+o.h, o.w/2, Math.PI, 0);
+                    ctx.arc(obs.x + obs.w / 2, obs.y + obs.h, obs.w / 2, Math.PI, 0);
+                    ctx.fill();
+                    ctx.fillStyle = '#8d6e63';
+                    ctx.beginPath();
+                    ctx.arc(obs.x + obs.w / 2, obs.y + 5, obs.w * 0.3, Math.PI, 2 * Math.PI);
                     ctx.fill();
                 }
             }
 
             // Hearts
-            for (const h of hearts) {
-                ctx.font = '22px Arial';
+            for (const heart of hearts) {
+                const bob = Math.sin(frameCount * 0.05 + heart.x) * 3;
+                ctx.font = '24px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('💗', h.x+12, h.y+12);
+                ctx.fillText('💗', heart.x + 12, heart.y + 12 + bob);
             }
+
+            // Particles
+            for (const p of particles) {
+                const alpha = p.life / p.maxLife;
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
 
             // Connection line
             if (myDino.alive && oppDino.alive) {
-                ctx.strokeStyle = 'rgba(244,114,182,0.3)';
+                ctx.save();
+                ctx.strokeStyle = 'rgba(244, 114, 182, 0.3)';
                 ctx.lineWidth = 2;
-                ctx.setLineDash([5,5]);
+                ctx.setLineDash([5, 5]);
                 ctx.beginPath();
-                ctx.moveTo(myDino.x+20, myDino.y+25);
-                ctx.lineTo(oppDino.x+20, oppDino.y+25);
+                ctx.moveTo(myDino.x + myDino.w / 2, myDino.y + myDino.h / 2);
+                ctx.lineTo(oppDino.x + oppDino.w / 2, oppDino.y + oppDino.h / 2);
                 ctx.stroke();
                 ctx.setLineDash([]);
+                // Floating hearts on line
+                for (let i = 0; i < 3; i++) {
+                    const t = (frameCount * 0.02 + i * 0.33) % 1;
+                    const hx = myDino.x + myDino.w / 2 + (oppDino.x + oppDino.w / 2 - myDino.x - myDino.w / 2) * t;
+                    const hy = myDino.y + myDino.h / 2 + (oppDino.y + oppDino.h / 2 - myDino.y - myDino.h / 2) * t - 10;
+                    ctx.font = '10px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('💗', hx, hy);
+                }
+                ctx.restore();
             }
 
-            // Dinos
-            if (myDino.alive) drawDino(myDino, '#f472b6', '💕');
-            if (oppDino.alive) drawDino(oppDino, '#60a5fa', '💙');
+            // Draw dinos
+            if (myDino.alive) drawDino(myDino);
+            if (oppDino.alive) drawDino(oppDino);
         }
 
-        function drawDino(d, color, emoji) {
-            ctx.fillStyle = color;
-            ctx.fillRect(d.x, d.y, d.w, d.h);
-            ctx.fillStyle = 'rgba(255,255,255,0.25)';
-            ctx.fillRect(d.x+10, d.y+20, d.w-20, d.h-25);
-            ctx.fillStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(d.x+d.w-15, d.y+14, 6, 0, Math.PI*2);
-            ctx.fill();
-            ctx.fillStyle = '#1a1a1a';
-            ctx.beginPath();
-            ctx.arc(d.x+d.w-13, d.y+15, 3, 0, Math.PI*2);
-            ctx.fill();
-            ctx.fillStyle = color;
-            const lo = frame%16 < 8 ? 0 : 5;
-            ctx.fillRect(d.x+10, d.y+d.h-4, 9, 16+lo);
-            ctx.fillRect(d.x+d.w-19, d.y+d.h-4, 9, 16-lo);
-            ctx.font = '15px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(emoji, d.x+d.w/2, d.y+d.h/2+5);
+        function drawDino(dino) {
+            const ctx2 = ctx;
+            
+            // Body
+            ctx2.fillStyle = dino.color;
+            ctx2.beginPath();
+            ctx2.roundRect(dino.x, dino.y, dino.w, dino.h, 8);
+            ctx2.fill();
+
+            // Belly
+            ctx2.fillStyle = 'rgba(255, 255, 255, 0.25)';
+            ctx2.beginPath();
+            ctx2.roundRect(dino.x + 10, dino.y + 20, dino.w - 20, dino.h - 25, 5);
+            ctx2.fill();
+
+            // Eye
+            ctx2.fillStyle = 'white';
+            ctx2.beginPath();
+            ctx2.arc(dino.x + dino.w - 15, dino.y + 14, 6, 0, Math.PI * 2);
+            ctx2.fill();
+            
+            // Pupil
+            ctx2.fillStyle = '#1a1a1a';
+            ctx2.beginPath();
+            ctx2.arc(dino.x + dino.w - 13, dino.y + 15, 3, 0, Math.PI * 2);
+            ctx2.fill();
+
+            // Legs with animation
+            ctx2.fillStyle = dino.color;
+            const legOffset = dino.legFrame === 0 ? 0 : 5;
+            ctx2.fillRect(dino.x + 10, dino.y + dino.h - 4, 9, 16 + legOffset);
+            ctx2.fillRect(dino.x + dino.w - 19, dino.y + dino.h - 4, 9, 16 - legOffset);
+
+            // Tail
+            ctx2.fillStyle = dino.color;
+            ctx2.beginPath();
+            ctx2.moveTo(dino.x, dino.y + 30);
+            ctx2.lineTo(dino.x - 15, dino.y + 20);
+            ctx2.lineTo(dino.x, dino.y + 20);
+            ctx2.fill();
+
+            // Emoji
+            ctx2.font = '15px Arial';
+            ctx2.textAlign = 'center';
+            ctx2.fillText(dino.emoji, dino.x + dino.w / 2, dino.y + dino.h / 2 + 5);
         }
 
-        // Chat
+        // ============================================
+        // CHAT SYSTEM
+        // ============================================
         function setupChat() {
-            const ref = db.ref('gameRooms/'+roomId+'/chat');
-            ref.off();
-            ref.limitToLast(50).on('child_added', s => {
-                const m = s.val();
-                displayMsg(m.sender, m.message, m.sender===myName);
+            const chatRef = db.ref('gameRooms/' + roomId + '/chat');
+            chatRef.off();
+            chatRef.limitToLast(50).on('child_added', (snap) => {
+                const msg = snap.val();
+                displayMessage(msg.sender, msg.message, msg.sender === myName);
             });
         }
 
@@ -494,33 +1094,56 @@
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
             if (msg && roomId) {
-                db.ref('gameRooms/'+roomId+'/chat').push({
-                    sender: myName, message: msg,
+                db.ref('gameRooms/' + roomId + '/chat').push({
+                    sender: myName,
+                    message: msg,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
                 input.value = '';
             }
         }
 
-        function displayMsg(sender, msg, isYou) {
-            const c = document.getElementById('chatMessages');
+        function displayMessage(sender, msg, isYou) {
+            const container = document.getElementById('chatMessages');
             const div = document.createElement('div');
-            div.className = `chat-message ${isYou?'you':'opponent'}`;
+            div.className = `chat-message ${isYou ? 'you' : 'opponent'}`;
             div.innerHTML = `<span class="sender">${sender}</span><span class="text">${msg}</span>`;
-            c.appendChild(div);
-            c.scrollTop = c.scrollHeight;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
         }
 
-        document.getElementById('chatInput').addEventListener('keypress', e => {
-            if (e.key==='Enter') sendMessage();
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
         });
 
+        // ============================================
+        // GAME LOOP
+        // ============================================
         function gameLoop() {
             update();
             render();
             requestAnimationFrame(gameLoop);
         }
 
+        // RoundRect polyfill
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                this.moveTo(x + r, y);
+                this.lineTo(x + w - r, y);
+                this.quadraticCurveTo(x + w, y, x + w, y + r);
+                this.lineTo(x + w, y + h - r);
+                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                this.lineTo(x + r, y + h);
+                this.quadraticCurveTo(x, y + h, x, y + h - r);
+                this.lineTo(x, y + r);
+                this.quadraticCurveTo(x, y, x + r, y);
+                return this;
+            };
+        }
+
+        // Start
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
