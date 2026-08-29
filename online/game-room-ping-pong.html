@@ -61,6 +61,7 @@
             font-size: 18px;
             font-weight: bold;
             color: #ff6b9d;
+            text-shadow: 0 0 20px rgba(255,107,157,0.5);
         }
 
         .scoreboard { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -70,9 +71,10 @@
             border-radius: 14px;
             font-size: 11px;
             font-weight: 600;
+            border: 1px solid;
         }
 
-        .score-chip.status { background: rgba(255,255,255,0.1); color: #fdcb6e; font-size: 10px; }
+        .score-chip.status { background: rgba(255,255,255,0.1); border-color: transparent; color: #fdcb6e; font-size: 10px; }
 
         .main-layout { display: flex; gap: 10px; }
         .game-area { flex: 1; min-width: 0; }
@@ -139,8 +141,8 @@
             <a href="lobby.html" class="back-btn">← Lobby</a>
             <h1 class="game-title">🏓 Online Ping Pong</h1>
             <div class="scoreboard">
-                <div class="score-chip" id="myScoreChip" style="background:rgba(255,255,255,0.1);">YOU: <span id="youScore">0</span></div>
-                <div class="score-chip" id="oppScoreChip" style="background:rgba(255,255,255,0.1);">OPP: <span id="oppScore">0</span></div>
+                <div class="score-chip" id="myScoreChip">YOU: <span id="youScore">0</span></div>
+                <div class="score-chip" id="oppScoreChip">OPP: <span id="oppScore">0</span></div>
                 <div class="score-chip status" id="statusChip">Connecting...</div>
             </div>
         </div>
@@ -192,9 +194,10 @@
         const ctx = canvas.getContext('2d');
         canvas.width = W; canvas.height = H;
 
-        const colors = ['#ff6b9d', '#74b9ff', '#4CAF50', '#FF9800', '#9c27b0', '#fdcb6e'];
-        
+        const COLORS = ['#ff6b9d', '#74b9ff', '#4CAF50', '#FF9800', '#9c27b0', '#fdcb6e'];
+
         let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
+        let mySide = 'left'; // 'left' or 'right' - RANDOMLY ASSIGNED
         let isHost = false, gameStarted = false, gameOver = false;
         let myScore = 0, oppScore = 0;
         let myPaddleY = H/2 - PADDLE_H/2;
@@ -204,13 +207,14 @@
         const ball = { x: W/2, y: H/2, vx: 4, vy: 2, radius: 8 };
 
         function init() {
-            // Random colors - always different
-            const myIdx = Math.floor(Math.random() * colors.length);
-            let oppIdx = Math.floor(Math.random() * colors.length);
-            while (oppIdx === myIdx) oppIdx = Math.floor(Math.random() * colors.length);
-            myColor = colors[myIdx];
-            oppColor = colors[oppIdx];
+            // Random colors - ALWAYS DIFFERENT
+            const myIdx = Math.floor(Math.random() * COLORS.length);
+            let oppIdx = Math.floor(Math.random() * COLORS.length);
+            while (oppIdx === myIdx) oppIdx = Math.floor(Math.random() * COLORS.length);
+            myColor = COLORS[myIdx];
+            oppColor = COLORS[oppIdx];
 
+            // Set score chip colors
             document.getElementById('myScoreChip').style.color = myColor;
             document.getElementById('myScoreChip').style.borderColor = myColor;
             document.getElementById('oppScoreChip').style.color = oppColor;
@@ -242,18 +246,20 @@
         function setupPlayers(data) {
             if (data.player1 === myPlayerId) {
                 isHost = true;
+                mySide = 'left';
                 opponentId = data.player2 || null;
                 opponentName = data.player2Name || 'Opponent';
             } else {
+                isHost = false;
+                mySide = 'right';
                 opponentId = data.player1 || null;
                 opponentName = data.player1Name || 'Opponent';
             }
 
             if (opponentId) startGame();
             else {
-                document.getElementById('statusChip').textContent = 'Waiting...';
-                const ref = db.ref('matchmaking/' + roomId + '/player2');
-                ref.on('value', s => {
+                document.getElementById('statusChip').textContent = '⏳ Waiting...';
+                db.ref('matchmaking/' + roomId + '/player2').on('value', s => {
                     if (s.val()) {
                         opponentId = s.val();
                         db.ref('users/' + opponentId).once('value').then(us => {
@@ -279,7 +285,7 @@
                 resetBall();
                 setInterval(() => {
                     if (gameStarted && !gameOver) {
-                        updateBall();
+                        updateBallPhysics();
                         db.ref('gameRooms/' + roomId + '/ppState').set({
                             bx: ball.x, by: ball.y, bvx: ball.vx, bvy: ball.vy,
                             hs: myScore, gs: oppScore
@@ -334,14 +340,14 @@
             ball.vy = (Math.random() - 0.5) * 3;
         }
 
-        function updateBall() {
+        function updateBallPhysics() {
             ball.x += ball.vx;
             ball.y += ball.vy;
 
             if (ball.y <= ball.radius) { ball.y = ball.radius; ball.vy = Math.abs(ball.vy); }
             if (ball.y >= H - ball.radius) { ball.y = H - ball.radius; ball.vy = -Math.abs(ball.vy); }
 
-            // My paddle (left)
+            // LEFT paddle collision (host side)
             if (ball.vx < 0 && ball.x - ball.radius <= PADDLE_W + 15 && ball.y >= myPaddleY && ball.y <= myPaddleY + PADDLE_H) {
                 const rel = (myPaddleY + PADDLE_H/2) - ball.y;
                 const norm = rel / (PADDLE_H/2);
@@ -352,7 +358,7 @@
                 ball.x = PADDLE_W + 15 + ball.radius;
             }
 
-            // Opponent paddle (right)
+            // RIGHT paddle collision (guest side)
             if (ball.vx > 0 && ball.x + ball.radius >= W - PADDLE_W - 15 && ball.y >= oppPaddleY && ball.y <= oppPaddleY + PADDLE_H) {
                 const rel = (oppPaddleY + PADDLE_H/2) - ball.y;
                 const norm = rel / (PADDLE_H/2);
@@ -413,19 +419,35 @@
             ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke();
             ctx.setLineDash([]);
 
-            // MY PADDLE - left side with MY color
-            ctx.fillStyle = myColor;
-            ctx.shadowColor = myColor;
-            ctx.shadowBlur = 15;
-            ctx.fillRect(15, myPaddleY, PADDLE_W, PADDLE_H);
-            ctx.shadowBlur = 0;
-
-            // OPPONENT PADDLE - right side with OPPONENT color
-            ctx.fillStyle = oppColor;
-            ctx.shadowColor = oppColor;
-            ctx.shadowBlur = 15;
-            ctx.fillRect(W - PADDLE_W - 15, oppPaddleY, PADDLE_W, PADDLE_H);
-            ctx.shadowBlur = 0;
+            // MY PADDLE - at MY SIDE with MY COLOR
+            if (mySide === 'left') {
+                ctx.fillStyle = myColor;
+                ctx.shadowColor = myColor;
+                ctx.shadowBlur = 15;
+                ctx.fillRect(15, myPaddleY, PADDLE_W, PADDLE_H);
+                ctx.shadowBlur = 0;
+                
+                // Opponent on right
+                ctx.fillStyle = oppColor;
+                ctx.shadowColor = oppColor;
+                ctx.shadowBlur = 15;
+                ctx.fillRect(W - PADDLE_W - 15, oppPaddleY, PADDLE_W, PADDLE_H);
+                ctx.shadowBlur = 0;
+            } else {
+                // Opponent on left
+                ctx.fillStyle = oppColor;
+                ctx.shadowColor = oppColor;
+                ctx.shadowBlur = 15;
+                ctx.fillRect(15, oppPaddleY, PADDLE_W, PADDLE_H);
+                ctx.shadowBlur = 0;
+                
+                // My paddle on right
+                ctx.fillStyle = myColor;
+                ctx.shadowColor = myColor;
+                ctx.shadowBlur = 15;
+                ctx.fillRect(W - PADDLE_W - 15, myPaddleY, PADDLE_W, PADDLE_H);
+                ctx.shadowBlur = 0;
+            }
 
             // Ball
             ctx.fillStyle = '#fff';
