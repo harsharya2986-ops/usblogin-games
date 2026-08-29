@@ -5,238 +5,167 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Chess ♟️ | UsBlog Games</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
-
-        :root {
-            --rose-gold: #b76e79;
-            --blush-pink: #ffd1dc;
-            --soft-lavender: #e6e6fa;
-            --amethyst: #9c27b0;
-            --primary: #ff6b9d;
-            --blue: #74b9ff;
-            --gold: #fdcb6e;
-            --dark: #1a1a2e;
-        }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 30%, #4a2d6b 60%, #1a1a2e 100%);
+            font-family: 'Segoe UI', 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b, #4c1d95, #9d174d);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            overflow-x: hidden;
+            padding: 10px;
         }
 
-        .game-container {
-            background: rgba(26, 26, 46, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 2rem;
-            padding: 1.5rem;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-            max-width: 1000px;
+        .game-shell {
+            background: rgba(30, 27, 75, 0.95);
+            border-radius: 18px;
+            padding: 15px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
             width: 100%;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            max-width: 800px;
         }
 
         .game-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .back-btn {
-            color: #ffd1dc;
+            color: white;
             text-decoration: none;
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            border: 1px solid rgba(255, 209, 220, 0.3);
-            transition: all 0.3s;
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 18px;
+            font-size: 12px;
         }
 
-        .game-title {
-            font-family: 'Dancing Script', cursive;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #ffd1dc;
-        }
+        .game-title { font-size: 18px; font-weight: bold; color: #ff6b9d; }
 
-        .players-info { display: flex; gap: 8px; flex-wrap: wrap; }
-        .player-chip { padding: 6px 14px; border-radius: 18px; font-size: 12px; font-weight: 600; }
-        .player-chip.you { background: rgba(255, 107, 157, 0.2); border: 1px solid #ff6b9d; color: #ff6b9d; }
-        .player-chip.opponent { background: rgba(156, 39, 176, 0.2); border: 1px solid #9c27b0; color: #ce93d8; }
+        .players-info { display: flex; gap: 6px; flex-wrap: wrap; }
+        .player-chip { padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 600; }
+        .player-chip.status { background: rgba(255,255,255,0.1); color: #fdcb6e; font-size: 10px; }
 
         .status-bar {
             text-align: center;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
-            color: #ffd1dc;
-            font-weight: 600;
-            margin-bottom: 1rem;
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            color: white;
         }
 
-        .main-layout {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .board-section {
-            flex: 1;
-            min-width: 280px;
-        }
+        .main-layout { display: flex; gap: 10px; }
+        .game-area { flex: 1; min-width: 0; }
 
         .chess-board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
             aspect-ratio: 1;
-            border-radius: 0.75rem;
+            border-radius: 8px;
             overflow: hidden;
-            border: 3px solid rgba(183, 110, 121, 0.5);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border: 3px solid rgba(255,255,255,0.2);
+            background: #0a0a1a;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         .square {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             cursor: pointer;
-            transition: all 0.2s ease;
             position: relative;
             user-select: none;
+            -webkit-user-select: none;
+            pointer-events: auto;
         }
 
         .square.light { background: #ffd1dc; }
         .square.dark { background: #e6e6fa; }
-        .square.selected { box-shadow: inset 0 0 20px rgba(183, 110, 121, 0.8); }
-
+        .square.selected { box-shadow: inset 0 0 15px rgba(255,107,157,0.9); }
         .square.valid-move::after {
             content: '';
             position: absolute;
             width: 25%;
             height: 25%;
             border-radius: 50%;
-            background: rgba(76, 175, 80, 0.6);
+            background: rgba(76,175,80,0.8);
         }
 
-        .square.valid-capture::after {
-            content: '';
-            position: absolute;
-            width: 85%;
-            height: 85%;
-            border-radius: 50%;
-            border: 3px solid rgba(255, 0, 0, 0.5);
-        }
-
-        .piece { font-size: 1.8rem; cursor: pointer; }
-        .piece.rose { filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.6)); }
-        .piece.amethyst { filter: drop-shadow(0 0 8px rgba(156, 39, 176, 0.6)); }
-
-        .sidebar {
-            width: 220px;
-            min-width: 180px;
+        .chat-sidebar {
+            width: 200px;
+            min-width: 200px;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .chat-box {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 1rem;
-            padding: 0.75rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-title {
-            font-family: 'Dancing Script', cursive;
-            font-size: 1rem;
-            color: #ffd1dc;
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            min-height: 150px;
-            max-height: 300px;
-        }
-
-        .chat-messages::-webkit-scrollbar { width: 4px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255, 107, 157, 0.5); border-radius: 2px; }
-
-        .chat-message {
-            margin-bottom: 8px;
-            padding: 6px 10px;
+            background: rgba(255,255,255,0.05);
             border-radius: 10px;
-            font-size: 11px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            max-height: 350px;
         }
 
-        .chat-message.you { background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(255, 107, 157, 0.3); }
-        .chat-message.opponent { background: rgba(156, 39, 176, 0.15); border: 1px solid rgba(156, 39, 176, 0.3); }
-        .chat-message .sender { font-weight: bold; font-size: 9px; display: block; }
-        .chat-message.you .sender { color: #ff6b9d; }
-        .chat-message.opponent .sender { color: #ce93d8; }
-        .chat-message .text { color: rgba(255, 255, 255, 0.85); }
+        .chat-header {
+            padding: 8px;
+            background: rgba(255,107,157,0.15);
+            text-align: center;
+            color: #ff6b9d;
+            font-weight: bold;
+            font-size: 12px;
+        }
 
-        .chat-input-area { display: flex; gap: 4px; margin-top: 0.5rem; }
-        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
-        .chat-input-area button { padding: 6px 12px; border-radius: 15px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 120px; max-height: 220px; display: flex; flex-direction: column; gap: 4px; }
+        .chat-messages::-webkit-scrollbar { width: 3px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
+
+        .chat-message { padding: 5px 8px; border-radius: 8px; font-size: 10px; max-width: 90%; }
+        .chat-message.you { background: rgba(255,107,157,0.2); align-self: flex-end; }
+        .chat-message.opponent { background: rgba(116,185,255,0.15); align-self: flex-start; }
+        .chat-message .sender { font-weight: bold; font-size: 8px; display: block; }
+
+        .chat-input-area { display: flex; gap: 4px; padding: 6px; }
+        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 10px; }
+        .chat-input-area button { padding: 6px 10px; border-radius: 14px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 9px; }
 
         @media (max-width: 700px) {
             .main-layout { flex-direction: column; }
-            .sidebar { width: 100%; }
-            .chat-messages { max-height: 120px; min-height: 80px; }
-            .piece { font-size: 1.3rem; }
-            .square { font-size: 1.3rem; }
-            .game-title { font-size: 1.5rem; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 120px; }
+            .chat-messages { max-height: 50px; min-height: 30px; }
+            .square { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
+    <div class="game-shell">
         <div class="game-header">
             <a href="lobby.html" class="back-btn">← Lobby</a>
-            <h1 class="game-title">👑 Online Chess</h1>
+            <h1 class="game-title">♟️ Chess</h1>
             <div class="players-info">
-                <div class="player-chip you" id="youChip">💕 You (Rose)</div>
-                <div class="player-chip opponent" id="opponentChip">💜 Opponent (Amethyst)</div>
+                <div class="player-chip" id="youChip">💕 You</div>
+                <div class="player-chip" id="opponentChip">💙 Opp</div>
+                <div class="player-chip status" id="statusChip">Connecting...</div>
             </div>
         </div>
 
         <div class="status-bar" id="statusBar">Loading...</div>
 
         <div class="main-layout">
-            <div class="board-section">
+            <div class="game-area">
                 <div class="chess-board" id="chessBoard"></div>
             </div>
-            <div class="sidebar">
-                <div class="chat-box">
-                    <div class="chat-title">💬 Chat</div>
-                    <div class="chat-messages" id="chatMessages">
-                        <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 11px; padding: 10px 0;">💕 Start chatting!</div>
-                    </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="chatInput" placeholder="Message...">
-                        <button onclick="sendMessage()">Send</button>
-                    </div>
+            <div class="chat-sidebar">
+                <div class="chat-header">💬 Chat</div>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Message...">
+                    <button onclick="sendMessage()">Send</button>
                 </div>
             </div>
         </div>
@@ -254,128 +183,149 @@
             projectId: "usblog-games",
             storageBucket: "usblog-games.firebasestorage.app",
             messagingSenderId: "568211981446",
-            appId: "1:568211981446:web:0e75688bb9a28c2df97d07",
-            measurementId: "G-BDKRR8E565"
+            appId: "1:568211981446:web:0e75688bb9a28c2df97d07"
         };
-
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const database = firebase.database();
+        const db = firebase.database();
 
-        const pieces = {
-            rose: { king: '🤴', queen: '👸', rook: '🏰', bishop: '🕊️', knight: '🦄', pawn: '❤️' },
-            amethyst: { king: '🧝', queen: '🧚', rook: '🏯', bishop: '🏹', knight: '🐉', pawn: '💜' }
+        const COLORS = ['#ff6b9d', '#74b9ff', '#4CAF50', '#FF9800', '#9c27b0'];
+        
+        const PIECES = {
+            white: { king: '🤴', queen: '👸', rook: '🏰', bishop: '🕊️', knight: '🦄', pawn: '❤️' },
+            black: { king: '🧝', queen: '🧚', rook: '🏯', bishop: '🏹', knight: '🐉', pawn: '💜' }
         };
 
-        let roomId = null;
-        let myPlayerId = null;
-        let opponentId = null;
-        let myName = '';
-        let opponentName = '';
-        let isHost = false;
-        let myColor = 'rose';
-        let currentTurn = 'rose';
-        let selectedSquare = null;
+        let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
+        let mySide = 'white', currentTurn = 'white';
+        let myColor, oppColor;
+        let selectedRow = -1, selectedCol = -1;
         let validMoves = [];
         let board = [];
+        let gameStarted = false;
 
-        function initBoard() {
-            board = Array(8).fill(null).map(() => Array(8).fill(null));
-            const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
-            for (let col = 0; col < 8; col++) {
-                board[7][col] = { type: backRow[col], side: 'rose' };
-                board[6][col] = { type: 'pawn', side: 'rose' };
-                board[0][col] = { type: backRow[col], side: 'amethyst' };
-                board[1][col] = { type: 'pawn', side: 'amethyst' };
+        window.squareClick = function(row, col) {
+            if (!gameStarted) return;
+            if (currentTurn !== mySide) return;
+            
+            const piece = board[row][col];
+
+            if (selectedRow >= 0) {
+                const isValid = validMoves.some(m => m.r === row && m.c === col);
+                if (isValid) {
+                    makeMove(selectedRow, selectedCol, row, col);
+                    return;
+                }
+                if (piece && piece.side === mySide) {
+                    selectSquare(row, col);
+                    return;
+                }
+                deselectSquare();
+                return;
             }
-        }
+
+            if (piece && piece.side === mySide) selectSquare(row, col);
+        };
 
         function init() {
-            auth.onAuthStateChanged((user) => {
-                if (!user) { window.location.href = 'login.html'; return; }
+            // Random colors
+            const myIdx = Math.floor(Math.random() * COLORS.length);
+            let oppIdx = Math.floor(Math.random() * COLORS.length);
+            while (oppIdx === myIdx) oppIdx = Math.floor(Math.random() * COLORS.length);
+            myColor = COLORS[myIdx];
+            oppColor = COLORS[oppIdx];
 
-                database.ref('users/' + user.uid).once('value').then((snapshot) => {
-                    const data = snapshot.val();
-                    myName = data ? data.username : user.email.split('@')[0];
-                    document.getElementById('youChip').textContent = `💕 ${myName} (Rose)`;
-                });
+            document.getElementById('youChip').style.color = myColor;
+            document.getElementById('youChip').style.border = '1px solid ' + myColor;
+            document.getElementById('youChip').style.background = myColor + '22';
+            document.getElementById('opponentChip').style.color = oppColor;
+            document.getElementById('opponentChip').style.border = '1px solid ' + oppColor;
+            document.getElementById('opponentChip').style.background = oppColor + '22';
 
-                const params = new URLSearchParams(window.location.search);
-                roomId = params.get('match') || params.get('team');
+            auth.onAuthStateChanged(user => {
+                if (!user) { location.href = 'login.html'; return; }
                 myPlayerId = user.uid;
-
-                if (!roomId) { window.location.href = 'lobby.html'; return; }
+                db.ref('users/' + user.uid).once('value').then(s => {
+                    myName = s.val()?.username || 'Player';
+                    document.getElementById('youChip').textContent = '💕 ' + myName;
+                });
+                const p = new URLSearchParams(location.search);
+                roomId = p.get('match') || p.get('team');
+                if (!roomId) { location.href = 'lobby.html'; return; }
                 setupRoom();
             });
         }
 
         function setupRoom() {
-            database.ref('matchmaking/' + roomId).once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    setupFromRoomData(snapshot.val(), 'matchmaking');
-                } else {
-                    database.ref('teams/' + roomId).once('value').then((teamSnap) => {
-                        if (teamSnap.exists()) {
-                            setupFromRoomData(teamSnap.val(), 'teams');
-                        } else {
-                            alert('Room not found!');
-                            window.location.href = 'lobby.html';
-                        }
-                    });
-                }
+            db.ref('matchmaking/' + roomId).once('value').then(s => {
+                if (s.exists()) setupPlayers(s.val());
+                else db.ref('teams/' + roomId).once('value').then(ts => {
+                    if (ts.exists()) setupPlayers(ts.val());
+                    else { location.href = 'lobby.html'; }
+                });
             });
         }
 
-        function setupFromRoomData(roomData, collection) {
-            if (roomData.player1 === myPlayerId) {
-                isHost = true;
-                myColor = 'rose';
-                opponentId = roomData.player2 || null;
-                opponentName = roomData.player2Name || 'Opponent';
+        function setupPlayers(data) {
+            if (data.player1 === myPlayerId) {
+                mySide = 'white';
+                opponentId = data.player2 || null;
+                opponentName = data.player2Name || 'Opponent';
             } else {
-                isHost = false;
-                myColor = 'amethyst';
-                opponentId = roomData.player1 || null;
-                opponentName = roomData.player1Name || 'Opponent';
+                mySide = 'black';
+                opponentId = data.player1 || null;
+                opponentName = data.player1Name || 'Opponent';
             }
 
-            document.getElementById('opponentChip').textContent = `💜 ${opponentName} (Amethyst)`;
-
             if (opponentId) {
+                db.ref('users/' + opponentId).once('value').then(us => {
+                    if (us.exists()) opponentName = us.val().username || opponentName;
+                    document.getElementById('opponentChip').textContent = '💙 ' + opponentName;
+                });
                 startGame();
             } else {
-                database.ref(collection + '/' + roomId).on('value', (snap) => {
-                    const data = snap.val();
-                    if (data && data.player2) {
-                        opponentId = data.player2;
-                        opponentName = data.player2Name || 'Opponent';
-                        document.getElementById('opponentChip').textContent = `💜 ${opponentName} (Amethyst)`;
-                        startGame();
+                document.getElementById('statusChip').textContent = '⏳ Waiting...';
+                db.ref('matchmaking/' + roomId + '/player2').on('value', s => {
+                    if (s.val()) {
+                        opponentId = s.val();
+                        db.ref('users/' + opponentId).once('value').then(us => {
+                            if (us.exists()) opponentName = us.val().username || 'Opponent';
+                            document.getElementById('opponentChip').textContent = '💙 ' + opponentName;
+                            startGame();
+                        });
                     }
                 });
             }
         }
 
+        function initBoard() {
+            board = Array(8).fill(null).map(() => Array(8).fill(null));
+            const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
+            for (let col = 0; col < 8; col++) {
+                board[0][col] = { type: backRow[col], side: 'black' };
+                board[1][col] = { type: 'pawn', side: 'black' };
+                board[6][col] = { type: 'pawn', side: 'white' };
+                board[7][col] = { type: backRow[col], side: 'white' };
+            }
+        }
+
         function startGame() {
+            gameStarted = true;
+            document.getElementById('statusChip').textContent = '🟢 LIVE';
             initBoard();
             renderBoard();
             updateStatus();
+            setupChat();
 
-            if (isHost) {
-                database.ref('gameRooms/' + roomId + '/chessBoard').set(board);
-                database.ref('gameRooms/' + roomId + '/chessTurn').set('rose');
-            }
-
-            database.ref('gameRooms/' + roomId + '/chessBoard').on('value', (snap) => {
+            db.ref('gameRooms/' + roomId + '/chessBoard').on('value', snap => {
                 const data = snap.val();
-                if (data && !isHost) {
+                if (data) {
                     board = data;
                     renderBoard();
-                    updateStatus();
                 }
             });
 
-            database.ref('gameRooms/' + roomId + '/chessTurn').on('value', (snap) => {
+            db.ref('gameRooms/' + roomId + '/chessTurn').on('value', snap => {
                 const turn = snap.val();
                 if (turn) {
                     currentTurn = turn;
@@ -383,15 +333,20 @@
                 }
             });
 
-            setupChat();
+            if (mySide === 'white') {
+                db.ref('gameRooms/' + roomId + '/chessBoard').set(board);
+                db.ref('gameRooms/' + roomId + '/chessTurn').set('white');
+            }
         }
 
         function updateStatus() {
-            const statusBar = document.getElementById('statusBar');
-            if (currentTurn === myColor) {
-                statusBar.textContent = '💕 Your Turn! Click a piece to move';
+            const sb = document.getElementById('statusBar');
+            if (currentTurn === mySide) {
+                sb.textContent = '💕 YOUR TURN!';
+                sb.style.color = myColor;
             } else {
-                statusBar.textContent = '💜 Opponent\'s Turn...';
+                sb.textContent = '💙 ' + opponentName + ' IS THINKING...';
+                sb.style.color = oppColor;
             }
         }
 
@@ -411,17 +366,17 @@
         }
 
         function getPawnMoves(row, col, side, moves) {
-            const dir = side === 'rose' ? -1 : 1;
-            const startRow = side === 'rose' ? 6 : 1;
+            const dir = side === 'white' ? -1 : 1;
+            const startRow = side === 'white' ? 6 : 1;
             if (row + dir >= 0 && row + dir < 8 && !board[row + dir][col]) {
-                moves.push({ row: row + dir, col });
-                if (row === startRow && !board[row + 2*dir][col]) moves.push({ row: row + 2*dir, col });
+                moves.push({ r: row + dir, c: col });
+                if (row === startRow && !board[row + 2*dir][col]) moves.push({ r: row + 2*dir, c: col });
             }
             for (const dc of [-1, 1]) {
                 const nc = col + dc;
                 if (nc >= 0 && nc < 8 && row + dir >= 0 && row + dir < 8) {
-                    const target = board[row + dir][nc];
-                    if (target && target.side !== side) moves.push({ row: row + dir, col: nc });
+                    const t = board[row + dir][nc];
+                    if (t && t.side !== side) moves.push({ r: row + dir, c: nc });
                 }
             }
         }
@@ -431,8 +386,8 @@
             for (const [dr, dc] of offsets) {
                 const nr = row + dr, nc = col + dc;
                 if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                    const target = board[nr][nc];
-                    if (!target || target.side !== side) moves.push({ row: nr, col: nc });
+                    const t = board[nr][nc];
+                    if (!t || t.side !== side) moves.push({ r: nr, c: nc });
                 }
             }
         }
@@ -441,9 +396,9 @@
             for (const [dr, dc] of [[1,1],[1,-1],[-1,1],[-1,-1]]) {
                 let nr = row + dr, nc = col + dc;
                 while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                    const target = board[nr][nc];
-                    if (!target) moves.push({ row: nr, col: nc });
-                    else { if (target.side !== side) moves.push({ row: nr, col: nc }); break; }
+                    const t = board[nr][nc];
+                    if (!t) moves.push({ r: nr, c: nc });
+                    else { if (t.side !== side) moves.push({ r: nr, c: nc }); break; }
                     nr += dr; nc += dc;
                 }
             }
@@ -453,9 +408,9 @@
             for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
                 let nr = row + dr, nc = col + dc;
                 while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                    const target = board[nr][nc];
-                    if (!target) moves.push({ row: nr, col: nc });
-                    else { if (target.side !== side) moves.push({ row: nr, col: nc }); break; }
+                    const t = board[nr][nc];
+                    if (!t) moves.push({ r: nr, c: nc });
+                    else { if (t.side !== side) moves.push({ r: nr, c: nc }); break; }
                     nr += dr; nc += dc;
                 }
             }
@@ -465,51 +420,36 @@
             for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
                 const nr = row + dr, nc = col + dc;
                 if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                    const target = board[nr][nc];
-                    if (!target || target.side !== side) moves.push({ row: nr, col: nc });
+                    const t = board[nr][nc];
+                    if (!t || t.side !== side) moves.push({ r: nr, c: nc });
                 }
             }
-        }
-
-        function handleSquareClick(row, col) {
-            if (currentTurn !== myColor) return;
-            const piece = board[row][col];
-
-            if (selectedSquare) {
-                const isValid = validMoves.some(m => m.row === row && m.col === col);
-                if (isValid) {
-                    makeMove(selectedSquare.row, selectedSquare.col, row, col);
-                    return;
-                }
-                if (piece && piece.side === myColor) { selectSquare(row, col); return; }
-                deselectSquare();
-                return;
-            }
-
-            if (piece && piece.side === myColor) selectSquare(row, col);
         }
 
         function selectSquare(row, col) {
-            selectedSquare = { row, col };
+            selectedRow = row;
+            selectedCol = col;
             validMoves = getValidMoves(row, col);
             renderBoard();
         }
 
         function deselectSquare() {
-            selectedSquare = null;
+            selectedRow = -1;
+            selectedCol = -1;
             validMoves = [];
             renderBoard();
         }
 
-        function makeMove(fromRow, fromCol, toRow, toCol) {
-            board[toRow][toCol] = board[fromRow][fromCol];
-            board[fromRow][fromCol] = null;
-            selectedSquare = null;
+        function makeMove(fromR, fromC, toR, toC) {
+            board[toR][toC] = board[fromR][fromC];
+            board[fromR][fromC] = null;
+            selectedRow = -1;
+            selectedCol = -1;
             validMoves = [];
-            currentTurn = currentTurn === 'rose' ? 'amethyst' : 'rose';
+            currentTurn = currentTurn === 'white' ? 'black' : 'white';
             
-            database.ref('gameRooms/' + roomId + '/chessBoard').set(board);
-            database.ref('gameRooms/' + roomId + '/chessTurn').set(currentTurn);
+            db.ref('gameRooms/' + roomId + '/chessBoard').set(board);
+            db.ref('gameRooms/' + roomId + '/chessTurn').set(currentTurn);
             
             renderBoard();
             updateStatus();
@@ -517,64 +457,65 @@
 
         function renderBoard() {
             const boardEl = document.getElementById('chessBoard');
+            if (!boardEl) return;
             boardEl.innerHTML = '';
+
             for (let row = 0; row < 8; row++) {
                 for (let col = 0; col < 8; col++) {
-                    const square = document.createElement('div');
-                    square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
-                    const piece = board[row][col];
+                    const sq = document.createElement('div');
+                    sq.className = 'square ' + ((row + col) % 2 === 0 ? 'light' : 'dark');
+                    sq.setAttribute('onclick', 'squareClick(' + row + ',' + col + ')');
+                    
+                    const piece = board[row] ? board[row][col] : null;
                     if (piece) {
-                        square.textContent = pieces[piece.side][piece.type];
-                        square.classList.add('piece', piece.side);
+                        sq.textContent = PIECES[piece.side][piece.type];
                     }
-                    if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) {
-                        square.classList.add('selected');
+                    
+                    if (selectedRow === row && selectedCol === col) {
+                        sq.classList.add('selected');
                     }
-                    if (validMoves.some(m => m.row === row && m.col === col)) {
-                        if (board[row][col]) square.classList.add('valid-capture');
-                        else square.classList.add('valid-move');
+                    
+                    if (validMoves.some(m => m.r === row && m.c === col)) {
+                        if (board[row] && board[row][col]) sq.classList.add('valid-capture');
+                        else sq.classList.add('valid-move');
                     }
-                    square.addEventListener('click', () => handleSquareClick(row, col));
-                    boardEl.appendChild(square);
+                    
+                    boardEl.appendChild(sq);
                 }
             }
         }
 
         function setupChat() {
-            const chatRef = database.ref('gameRooms/' + roomId + '/chat');
-            chatRef.off();
-            chatRef.limitToLast(50).on('child_added', (snap) => {
-                const msg = snap.val();
-                displayMessage(msg.sender, msg.message, msg.sender === myName);
+            const ref = db.ref('gameRooms/' + roomId + '/chat');
+            ref.off();
+            ref.limitToLast(50).on('child_added', s => {
+                const m = s.val();
+                displayMsg(m.sender, m.message, m.sender === myName);
             });
         }
 
         function sendMessage() {
             const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            if (message && roomId) {
-                database.ref('gameRooms/' + roomId + '/chat').push({
-                    sender: myName,
-                    message: message,
+            const msg = input.value.trim();
+            if (msg && roomId) {
+                db.ref('gameRooms/' + roomId + '/chat').push({
+                    sender: myName, message: msg,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
                 input.value = '';
             }
         }
 
-        function displayMessage(sender, message, isYou) {
-            const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages.querySelector('div[style*="padding: 10px"]')) {
-                chatMessages.innerHTML = '';
-            }
+        function displayMsg(sender, msg, isYou) {
+            const c = document.getElementById('chatMessages');
             const div = document.createElement('div');
-            div.className = `chat-message ${isYou ? 'you' : 'opponent'}`;
-            div.innerHTML = `<span class="sender">${sender}</span><span class="text">${message}</span>`;
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            div.className = 'chat-message ' + (isYou ? 'you' : 'opponent');
+            div.innerHTML = '<span class="sender">' + sender + '</span>' + msg;
+            c.appendChild(div);
+            c.scrollTop = c.scrollHeight;
         }
 
-        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+        document.getElementById('chatInput').addEventListener('keypress', e => {
             if (e.key === 'Enter') sendMessage();
         });
 
