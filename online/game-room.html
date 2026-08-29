@@ -7,16 +7,12 @@
     <style>
         :root {
             --pink: #ff6b9d;
-            --pink-light: #f8bbd0;
             --blue: #74b9ff;
             --gold: #fdcb6e;
             --dark: #1a1a2e;
-            --darker: #0a0a1a;
             --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
             --white: #ffffff;
             --red: #ff4444;
-            --green: #4CAF50;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -84,7 +80,6 @@
         .game-area { flex: 1; min-width: 0; }
 
         .canvas-wrap {
-            position: relative;
             border-radius: 12px;
             overflow: hidden;
             border: 2px solid rgba(255,255,255,0.15);
@@ -94,44 +89,8 @@
 
         canvas { display: block; width: 100%; height: auto; }
 
-        /* Disconnect Overlay */
-        .disconnect-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .disconnect-overlay.show { display: flex; }
-
-        .disconnect-content {
-            text-align: center;
-            background: rgba(26, 26, 46, 0.95);
-            padding: 2rem 3rem;
-            border-radius: 20px;
-            border: 2px solid #ff4444;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-
-        .disconnect-emoji { font-size: 4rem; margin-bottom: 1rem; }
-        .disconnect-title { font-size: 1.5rem; font-weight: bold; color: #ff4444; margin-bottom: 0.5rem; }
-        .disconnect-text { font-size: 1rem; color: white; margin-bottom: 1rem; }
-        .disconnect-countdown { font-size: 3rem; font-weight: bold; color: #fdcb6e; animation: pulse 1s infinite; }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
         .info-bar { display: flex; gap: 6px; margin-top: 8px; justify-content: center; flex-wrap: wrap; }
         .info-pill { font-size: 10px; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 10px; }
-        .info-pill.warning { color: #fdcb6e; background: rgba(253,203,110,0.1); }
 
         .chat-sidebar {
             width: 220px;
@@ -185,7 +144,7 @@
             <div class="scoreboard">
                 <div class="score-chip you">💕 <span id="youName">You</span>: <span id="youScore">0</span></div>
                 <div class="score-chip opponent">💙 <span id="oppName">Opp</span>: <span id="oppScore">0</span></div>
-                <div class="score-chip target">🎯 Target: <span id="targetScore">10000</span></div>
+                <div class="score-chip target">🎯 <span id="targetScore">100000</span></div>
                 <div class="score-chip status" id="statusChip">Connecting...</div>
             </div>
         </div>
@@ -198,7 +157,7 @@
                 <div class="info-bar">
                     <div class="info-pill">⌨️ Space/Click/Tap</div>
                     <div class="info-pill">💗 +100</div>
-                    <div class="info-pill warning">🛡️ 3s Invincible After Hit</div>
+                    <div class="info-pill">⚡ Blink 2s After Hit</div>
                     <div class="info-pill">🌐 LIVE</div>
                 </div>
             </div>
@@ -213,24 +172,12 @@
         </div>
     </div>
 
-    <!-- Disconnect Overlay -->
-    <div class="disconnect-overlay" id="disconnectOverlay">
-        <div class="disconnect-content">
-            <div class="disconnect-emoji">💔</div>
-            <div class="disconnect-title" id="disconnectTitle">Teammate Left!</div>
-            <div class="disconnect-text" id="disconnectText">Redirecting in...</div>
-            <div class="disconnect-countdown" id="disconnectCountdown">5</div>
-        </div>
-    </div>
-
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
 
     <script>
-        // =====================================================
-        // FIREBASE CONFIGURATION
-        // =====================================================
+        // Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCaR33cAwHFTNdSlBuuzoju9yzah8szBmQ",
             authDomain: "usblog-games.firebaseapp.com",
@@ -244,9 +191,7 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // =====================================================
-        // GAME CONSTANTS
-        // =====================================================
+        // Constants
         const W = 850, H = 400;
         const GROUND_Y = 320;
         const GRAVITY = 0.7;
@@ -254,52 +199,32 @@
         const BASE_SPEED = 5;
         const MAX_SPEED = 10;
         const HEART_BONUS = 100;
-        const TARGET_SCORE = 10000;
-        const INVINCIBLE_DURATION = 3000; // 3 seconds in ms
-        const DISCONNECT_REDIRECT_DELAY = 5000; // 5 seconds
+        const TARGET_SCORE = 100000;
+        const BLINK_DURATION = 2000; // 2 seconds
 
-        // =====================================================
-        // CANVAS SETUP
-        // =====================================================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = W;
         canvas.height = H;
 
-        // =====================================================
-        // GAME STATE
-        // =====================================================
+        // State
         let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
         let isHost = false, gameStarted = false, gameOver = false;
         let myScore = 0, oppScore = 0;
         let obstacles = [], hearts = [];
         let speed = BASE_SPEED;
         let frameCount = 0;
-        let invincibleUntil = 0;
-        let disconnectTimer = null;
-        let disconnectCountdownInterval = null;
+        let blinkUntil = 0;
+        let opponentLastSeen = Date.now();
+        let opponentCheckInterval = null;
 
-        // =====================================================
-        // PLAYER OBJECTS
-        // =====================================================
-        const myDino = {
-            x: 100, y: GROUND_Y - 50, w: 42, h: 50,
-            vy: 0, jumping: false, alive: true
-        };
+        // Players
+        const myDino = { x: 100, y: GROUND_Y - 50, w: 42, h: 50, vy: 0, jumping: false, alive: true, hit: false };
+        const oppDino = { x: 620, y: GROUND_Y - 50, w: 42, h: 50, alive: true };
 
-        const oppDino = {
-            x: 620, y: GROUND_Y - 50, w: 42, h: 50,
-            currentY: GROUND_Y - 50, targetY: GROUND_Y - 50,
-            previousY: GROUND_Y - 50,
-            interpolationTime: 0, interpolationDuration: 0.05,
-            alive: true
-        };
+        document.getElementById('targetScore').textContent = TARGET_SCORE;
 
-        // =====================================================
-        // INITIALIZATION
-        // =====================================================
         function init() {
-            document.getElementById('targetScore').textContent = TARGET_SCORE;
             auth.onAuthStateChanged(user => {
                 if (!user) { location.href = 'login.html'; return; }
                 db.ref('users/' + user.uid).once('value').then(s => {
@@ -365,9 +290,7 @@
                 setInterval(() => {
                     if (gameStarted) {
                         db.ref('gameRooms/' + roomId + '/state').set({
-                            obstacles, hearts, speed,
-                            hostScore: Math.floor(myScore),
-                            hostAlive: myDino.alive
+                            obstacles, hearts, speed, hostScore: Math.floor(myScore)
                         });
                     }
                 }, 80);
@@ -379,67 +302,53 @@
                         hearts = d.hearts || [];
                         speed = d.speed || BASE_SPEED;
                         oppScore = d.hostScore || 0;
-                        oppDino.alive = d.hostAlive !== false;
                         document.getElementById('oppScore').textContent = Math.floor(oppScore);
                     }
                 });
             }
 
+            // Sync my position
             setInterval(() => {
-                if (gameStarted) {
+                if (gameStarted && !gameOver) {
                     db.ref('gameRooms/' + roomId + '/players/' + myPlayerId).set({
                         y: myDino.y, jumping: myDino.jumping,
-                        alive: myDino.alive, score: Math.floor(myScore)
+                        alive: myDino.alive, score: Math.floor(myScore),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
                     });
                 }
             }, 40);
 
-            // Listen opponent with disconnect detection
+            // Listen opponent - ONLY handle disconnect if truly gone
             db.ref('gameRooms/' + roomId + '/players/' + opponentId).on('value', s => {
                 const d = s.val();
-                if (d) {
-                    oppDino.targetY = d.y ?? oppDino.targetY;
+                if (d && d.timestamp) {
+                    opponentLastSeen = Date.now();
+                    oppDino.y = d.y ?? oppDino.y;
                     oppDino.alive = d.alive !== false;
                     document.getElementById('statusChip').textContent = '🟢 LIVE';
-                } else {
-                    // Opponent disconnected
-                    handleOpponentDisconnect();
                 }
             });
+
+            // Check opponent presence every 5 seconds (not instantly)
+            opponentCheckInterval = setInterval(() => {
+                if (gameStarted && !gameOver) {
+                    const timeSinceLastSeen = Date.now() - opponentLastSeen;
+                    if (timeSinceLastSeen > 10000) { // 10 seconds no update = disconnected
+                        handleDisconnect();
+                    }
+                }
+            }, 5000);
         }
 
-        // =====================================================
-        // DISCONNECT HANDLING
-        // =====================================================
-        function handleOpponentDisconnect() {
+        function handleDisconnect() {
             if (gameOver) return;
             gameOver = true;
+            clearInterval(opponentCheckInterval);
             document.getElementById('statusChip').textContent = '💔 Left';
-            
-            const overlay = document.getElementById('disconnectOverlay');
-            const countdownEl = document.getElementById('disconnectCountdown');
-            const titleEl = document.getElementById('disconnectTitle');
-            
-            titleEl.textContent = `${opponentName} has gone!`;
-            overlay.classList.add('show');
-            
-            let countdown = 5;
-            countdownEl.textContent = countdown;
-            
-            disconnectCountdownInterval = setInterval(() => {
-                countdown--;
-                if (countdown > 0) {
-                    countdownEl.textContent = countdown;
-                } else {
-                    clearInterval(disconnectCountdownInterval);
-                    window.location.href = 'lobby.html';
-                }
-            }, 1000);
+            alert(opponentName + ' has gone! Redirecting...');
+            setTimeout(() => { location.href = 'lobby.html'; }, 2000);
         }
 
-        // =====================================================
-        // GAME OBJECTS
-        // =====================================================
         function spawnObstacle() {
             const type = Math.random() > 0.5 ? 'cactus' : 'rock';
             const w = type === 'cactus' ? 22 + Math.random() * 10 : 28 + Math.random() * 14;
@@ -451,9 +360,6 @@
             hearts.push({ x: W + 40, y: Math.random() * 120 + 70, w: 24, h: 24 });
         }
 
-        // =====================================================
-        // JUMP CONTROL
-        // =====================================================
         function jump() {
             if (!gameStarted || gameOver || !myDino.alive) return;
             if (!myDino.jumping) {
@@ -468,19 +374,15 @@
         canvas.addEventListener('click', jump);
         canvas.addEventListener('touchstart', e => { e.preventDefault(); jump(); });
 
-        // =====================================================
-        // GAME UPDATE
-        // =====================================================
         function update() {
             if (!gameStarted || gameOver) return;
             frameCount++;
 
-            // Medium speed progression
             if (isHost) {
                 speed = Math.min(MAX_SPEED, BASE_SPEED + frameCount * 0.001);
             }
 
-            // My dino physics
+            // Physics
             if (myDino.jumping) {
                 myDino.vy += GRAVITY;
                 myDino.y += myDino.vy;
@@ -491,16 +393,7 @@
                 }
             }
 
-            // Interpolate opponent
-            oppDino.interpolationTime += 0.016; // Approx 60fps dt
-            const t = Math.min(oppDino.interpolationTime / oppDino.interpolationDuration, 1);
-            oppDino.y = oppDino.previousY + (oppDino.targetY - oppDino.previousY) * t;
-            if (t >= 1) {
-                oppDino.previousY = oppDino.targetY;
-                oppDino.interpolationTime = 0;
-            }
-
-            // Move obstacles (host)
+            // Move (host)
             if (isHost) {
                 for (let i = obstacles.length - 1; i >= 0; i--) {
                     obstacles[i].x -= speed;
@@ -512,24 +405,20 @@
                 }
             }
 
-            // Collisions
-            const isInvincible = Date.now() < invincibleUntil;
-            
+            // Collisions - CAN hit during blink (blink is just visual)
             if (myDino.alive) {
-                if (!isInvincible) {
-                    for (const obs of obstacles) {
-                        if (rectCollide(myDino, obs)) {
-                            myDino.alive = false;
-                            setTimeout(() => {
-                                myDino.alive = true;
-                                myDino.y = GROUND_Y - 50;
-                                invincibleUntil = Date.now() + INVINCIBLE_DURATION;
-                            }, 1500);
-                            break;
-                        }
+                for (const obs of obstacles) {
+                    if (rectCollide(myDino, obs)) {
+                        myDino.alive = false;
+                        myDino.hit = true;
+                        blinkUntil = Date.now() + BLINK_DURATION;
+                        setTimeout(() => {
+                            myDino.alive = true;
+                            myDino.y = GROUND_Y - 50;
+                        }, 500); // Quick respawn
+                        break;
                     }
                 }
-                
                 for (let i = hearts.length - 1; i >= 0; i--) {
                     if (rectCollide(myDino, hearts[i])) {
                         myScore += HEART_BONUS;
@@ -538,21 +427,18 @@
                 }
             }
 
-            // Score increases only when alive AND not in respawn period
+            // Score - always increases when alive (even during blink)
             if (myDino.alive) {
-                // Medium score speed
-                myScore += speed * 0.15;
+                myScore += speed * 0.2;
             }
             document.getElementById('youScore').textContent = Math.floor(myScore);
 
-            // Check target score
+            // Win check
             if (myScore >= TARGET_SCORE || oppScore >= TARGET_SCORE) {
                 gameOver = true;
                 const isWinner = myScore > oppScore;
-                setTimeout(() => {
-                    alert(isWinner ? '🏆 You reached 10000 first! You Win!' : '💙 Opponent reached 10000 first!');
-                    window.location.href = 'lobby.html';
-                }, 500);
+                alert(isWinner ? '🏆 You reached 100000! You Win!' : '💙 Opponent reached 100000 first!');
+                setTimeout(() => { location.href = 'lobby.html'; }, 1000);
             }
         }
 
@@ -560,9 +446,6 @@
             return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
         }
 
-        // =====================================================
-        // RENDER
-        // =====================================================
         function render() {
             ctx.clearRect(0, 0, W, H);
 
@@ -591,7 +474,6 @@
                 if (o.type === 'cactus') {
                     ctx.fillStyle = '#4CAF50';
                     ctx.fillRect(o.x, o.y, o.w, o.h);
-                    ctx.fillRect(o.x - 5, o.y + 10, 7, 13);
                 } else {
                     ctx.fillStyle = '#795548';
                     ctx.beginPath();
@@ -619,17 +501,17 @@
                 ctx.setLineDash([]);
             }
 
-            // Draw my dino with blink effect if invincible
-            const isInvincible = Date.now() < invincibleUntil;
+            // My dino with blink
             if (myDino.alive) {
-                if (isInvincible && Math.floor(Date.now() / 100) % 2 === 0) {
-                    ctx.globalAlpha = 0.5;
+                const isBlinking = Date.now() < blinkUntil;
+                if (isBlinking && Math.floor(Date.now() / 150) % 2 === 0) {
+                    ctx.globalAlpha = 0.4;
                 }
                 drawDino(myDino, '#f472b6', '💕');
                 ctx.globalAlpha = 1;
             }
 
-            // Draw opponent
+            // Opponent
             if (oppDino.alive) {
                 drawDino(oppDino, '#60a5fa', '💙');
             }
@@ -653,9 +535,6 @@
             ctx.fillText(emoji, d.x + d.w / 2, d.y + d.h / 2 + 5);
         }
 
-        // =====================================================
-        // CHAT
-        // =====================================================
         function setupChat() {
             const ref = db.ref('gameRooms/' + roomId + '/chat');
             ref.off();
@@ -690,9 +569,6 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        // =====================================================
-        // GAME LOOP
-        // =====================================================
         function gameLoop() {
             update();
             render();
