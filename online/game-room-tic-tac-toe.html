@@ -11,6 +11,7 @@
             --gold: #fdcb6e;
             --dark: #1a1a2e;
             --white: #ffffff;
+            --red: #ff4444;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -23,6 +24,7 @@
             align-items: center;
             justify-content: center;
             padding: 10px;
+            overflow-x: hidden;
         }
 
         .game-shell {
@@ -69,7 +71,7 @@
             border-radius: 10px;
             margin-bottom: 8px;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
         }
         .turn-indicator.your-turn { background: rgba(255,107,157,0.3); color: #ff6b9d; border: 2px solid #ff6b9d; }
         .turn-indicator.opponent-turn { background: rgba(116,185,255,0.2); color: #74b9ff; border: 2px solid #74b9ff; }
@@ -134,6 +136,9 @@
             cursor: pointer;
             aspect-ratio: 1;
             border: 1px solid rgba(255,255,255,0.08);
+            pointer-events: auto;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .mini-cell:hover { background: rgba(255,255,255,0.15); }
@@ -174,6 +179,27 @@
         .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 10px; }
         .chat-input-area button { padding: 6px 10px; border-radius: 14px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 9px; }
 
+        .disconnect-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .disconnect-overlay.show { display: flex; }
+        .disconnect-content {
+            text-align: center;
+            background: rgba(26,26,46,0.95);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 2px solid #ff4444;
+        }
+        .disconnect-emoji { font-size: 3rem; margin-bottom: 0.5rem; }
+        .disconnect-title { font-size: 1.2rem; font-weight: bold; color: #ff4444; margin-bottom: 0.5rem; }
+        .disconnect-countdown { font-size: 2rem; font-weight: bold; color: #fdcb6e; }
+
         @media (max-width: 750px) {
             .main-layout { flex-direction: column; }
             .chat-sidebar { width: 100%; min-width: auto; max-height: 120px; }
@@ -212,6 +238,14 @@
         </div>
     </div>
 
+    <div class="disconnect-overlay" id="disconnectOverlay">
+        <div class="disconnect-content">
+            <div class="disconnect-emoji">💔</div>
+            <div class="disconnect-title" id="disconnectTitle">Opponent left!</div>
+            <div class="disconnect-countdown" id="disconnectCountdown">5</div>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
@@ -230,32 +264,76 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
-        let myColor = 'pink', currentTurn = 'pink';
-        let gameStarted = false, gameOver = false;
+        let roomId = null;
+        let myPlayerId = null;
+        let opponentId = null;
+        let myName = '';
+        let opponentName = '';
+        let myColor = 'pink';
+        let currentTurn = 'pink';
+        let gameStarted = false;
+        let gameOver = false;
         let macroBoard = Array(9).fill(null);
         let miniBoards = Array(9).fill(null).map(() => Array(9).fill(null));
+        let oppLastSeen = Date.now();
+
+        // GLOBAL CLICK FUNCTION - Always accessible
+        window.cellClick = function(macroIdx, miniIdx) {
+            if (!gameStarted || gameOver) return;
+            if (currentTurn !== myColor) return;
+            if (macroBoard[macroIdx] !== null) return;
+            if (miniBoards[macroIdx][miniIdx] !== null) return;
+
+            miniBoards[macroIdx][miniIdx] = myColor;
+            
+            const miniWin = checkMiniWin(macroIdx);
+            if (miniWin) macroBoard[macroIdx] = miniWin;
+            else if (isMiniFull(macroIdx)) macroBoard[macroIdx] = 'tie';
+
+            const macroWin = checkMacroWin();
+            
+            currentTurn = (currentTurn === 'pink') ? 'blue' : 'pink';
+
+            db.ref('gameRooms/' + roomId + '/gameState').set({
+                macro: macroBoard,
+                mini: miniBoards,
+                turn: currentTurn
+            });
+
+            if (macroWin) {
+                gameOver = true;
+                db.ref('gameRooms/' + roomId + '/winner').set(macroWin);
+                renderBoard();
+                showWin(macroWin);
+                return;
+            }
+
+            renderBoard();
+            updateTurnIndicator();
+        };
 
         function init() {
             auth.onAuthStateChanged(user => {
                 if (!user) { location.href = 'login.html'; return; }
                 myPlayerId = user.uid;
+                
                 db.ref('users/' + user.uid).once('value').then(s => {
                     myName = s.val()?.username || 'Player';
                     document.getElementById('youName').textContent = myName;
                 });
-                const p = new URLSearchParams(location.search);
-                roomId = p.get('match') || p.get('team');
+                
+                const params = new URLSearchParams(location.search);
+                roomId = params.get('match') || params.get('team');
                 if (!roomId) { location.href = 'lobby.html'; return; }
                 setupRoom();
             });
         }
 
         function setupRoom() {
-            db.ref('matchmaking/' + roomId).once('value').then(s => {
-                if (s.exists()) setupPlayers(s.val());
-                else db.ref('teams/' + roomId).once('value').then(ts => {
-                    if (ts.exists()) setupPlayers(ts.val());
+            db.ref('matchmaking/' + roomId).once('value').then(snap => {
+                if (snap.exists()) setupPlayers(snap.val());
+                else db.ref('teams/' + roomId).once('value').then(teamSnap => {
+                    if (teamSnap.exists()) setupPlayers(teamSnap.val());
                     else { location.href = 'lobby.html'; }
                 });
             });
@@ -295,6 +373,7 @@
 
         function startGame() {
             gameStarted = true;
+            oppLastSeen = Date.now();
             document.getElementById('statusChip').textContent = '🟢 LIVE';
             
             macroBoard = Array(9).fill(null);
@@ -305,7 +384,7 @@
             updateTurnIndicator();
             setupChat();
 
-            // LISTEN FOR STATE CHANGES - BOTH PLAYERS
+            // Firebase listener - updates for BOTH players
             db.ref('gameRooms/' + roomId + '/gameState').on('value', snap => {
                 const data = snap.val();
                 if (data) {
@@ -326,7 +405,7 @@
                 }
             });
 
-            // INITIAL BOARD - Only host sets
+            // Host initializes the board
             if (myColor === 'pink') {
                 db.ref('gameRooms/' + roomId + '/gameState').set({
                     macro: macroBoard,
@@ -334,13 +413,36 @@
                     turn: 'pink'
                 });
             }
+
+            // Disconnect check
+            setInterval(() => {
+                if (gameStarted && !gameOver && Date.now() - oppLastSeen > 15000) {
+                    gameOver = true;
+                    showDisconnect();
+                }
+            }, 5000);
+        }
+
+        function showDisconnect() {
+            document.getElementById('disconnectTitle').textContent = opponentName + ' has left!';
+            document.getElementById('disconnectOverlay').classList.add('show');
+            let count = 5;
+            document.getElementById('disconnectCountdown').textContent = count;
+            const interval = setInterval(() => {
+                count--;
+                if (count > 0) document.getElementById('disconnectCountdown').textContent = count;
+                else {
+                    clearInterval(interval);
+                    location.href = 'lobby.html';
+                }
+            }, 1000);
         }
 
         function updateTurnIndicator() {
             const ind = document.getElementById('turnIndicator');
             if (gameOver) return;
             if (currentTurn === myColor) {
-                ind.textContent = '💕 YOUR TURN - CLICK!';
+                ind.textContent = '💕 YOUR TURN - CLICK ANY EMPTY CELL!';
                 ind.className = 'turn-indicator your-turn';
             } else {
                 ind.textContent = '💙 ' + opponentName + ' IS THINKING...';
@@ -369,46 +471,6 @@
             return miniBoards[idx].every(c => c !== null);
         }
 
-        function makeMove(macroIdx, miniIdx) {
-            // CHECK: Game started, not over, it's MY turn
-            if (!gameStarted || gameOver) return;
-            if (currentTurn !== myColor) return;
-            
-            // CHECK: Cell is available
-            if (macroBoard[macroIdx] !== null) return;
-            if (miniBoards[macroIdx][miniIdx] !== null) return;
-
-            // MAKE MOVE
-            miniBoards[macroIdx][miniIdx] = myColor;
-            
-            const mw = checkMiniWin(macroIdx);
-            if (mw) macroBoard[macroIdx] = mw;
-            else if (isMiniFull(macroIdx)) macroBoard[macroIdx] = 'tie';
-
-            const gw = checkMacroWin();
-            
-            // SWITCH TURN
-            currentTurn = (currentTurn === 'pink') ? 'blue' : 'pink';
-
-            // SAVE TO FIREBASE
-            db.ref('gameRooms/' + roomId + '/gameState').set({
-                macro: macroBoard,
-                mini: miniBoards,
-                turn: currentTurn
-            });
-
-            if (gw) {
-                gameOver = true;
-                db.ref('gameRooms/' + roomId + '/winner').set(gw);
-                renderBoard();
-                showWin(gw);
-                return;
-            }
-
-            renderBoard();
-            updateTurnIndicator();
-        }
-
         function renderBoard() {
             const boardEl = document.getElementById('macroBoard');
             if (!boardEl) return;
@@ -433,8 +495,7 @@
                     for (let si = 0; si < 9; si++) {
                         const sc = document.createElement('div');
                         sc.className = 'mini-cell';
-                        sc.setAttribute('data-macro', mi);
-                        sc.setAttribute('data-mini', si);
+                        sc.setAttribute('onclick', 'cellClick(' + mi + ',' + si + ')');
                         const val = miniBoards[mi] ? miniBoards[mi][si] : null;
                         if (val === 'pink') { sc.textContent = '💕'; sc.classList.add('pink'); }
                         else if (val === 'blue') { sc.textContent = '💙'; sc.classList.add('blue'); }
@@ -444,16 +505,6 @@
                 }
                 boardEl.appendChild(mc);
             }
-
-            // EVENT DELEGATION - Single listener for all cells
-            boardEl.onclick = function(e) {
-                const cell = e.target.closest('.mini-cell');
-                if (cell) {
-                    const macroIdx = parseInt(cell.getAttribute('data-macro'));
-                    const miniIdx = parseInt(cell.getAttribute('data-mini'));
-                    makeMove(macroIdx, miniIdx);
-                }
-            };
         }
 
         function showWin(winner) {
