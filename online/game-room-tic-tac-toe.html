@@ -52,11 +52,7 @@
             font-size: 12px;
         }
 
-        .game-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ff6b9d;
-        }
+        .game-title { font-size: 18px; font-weight: bold; color: #ff6b9d; }
 
         .players-info { display: flex; gap: 6px; flex-wrap: wrap; }
         .player-chip { padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 600; }
@@ -74,8 +70,11 @@
             margin-bottom: 8px;
             font-weight: bold;
             font-size: 13px;
+            background: rgba(255,255,255,0.1);
+            color: white;
         }
-        .turn-indicator.your-turn { background: rgba(255,107,157,0.2); color: #ff6b9d; border: 1px solid #ff6b9d; }
+
+        .turn-indicator.your-turn { background: rgba(255,107,157,0.25); color: #ff6b9d; border: 1px solid #ff6b9d; }
         .turn-indicator.opponent-turn { background: rgba(116,185,255,0.2); color: #74b9ff; border: 1px solid #74b9ff; }
 
         .board-wrap {
@@ -96,15 +95,14 @@
         }
 
         .macro-cell {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.05);
             border-radius: 8px;
             padding: 3px;
             border: 2px solid rgba(255,255,255,0.1);
-            transition: all 0.3s;
         }
 
         .macro-cell.won-pink {
-            background: rgba(255,107,157,0.2);
+            background: rgba(255,107,157,0.25);
             border-color: #ff6b9d;
             display: flex;
             align-items: center;
@@ -112,7 +110,7 @@
         }
 
         .macro-cell.won-blue {
-            background: rgba(116,185,255,0.2);
+            background: rgba(116,185,255,0.25);
             border-color: #74b9ff;
             display: flex;
             align-items: center;
@@ -130,19 +128,19 @@
         }
 
         .mini-cell {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.06);
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s;
             aspect-ratio: 1;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.2s;
         }
 
-        .mini-cell:hover { background: rgba(255,255,255,0.12); }
+        .mini-cell:hover { background: rgba(255,255,255,0.15); }
         .mini-cell.pink { color: #ff6b9d; text-shadow: 0 0 8px rgba(255,107,157,0.7); }
         .mini-cell.blue { color: #74b9ff; text-shadow: 0 0 8px rgba(116,185,255,0.7); }
 
@@ -155,7 +153,7 @@
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
-            max-height: 400px;
+            max-height: 380px;
         }
 
         .chat-header {
@@ -167,7 +165,7 @@
             font-size: 12px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 120px; max-height: 250px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 100px; max-height: 220px; }
         .chat-messages::-webkit-scrollbar { width: 3px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
 
@@ -180,30 +178,11 @@
         .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
         .chat-input-area button { padding: 6px 12px; border-radius: 14px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 10px; }
 
-        .win-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 100;
-        }
-        .win-content {
-            text-align: center;
-            background: rgba(26,26,46,0.95);
-            padding: 2rem;
-            border-radius: 1rem;
-            border: 2px solid #ff6b9d;
-        }
-        .win-emoji { font-size: 3rem; margin-bottom: 0.5rem; }
-        .win-title { font-size: 1.5rem; font-weight: bold; color: #ff6b9d; margin-bottom: 0.5rem; }
-
         @media (max-width: 800px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; max-height: 150px; }
-            .chat-messages { max-height: 70px; min-height: 40px; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 130px; }
+            .chat-messages { max-height: 50px; min-height: 30px; }
             .game-title { font-size: 14px; }
-            .mini-cell { font-size: 11px; }
-            .macro-overlay { font-size: 22px; }
         }
     </style>
 </head>
@@ -211,10 +190,10 @@
     <div class="game-shell">
         <div class="game-header">
             <a href="lobby.html" class="back-btn">← Lobby</a>
-            <h1 class="game-title">💕 Super Tic Tac Toe</h1>
+            <h1 class="game-title">💕 Super TTT</h1>
             <div class="players-info">
-                <div class="player-chip you">💕 <span id="youName">You</span>: <span id="youScore">0</span></div>
-                <div class="player-chip opponent">💙 <span id="oppName">Opp</span>: <span id="oppScore">0</span></div>
+                <div class="player-chip you">💕 <span id="youName">You</span></div>
+                <div class="player-chip opponent">💙 <span id="oppName">Opp</span></div>
                 <div class="player-chip status" id="statusChip">Connecting...</div>
             </div>
         </div>
@@ -261,7 +240,6 @@
         let gameStarted = false, gameOver = false;
         let macroBoard = Array(9).fill(null);
         let miniBoards = Array(9).fill(null).map(() => Array(9).fill(null));
-        let oppLastSeen = Date.now();
 
         function init() {
             auth.onAuthStateChanged(user => {
@@ -322,10 +300,9 @@
 
         function startGame() {
             gameStarted = true;
-            oppLastSeen = Date.now();
             document.getElementById('statusChip').textContent = '🟢 LIVE';
             
-            // Initialize board
+            // Initialize fresh board
             macroBoard = Array(9).fill(null);
             miniBoards = Array(9).fill(null).map(() => Array(9).fill(null));
             currentTurn = 'pink';
@@ -334,19 +311,12 @@
             updateTurnIndicator();
             setupChat();
 
-            // REAL-TIME LISTENERS - Always render on data change
-            db.ref('gameRooms/' + roomId + '/sttMacro').on('value', snap => {
+            // Firebase Listeners - CRITICAL: Both players listen
+            db.ref('gameRooms/' + roomId + '/sttBoard').on('value', snap => {
                 const data = snap.val();
                 if (data) {
-                    macroBoard = data;
-                    renderBoard();
-                }
-            });
-
-            db.ref('gameRooms/' + roomId + '/sttMini').on('value', snap => {
-                const data = snap.val();
-                if (data) {
-                    miniBoards = data;
+                    macroBoard = data.macro || Array(9).fill(null);
+                    miniBoards = data.mini || Array(9).fill(null).map(() => Array(9).fill(null));
                     renderBoard();
                 }
             });
@@ -359,15 +329,23 @@
                 }
             });
 
-            // Disconnect check
-            setInterval(() => {
-                if (gameStarted && !gameOver && Date.now() - oppLastSeen > 15000) {
+            db.ref('gameRooms/' + roomId + '/sttGameOver').on('value', snap => {
+                const winner = snap.val();
+                if (winner) {
                     gameOver = true;
-                    document.getElementById('statusChip').textContent = '💔 Left';
-                    alert(opponentName + ' has left!');
-                    setTimeout(() => location.href = 'lobby.html', 1500);
+                    renderBoard();
+                    showWin(winner);
                 }
-            }, 5000);
+            });
+
+            // Initial board set by host
+            if (data) {
+                db.ref('gameRooms/' + roomId + '/sttBoard').set({
+                    macro: macroBoard,
+                    mini: miniBoards
+                });
+                db.ref('gameRooms/' + roomId + '/sttTurn').set('pink');
+            }
         }
 
         function updateTurnIndicator() {
@@ -384,16 +362,16 @@
 
         function checkMiniWin(idx) {
             const b = miniBoards[idx];
-            const p = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-            for (const [a,b2,c] of p) {
+            const patterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (const [a,b2,c] of patterns) {
                 if (b[a] && b[a] === b[b2] && b[a] === b[c]) return b[a];
             }
             return null;
         }
 
         function checkMacroWin() {
-            const p = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-            for (const [a,b,c] of p) {
+            const patterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (const [a,b,c] of patterns) {
                 if (macroBoard[a] && macroBoard[a] === macroBoard[b] && macroBoard[a] === macroBoard[c] && macroBoard[a] !== 'tie') return macroBoard[a];
             }
             return null;
@@ -418,8 +396,9 @@
             const gw = checkMacroWin();
             if (gw) {
                 gameOver = true;
-                db.ref('gameRooms/' + roomId + '/sttMacro').set(macroBoard);
-                db.ref('gameRooms/' + roomId + '/sttMini').set(miniBoards);
+                // SYNC before showing win
+                db.ref('gameRooms/' + roomId + '/sttBoard').set({ macro: macroBoard, mini: miniBoards });
+                db.ref('gameRooms/' + roomId + '/sttGameOver').set(gw);
                 renderBoard();
                 showWin(gw);
                 return;
@@ -427,9 +406,11 @@
 
             currentTurn = currentTurn === 'pink' ? 'blue' : 'pink';
             
-            // SYNC TO FIREBASE - This prevents black screen
-            db.ref('gameRooms/' + roomId + '/sttMacro').set(macroBoard);
-            db.ref('gameRooms/' + roomId + '/sttMini').set(miniBoards);
+            // CRITICAL: Sync board AND turn together
+            db.ref('gameRooms/' + roomId + '/sttBoard').set({
+                macro: macroBoard,
+                mini: miniBoards
+            });
             db.ref('gameRooms/' + roomId + '/sttTurn').set(currentTurn);
             
             renderBoard();
@@ -462,7 +443,7 @@
                         sc.className = 'mini-cell';
                         sc.dataset.macro = mi;
                         sc.dataset.mini = si;
-                        const val = miniBoards[mi][si];
+                        const val = miniBoards[mi] ? miniBoards[mi][si] : null;
                         if (val === 'pink') { sc.textContent = '💕'; sc.classList.add('pink'); }
                         else if (val === 'blue') { sc.textContent = '💙'; sc.classList.add('blue'); }
                         sc.addEventListener('click', () => makeMove(mi, si));
@@ -476,13 +457,13 @@
 
         function showWin(winner) {
             const overlay = document.createElement('div');
-            overlay.className = 'win-overlay';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:100;';
             const win = winner === myColor;
             overlay.innerHTML = `
-                <div class="win-content">
-                    <div class="win-emoji">${win ? '🎉' : '💙'}</div>
-                    <div class="win-title">${win ? 'YOU WIN!' : 'OPPONENT WINS!'}</div>
-                    <button onclick="location.href='lobby.html'" style="padding:8px 16px;border-radius:16px;border:none;background:#ff6b9d;color:white;font-weight:bold;cursor:pointer;margin-top:10px;">Back to Lobby</button>
+                <div style="text-align:center;background:rgba(26,26,46,0.95);padding:2rem;border-radius:1rem;border:2px solid #ff6b9d;">
+                    <div style="font-size:3rem;margin-bottom:0.5rem;">${win ? '🎉' : '💙'}</div>
+                    <div style="font-size:1.5rem;font-weight:bold;color:#ff6b9d;margin-bottom:0.5rem;">${win ? 'YOU WIN!' : 'OPPONENT WINS!'}</div>
+                    <button onclick="location.href='lobby.html'" style="padding:8px 16px;border-radius:16px;border:none;background:#ff6b9d;color:white;font-weight:bold;cursor:pointer;">Back to Lobby</button>
                 </div>
             `;
             document.body.appendChild(overlay);
