@@ -31,7 +31,7 @@
             padding: 12px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.5);
             width: 100%;
-            max-width: 1100px;
+            max-width: 1000px;
         }
 
         .game-header {
@@ -69,9 +69,9 @@
             border-radius: 10px;
             margin-bottom: 8px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 15px;
         }
-        .turn-indicator.your-turn { background: rgba(255,107,157,0.25); color: #ff6b9d; border: 2px solid #ff6b9d; }
+        .turn-indicator.your-turn { background: rgba(255,107,157,0.3); color: #ff6b9d; border: 2px solid #ff6b9d; }
         .turn-indicator.opponent-turn { background: rgba(116,185,255,0.2); color: #74b9ff; border: 2px solid #74b9ff; }
 
         .board-wrap {
@@ -87,7 +87,7 @@
             gap: 6px;
             aspect-ratio: 1;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             margin: 0 auto;
         }
 
@@ -114,7 +114,7 @@
             justify-content: center;
         }
 
-        .macro-overlay { font-size: 30px; }
+        .macro-overlay { font-size: 28px; }
 
         .mini-board {
             display: grid;
@@ -130,7 +130,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             aspect-ratio: 1;
             border: 1px solid rgba(255,255,255,0.08);
@@ -141,19 +141,19 @@
         .mini-cell.blue { color: #74b9ff; }
 
         .chat-sidebar {
-            width: 230px;
-            min-width: 230px;
+            width: 200px;
+            min-width: 200px;
             display: flex;
             flex-direction: column;
             background: rgba(255,255,255,0.08);
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.15);
             overflow: hidden;
-            max-height: 380px;
+            max-height: 350px;
         }
 
         .chat-header {
-            padding: 10px;
+            padding: 8px;
             background: rgba(255,107,157,0.2);
             text-align: center;
             color: #ff6b9d;
@@ -161,36 +161,23 @@
             font-size: 12px;
         }
 
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            min-height: 150px;
-            max-height: 250px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
+        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 120px; max-height: 220px; display: flex; flex-direction: column; gap: 4px; }
         .chat-messages::-webkit-scrollbar { width: 3px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
 
-        .chat-message { padding: 6px 10px; border-radius: 10px; font-size: 11px; max-width: 90%; }
-        .chat-message.you { background: rgba(255,107,157,0.2); border: 1px solid rgba(255,107,157,0.3); align-self: flex-end; }
-        .chat-message.opponent { background: rgba(116,185,255,0.15); border: 1px solid rgba(116,185,255,0.25); align-self: flex-start; }
-        .chat-message .sender { font-weight: bold; font-size: 9px; display: block; }
-        .chat-message.you .sender { color: #ff6b9d; }
-        .chat-message.opponent .sender { color: #74b9ff; }
+        .chat-message { padding: 5px 8px; border-radius: 8px; font-size: 10px; max-width: 90%; }
+        .chat-message.you { background: rgba(255,107,157,0.2); align-self: flex-end; }
+        .chat-message.opponent { background: rgba(116,185,255,0.15); align-self: flex-start; }
+        .chat-message .sender { font-weight: bold; font-size: 8px; display: block; }
 
-        .chat-input-area { display: flex; gap: 5px; padding: 8px; }
-        .chat-input-area input { flex: 1; padding: 7px 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
-        .chat-input-area button { padding: 7px 14px; border-radius: 16px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 10px; }
+        .chat-input-area { display: flex; gap: 4px; padding: 6px; }
+        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 10px; }
+        .chat-input-area button { padding: 6px 10px; border-radius: 14px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 9px; }
 
-        @media (max-width: 800px) {
+        @media (max-width: 750px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; max-height: 150px; }
-            .chat-messages { max-height: 70px; min-height: 40px; }
-            .game-title { font-size: 14px; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 120px; }
+            .chat-messages { max-height: 50px; min-height: 30px; }
         }
     </style>
 </head>
@@ -248,8 +235,6 @@
         let gameStarted = false, gameOver = false;
         let macroBoard = Array(9).fill(null);
         let miniBoards = Array(9).fill(null).map(() => Array(9).fill(null));
-        let listenersAttached = false;
-        let myTurnListener = null;
 
         function init() {
             auth.onAuthStateChanged(user => {
@@ -320,34 +305,30 @@
             updateTurnIndicator();
             setupChat();
 
-            if (!listenersAttached) {
-                listenersAttached = true;
-                
-                // SINGLE LISTENER - Updates everything on any change
-                db.ref('gameRooms/' + roomId + '/tttState').on('value', snap => {
-                    const data = snap.val();
-                    if (data) {
-                        macroBoard = data.macro || Array(9).fill(null);
-                        miniBoards = data.mini || Array(9).fill(null).map(() => Array(9).fill(null));
-                        currentTurn = data.turn || 'pink';
-                        renderBoard();
-                        updateTurnIndicator();
-                    }
-                });
+            // LISTEN FOR STATE CHANGES - BOTH PLAYERS
+            db.ref('gameRooms/' + roomId + '/gameState').on('value', snap => {
+                const data = snap.val();
+                if (data) {
+                    macroBoard = data.macro || Array(9).fill(null);
+                    miniBoards = data.mini || Array(9).fill(null).map(() => Array(9).fill(null));
+                    currentTurn = data.turn || 'pink';
+                    renderBoard();
+                    updateTurnIndicator();
+                }
+            });
 
-                db.ref('gameRooms/' + roomId + '/tttWinner').on('value', snap => {
-                    const winner = snap.val();
-                    if (winner && !gameOver) {
-                        gameOver = true;
-                        renderBoard();
-                        showWin(winner);
-                    }
-                });
-            }
+            db.ref('gameRooms/' + roomId + '/winner').on('value', snap => {
+                const winner = snap.val();
+                if (winner && !gameOver) {
+                    gameOver = true;
+                    renderBoard();
+                    showWin(winner);
+                }
+            });
 
-            // Host initializes board
+            // INITIAL BOARD - Only host sets
             if (myColor === 'pink') {
-                db.ref('gameRooms/' + roomId + '/tttState').set({
+                db.ref('gameRooms/' + roomId + '/gameState').set({
                     macro: macroBoard,
                     mini: miniBoards,
                     turn: 'pink'
@@ -359,10 +340,10 @@
             const ind = document.getElementById('turnIndicator');
             if (gameOver) return;
             if (currentTurn === myColor) {
-                ind.textContent = '💕 YOUR TURN - CLICK A CELL!';
+                ind.textContent = '💕 YOUR TURN - CLICK!';
                 ind.className = 'turn-indicator your-turn';
             } else {
-                ind.textContent = '💙 ' + opponentName + '\'S TURN - WAITING...';
+                ind.textContent = '💙 ' + opponentName + ' IS THINKING...';
                 ind.className = 'turn-indicator opponent-turn';
             }
         }
@@ -389,15 +370,15 @@
         }
 
         function makeMove(macroIdx, miniIdx) {
+            // CHECK: Game started, not over, it's MY turn
             if (!gameStarted || gameOver) return;
-            if (currentTurn !== myColor) {
-                updateTurnIndicator();
-                return;
-            }
+            if (currentTurn !== myColor) return;
+            
+            // CHECK: Cell is available
             if (macroBoard[macroIdx] !== null) return;
             if (miniBoards[macroIdx][miniIdx] !== null) return;
 
-            // Make move
+            // MAKE MOVE
             miniBoards[macroIdx][miniIdx] = myColor;
             
             const mw = checkMiniWin(macroIdx);
@@ -406,11 +387,11 @@
 
             const gw = checkMacroWin();
             
-            // Switch turn
-            currentTurn = currentTurn === 'pink' ? 'blue' : 'pink';
+            // SWITCH TURN
+            currentTurn = (currentTurn === 'pink') ? 'blue' : 'pink';
 
-            // SYNC EVERYTHING IN ONE UPDATE
-            db.ref('gameRooms/' + roomId + '/tttState').set({
+            // SAVE TO FIREBASE
+            db.ref('gameRooms/' + roomId + '/gameState').set({
                 macro: macroBoard,
                 mini: miniBoards,
                 turn: currentTurn
@@ -418,7 +399,7 @@
 
             if (gw) {
                 gameOver = true;
-                db.ref('gameRooms/' + roomId + '/tttWinner').set(gw);
+                db.ref('gameRooms/' + roomId + '/winner').set(gw);
                 renderBoard();
                 showWin(gw);
                 return;
@@ -452,23 +433,27 @@
                     for (let si = 0; si < 9; si++) {
                         const sc = document.createElement('div');
                         sc.className = 'mini-cell';
+                        sc.setAttribute('data-macro', mi);
+                        sc.setAttribute('data-mini', si);
                         const val = miniBoards[mi] ? miniBoards[mi][si] : null;
                         if (val === 'pink') { sc.textContent = '💕'; sc.classList.add('pink'); }
                         else if (val === 'blue') { sc.textContent = '💙'; sc.classList.add('blue'); }
-                        
-                        // Use closure to capture mi and si correctly
-                        (function(macroIdx, miniIdx) {
-                            sc.addEventListener('click', function() {
-                                makeMove(macroIdx, miniIdx);
-                            });
-                        })(mi, si);
-                        
                         mb.appendChild(sc);
                     }
                     mc.appendChild(mb);
                 }
                 boardEl.appendChild(mc);
             }
+
+            // EVENT DELEGATION - Single listener for all cells
+            boardEl.onclick = function(e) {
+                const cell = e.target.closest('.mini-cell');
+                if (cell) {
+                    const macroIdx = parseInt(cell.getAttribute('data-macro'));
+                    const miniIdx = parseInt(cell.getAttribute('data-mini'));
+                    makeMove(macroIdx, miniIdx);
+                }
+            };
         }
 
         function showWin(winner) {
@@ -477,9 +462,9 @@
             const win = winner === myColor;
             overlay.innerHTML = `
                 <div style="text-align:center;background:rgba(26,26,46,0.95);padding:2rem;border-radius:1rem;border:2px solid #ff6b9d;">
-                    <div style="font-size:3rem;margin-bottom:0.5rem;">${win ? '🎉' : '💙'}</div>
-                    <div style="font-size:1.5rem;font-weight:bold;color:#ff6b9d;margin-bottom:1rem;">${win ? 'YOU WIN!' : opponentName + ' WINS!'}</div>
-                    <button onclick="location.href='lobby.html'" style="padding:10px 20px;border-radius:20px;border:none;background:#ff6b9d;color:white;font-weight:bold;cursor:pointer;">Back to Lobby</button>
+                    <div style="font-size:3rem;">${win ? '🎉' : '💙'}</div>
+                    <div style="font-size:1.5rem;font-weight:bold;color:#ff6b9d;margin:10px 0;">${win ? 'YOU WIN!' : opponentName + ' WINS!'}</div>
+                    <button onclick="location.href='lobby.html'" style="padding:10px 20px;border:none;background:#ff6b9d;color:white;font-weight:bold;cursor:pointer;border-radius:20px;">Back to Lobby</button>
                 </div>
             `;
             document.body.appendChild(overlay);
