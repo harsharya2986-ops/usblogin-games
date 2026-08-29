@@ -5,370 +5,261 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Rock Paper Scissors ✂️ | UsBlog Games</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
-
         :root {
-            --blush-pink: #f8bbd0;
-            --rose-gold: #b76e79;
-            --dreamy-lavender: #e1bee7;
-            --soft-cream: #fff9f0;
-            --deep-rose: #d81b60;
-            --soft-purple: #9c27b0;
             --primary: #ff6b9d;
             --blue: #74b9ff;
+            --gold: #fdcb6e;
+            --dark: #1a1a2e;
+            --white: #ffffff;
+            --red: #ff4444;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 25%, #e8eaf6 50%, #fce4ec 75%, #f3e5f5 100%);
+            font-family: 'Segoe UI', 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b, #4c1d95, #9d174d);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 10px;
             overflow-x: hidden;
-            position: relative;
         }
 
-        .floating-hearts {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .game-shell {
+            background: rgba(30, 27, 75, 0.95);
+            border-radius: 18px;
+            padding: 15px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
             width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .floating-heart {
-            position: absolute;
-            bottom: -60px;
-            animation: floatUp linear infinite;
-            opacity: 0.2;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.25; }
-            90% { opacity: 0.15; }
-            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
-        }
-
-        .game-container {
-            position: relative;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: 2rem;
-            padding: 1.5rem;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
             max-width: 800px;
-            width: 100%;
-            border: 2px solid rgba(255, 255, 255, 0.6);
         }
 
         .game-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
             flex-wrap: wrap;
-            gap: 0.75rem;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .back-btn {
-            color: #d81b60;
+            color: white;
             text-decoration: none;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 25px;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: 1px solid rgba(216, 27, 96, 0.3);
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 18px;
+            font-size: 12px;
         }
 
         .game-title {
-            font-family: 'Dancing Script', cursive;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #d81b60;
-            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff6b9d;
+            text-shadow: 0 0 20px rgba(255,107,157,0.5);
         }
 
-        .players-info {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .scoreboard { display: flex; gap: 6px; flex-wrap: wrap; }
 
-        .player-chip {
-            padding: 6px 14px;
-            border-radius: 18px;
-            font-size: 12px;
+        .score-chip {
+            padding: 5px 12px;
+            border-radius: 14px;
+            font-size: 11px;
             font-weight: 600;
-            white-space: nowrap;
         }
 
-        .player-chip.you { background: rgba(255, 107, 157, 0.2); border: 1px solid #ff6b9d; color: #d81b60; }
-        .player-chip.opponent { background: rgba(116, 185, 255, 0.2); border: 1px solid #74b9ff; color: #5b8def; }
+        .score-chip.you { background: rgba(255,107,157,0.2); border: 1px solid #ff6b9d; color: #ff6b9d; }
+        .score-chip.opponent { background: rgba(116,185,255,0.2); border: 1px solid #74b9ff; color: #74b9ff; }
+        .score-chip.round { background: rgba(253,203,110,0.2); border: 1px solid #fdcb6e; color: #fdcb6e; }
+        .score-chip.timer { background: rgba(255,255,255,0.1); color: #fff; font-size: 10px; }
 
-        .main-layout {
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
-        }
+        .main-layout { display: flex; gap: 10px; }
+        .game-area { flex: 1; min-width: 0; }
 
-        .game-area {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .scoreboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .score-card {
-            background: linear-gradient(135deg, #fff, #fce4ec);
-            border-radius: 1rem;
-            padding: 0.75rem;
+        .arena {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
             text-align: center;
-            border: 2px solid rgba(216, 27, 96, 0.15);
-        }
-
-        .score-label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #9c27b0;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .score-value {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #d81b60;
-        }
-
-        .battle-arena {
-            background: linear-gradient(135deg, #fdf2f8, #fce4ec, #f3e5f5);
-            border-radius: 1.25rem;
-            padding: 1rem;
-            min-height: 120px;
+            min-height: 150px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1rem;
-            border: 1px solid rgba(216, 27, 96, 0.1);
+            margin-bottom: 10px;
+            border: 2px solid rgba(255,255,255,0.1);
         }
 
-        .arena-content { text-align: center; width: 100%; }
-
-        .arena-choices {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
+        .arena-hand {
+            font-size: 5rem;
+            animation: shakeHand 0.5s ease infinite;
         }
 
-        .arena-choice { text-align: center; }
-
-        .arena-choice-label {
-            font-size: 0.7rem;
-            color: #9c27b0;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .arena-choice-emoji {
-            font-size: 3rem;
-            animation: fadeInScale 0.5s ease;
-        }
-
-        @keyframes fadeInScale {
-            0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
-            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        @keyframes shakeHand {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
         }
 
         .vs-text {
-            font-family: 'Dancing Script', cursive;
             font-size: 2rem;
-            color: #b76e79;
-            font-weight: 700;
+            font-weight: bold;
+            color: #ff6b9d;
+            margin: 0 20px;
         }
 
-        .arena-message {
-            font-size: 1.1rem;
-            color: #d81b60;
-            font-family: 'Dancing Script', cursive;
+        .choice-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
         }
 
-        .result-message {
+        .choice-item { text-align: center; }
+        .choice-label { font-size: 10px; color: rgba(255,255,255,0.6); margin-bottom: 5px; }
+        .choice-hand { font-size: 4rem; }
+
+        .result-display {
             text-align: center;
-            font-family: 'Dancing Script', cursive;
-            font-size: 1.4rem;
-            color: #d81b60;
-            min-height: 2rem;
-            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fdcb6e;
+            min-height: 30px;
+            margin-bottom: 10px;
         }
 
         .choices-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
         .choice-card {
-            background: linear-gradient(135deg, #ffffff, #fdf2f8);
-            border-radius: 1rem;
-            padding: 1rem 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid rgba(216, 27, 96, 0.1);
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            padding: 15px 10px;
             text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
         .choice-card:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-            border-color: rgba(216, 27, 96, 0.4);
+            transform: translateY(-5px);
+            border-color: #ff6b9d;
+            box-shadow: 0 5px 20px rgba(255,107,157,0.3);
         }
 
         .choice-card.selected {
-            transform: translateY(-3px) scale(1.08);
-            border-color: #d81b60;
-            box-shadow: 0 8px 20px rgba(216, 27, 96, 0.3);
+            border-color: #ff6b9d;
+            background: rgba(255,107,157,0.2);
         }
 
         .choice-card:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        .choice-icon { font-size: 2.5rem; margin-bottom: 0.25rem; }
-        .choice-name { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 600; color: #333; }
+        .hand-emoji { font-size: 3rem; display: block; margin-bottom: 5px; }
+        .hand-name { font-size: 12px; color: white; font-weight: 600; }
 
         .chat-sidebar {
-            width: 230px;
-            min-width: 230px;
+            width: 200px;
+            min-width: 200px;
             display: flex;
             flex-direction: column;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 1rem;
-            border: 1px solid rgba(216, 27, 96, 0.2);
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
-            max-height: 450px;
+            max-height: 400px;
         }
 
         .chat-header {
-            padding: 10px;
-            background: rgba(255, 107, 157, 0.15);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px;
+            background: rgba(255,107,157,0.15);
             text-align: center;
+            color: #ff6b9d;
             font-weight: bold;
-            color: #d81b60;
-            font-size: 13px;
+            font-size: 12px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 150px; max-height: 300px; }
-        .chat-messages::-webkit-scrollbar { width: 4px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: rgba(216, 27, 96, 0.4); border-radius: 2px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 120px; max-height: 250px; }
+        .chat-messages::-webkit-scrollbar { width: 3px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
 
-        .chat-message {
-            margin-bottom: 8px;
-            padding: 7px 10px;
-            border-radius: 10px;
-            font-size: 11px;
-        }
+        .chat-message { margin-bottom: 5px; padding: 5px 8px; border-radius: 8px; font-size: 11px; }
+        .chat-message.you { background: rgba(255,107,157,0.15); margin-left: 10px; }
+        .chat-message.opponent { background: rgba(116,185,255,0.15); margin-right: 10px; }
+        .chat-message .sender { font-weight: bold; font-size: 9px; display: block; }
+        .chat-message.you .sender { color: #ff6b9d; }
+        .chat-message.opponent .sender { color: #74b9ff; }
 
-        .chat-message.you { background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(216, 27, 96, 0.3); margin-left: 15px; }
-        .chat-message.opponent { background: rgba(116, 185, 255, 0.15); border: 1px solid rgba(91, 141, 239, 0.3); margin-right: 15px; }
-        .chat-message .sender { font-weight: bold; font-size: 9px; display: block; margin-bottom: 2px; }
-        .chat-message.you .sender { color: #d81b60; }
-        .chat-message.opponent .sender { color: #5b8def; }
-        .chat-message .text { color: #333; }
-
-        .chat-input-area { display: flex; gap: 5px; padding: 8px; border-top: 1px solid rgba(216, 27, 96, 0.15); }
-        .chat-input-area input { flex: 1; padding: 7px 10px; border-radius: 15px; border: 1px solid rgba(216, 27, 96, 0.3); background: white; color: #333; outline: none; font-size: 11px; }
-        .chat-input-area button { padding: 7px 12px; border-radius: 15px; border: none; background: #d81b60; color: white; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .chat-input-area { display: flex; gap: 4px; padding: 6px; }
+        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
+        .chat-input-area button { padding: 6px 12px; border-radius: 14px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 10px; }
 
         @media (max-width: 700px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; margin-top: 10px; max-height: 200px; }
-            .chat-messages { max-height: 120px; min-height: 80px; }
-            .game-title { font-size: 1.5rem; }
-            .choice-icon { font-size: 2rem; }
-            .arena-choice-emoji { font-size: 2.5rem; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 130px; }
+            .chat-messages { max-height: 60px; min-height: 40px; }
+            .arena-hand { font-size: 3rem; }
+            .choice-hand { font-size: 2.5rem; }
+            .hand-emoji { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
-    <div class="floating-hearts" id="floatingHearts"></div>
-    
-    <div class="game-container">
+    <div class="game-shell">
         <div class="game-header">
             <a href="lobby.html" class="back-btn">← Lobby</a>
-            <h1 class="game-title">✂️ Online RPS</h1>
-            <div class="players-info">
-                <div class="player-chip you" id="youChip">💕 You: 0</div>
-                <div class="player-chip opponent" id="opponentChip">💙 Opponent: 0</div>
+            <h1 class="game-title">✂️ Online Rock Paper Scissors</h1>
+            <div class="scoreboard">
+                <div class="score-chip you">💕 <span id="youName">You</span>: <span id="youScore">0</span></div>
+                <div class="score-chip opponent">💙 <span id="oppName">Opp</span>: <span id="oppScore">0</span></div>
+                <div class="score-chip round">Round: <span id="roundNum">1</span>/25</div>
+                <div class="score-chip timer">⏱️ <span id="timerDisplay">5</span>s</div>
             </div>
         </div>
 
         <div class="main-layout">
             <div class="game-area">
-                <div class="scoreboard">
-                    <div class="score-card">
-                        <div class="score-label">Your Score</div>
-                        <div class="score-value" id="playerScore">0</div>
-                    </div>
-                    <div class="score-card">
-                        <div class="score-label">Opponent's Score</div>
-                        <div class="score-value" id="aiScore">0</div>
-                    </div>
-                </div>
-
-                <div class="battle-arena">
-                    <div class="arena-content" id="arenaContent">
-                        <div class="arena-message">💕 Choose your move!</div>
+                <div class="arena" id="arena">
+                    <div class="choice-display">
+                        <div class="choice-item">
+                            <div class="choice-label">YOU</div>
+                            <div class="choice-hand" id="myHandDisplay">✊</div>
+                        </div>
+                        <div class="vs-text">VS</div>
+                        <div class="choice-item">
+                            <div class="choice-label">OPPONENT</div>
+                            <div class="choice-hand" id="oppHandDisplay">✊</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="result-message" id="resultMessage"></div>
+                <div class="result-display" id="resultDisplay">Choose your move!</div>
 
                 <div class="choices-grid">
-                    <div class="choice-card" id="cardRock" onclick="makeChoice('rock')">
-                        <div class="choice-icon">🪨</div>
-                        <div class="choice-name">Rock</div>
+                    <div class="choice-card" id="rockBtn" onclick="makeChoice('rock')">
+                        <span class="hand-emoji">✊</span>
+                        <span class="hand-name">Rock</span>
                     </div>
-                    <div class="choice-card" id="cardPaper" onclick="makeChoice('paper')">
-                        <div class="choice-icon">📄</div>
-                        <div class="choice-name">Paper</div>
+                    <div class="choice-card" id="paperBtn" onclick="makeChoice('paper')">
+                        <span class="hand-emoji">✋</span>
+                        <span class="hand-name">Paper</span>
                     </div>
-                    <div class="choice-card" id="cardScissors" onclick="makeChoice('scissors')">
-                        <div class="choice-icon">✂️</div>
-                        <div class="choice-name">Scissors</div>
+                    <div class="choice-card" id="scissorsBtn" onclick="makeChoice('scissors')">
+                        <span class="hand-emoji">✌️</span>
+                        <span class="hand-name">Scissors</span>
                     </div>
                 </div>
             </div>
 
             <div class="chat-sidebar">
                 <div class="chat-header">💬 Chat</div>
-                <div class="chat-messages" id="chatMessages">
-                    <div style="text-align: center; color: #999; font-size: 11px; padding: 15px 0;">💕 Start chatting!</div>
-                </div>
+                <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Type message...">
+                    <input type="text" id="chatInput" placeholder="Message...">
                     <button onclick="sendMessage()">Send</button>
                 </div>
             </div>
@@ -387,108 +278,69 @@
             projectId: "usblog-games",
             storageBucket: "usblog-games.firebasestorage.app",
             messagingSenderId: "568211981446",
-            appId: "1:568211981446:web:0e75688bb9a28c2df97d07",
-            measurementId: "G-BDKRR8E565"
+            appId: "1:568211981446:web:0e75688bb9a28c2df97d07"
         };
-
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const database = firebase.database();
+        const db = firebase.database();
 
-        const WIN_SCORE = 5;
-        const choices = { rock: '🪨', paper: '📄', scissors: '✂️' };
-        
-        let roomId = null;
-        let myPlayerId = null;
-        let opponentId = null;
-        let myName = '';
-        let opponentName = '';
-        let isHost = false;
-        let gameStarted = false;
-        let myScore = 0;
-        let opponentScore = 0;
-        let myChoice = null;
-        let opponentChoice = null;
-        let roundActive = true;
-        let gameOver = false;
+        const TOTAL_ROUNDS = 25;
+        const ROUND_TIME = 5; // seconds
+        const HANDS = { rock: '✊', paper: '✋', scissors: '✌️' };
 
-        // Create floating hearts
-        function createHearts() {
-            const container = document.getElementById('floatingHearts');
-            const hearts = ['💕', '💗', '💖', '💘', '💝'];
-            for (let i = 0; i < 12; i++) {
-                const heart = document.createElement('span');
-                heart.className = 'floating-heart';
-                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
-                heart.style.left = Math.random() * 100 + '%';
-                heart.style.fontSize = Math.random() * 18 + 12 + 'px';
-                heart.style.animationDuration = Math.random() * 10 + 8 + 's';
-                heart.style.animationDelay = Math.random() * 10 + 's';
-                container.appendChild(heart);
-            }
-        }
+        let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
+        let gameStarted = false, gameOver = false;
+        let myScore = 0, oppScore = 0;
+        let currentRound = 1;
+        let myChoice = null, oppChoice = null;
+        let timerInterval = null;
+        let timeLeft = ROUND_TIME;
 
         function init() {
-            createHearts();
-            auth.onAuthStateChanged((user) => {
-                if (!user) { window.location.href = 'login.html'; return; }
-
-                database.ref('users/' + user.uid).once('value').then((snapshot) => {
-                    const data = snapshot.val();
-                    myName = data ? data.username : user.email.split('@')[0];
-                    document.getElementById('youChip').textContent = `💕 ${myName}: 0`;
+            auth.onAuthStateChanged(user => {
+                if (!user) { location.href = 'login.html'; return; }
+                db.ref('users/' + user.uid).once('value').then(s => {
+                    myName = s.val()?.username || user.email.split('@')[0];
+                    document.getElementById('youName').textContent = myName;
                 });
-
-                const params = new URLSearchParams(window.location.search);
-                roomId = params.get('match') || params.get('team');
+                const p = new URLSearchParams(location.search);
+                roomId = p.get('match') || p.get('team');
                 myPlayerId = user.uid;
-
-                if (!roomId) { window.location.href = 'lobby.html'; return; }
+                if (!roomId) { location.href = 'lobby.html'; return; }
                 setupRoom();
             });
         }
 
         function setupRoom() {
-            database.ref('matchmaking/' + roomId).once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    setupFromRoomData(snapshot.val());
-                } else {
-                    database.ref('teams/' + roomId).once('value').then((teamSnap) => {
-                        if (teamSnap.exists()) {
-                            setupFromRoomData(teamSnap.val());
-                        } else {
-                            alert('Room not found!');
-                            window.location.href = 'lobby.html';
-                        }
-                    });
-                }
+            db.ref('matchmaking/' + roomId).once('value').then(s => {
+                if (s.exists()) setupPlayers(s.val());
+                else db.ref('teams/' + roomId).once('value').then(ts => {
+                    if (ts.exists()) setupPlayers(ts.val());
+                    else { location.href = 'lobby.html'; }
+                });
             });
         }
 
-        function setupFromRoomData(roomData) {
-            if (roomData.player1 === myPlayerId) {
-                isHost = true;
-                opponentId = roomData.player2 || null;
-                opponentName = roomData.player2Name || 'Opponent';
+        function setupPlayers(data) {
+            if (data.player1 === myPlayerId) {
+                opponentId = data.player2 || null;
+                opponentName = data.player2Name || 'Opponent';
             } else {
-                isHost = false;
-                opponentId = roomData.player1 || null;
-                opponentName = roomData.player1Name || 'Opponent';
+                opponentId = data.player1 || null;
+                opponentName = data.player1Name || 'Opponent';
             }
+            document.getElementById('oppName').textContent = opponentName;
 
-            document.getElementById('opponentChip').textContent = `💙 ${opponentName}: 0`;
-
-            if (opponentId) {
-                startGame();
-            } else {
-                // Wait for opponent
-                database.ref('matchmaking/' + roomId).on('value', (snap) => {
-                    const data = snap.val();
-                    if (data && data.player2) {
-                        opponentId = data.player2;
-                        opponentName = data.player2Name || 'Opponent';
-                        document.getElementById('opponentChip').textContent = `💙 ${opponentName}: 0`;
-                        startGame();
+            if (opponentId) startGame();
+            else {
+                db.ref('matchmaking/' + roomId + '/player2').on('value', s => {
+                    if (s.val()) {
+                        opponentId = s.val();
+                        db.ref('users/' + opponentId).once('value').then(us => {
+                            opponentName = us.val()?.username || 'Opponent';
+                            document.getElementById('oppName').textContent = opponentName;
+                            startGame();
+                        });
                     }
                 });
             }
@@ -498,178 +350,165 @@
             gameStarted = true;
             setupChat();
             setupListeners();
+            startRoundTimer();
+        }
+
+        function startRoundTimer() {
+            timeLeft = ROUND_TIME;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    // Time's up - auto choose random if not chosen
+                    if (!myChoice) {
+                        const randomChoice = ['rock', 'paper', 'scissors'][Math.floor(Math.random() * 3)];
+                        makeChoice(randomChoice);
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('timerDisplay').textContent = timeLeft;
         }
 
         function setupListeners() {
-            // Listen for opponent choice
-            database.ref('gameRooms/' + roomId + '/rpsChoices').on('value', (snap) => {
-                const data = snap.val();
-                if (data && data[opponentId] && !opponentChoice) {
-                    opponentChoice = data[opponentId];
-                    document.getElementById('opponentChoice').textContent = choices[opponentChoice] || '❓';
-                    checkRoundResult();
+            db.ref('gameRooms/' + roomId + '/rpsChoices').on('value', s => {
+                const data = s.val();
+                if (data && data[opponentId] && !oppChoice) {
+                    oppChoice = data[opponentId];
+                    document.getElementById('oppHandDisplay').textContent = HANDS[oppChoice] || '✊';
+                    checkResult();
                 }
             });
 
-            // Listen for scores
-            database.ref('gameRooms/' + roomId + '/rpsScores').on('value', (snap) => {
-                const scores = snap.val();
+            db.ref('gameRooms/' + roomId + '/rpsScores').on('value', s => {
+                const scores = s.val();
                 if (scores) {
                     myScore = scores[myPlayerId] || 0;
-                    opponentScore = scores[opponentId] || 0;
-                    updateScoreDisplay();
-                }
-            });
-
-            // Listen for round reset
-            database.ref('gameRooms/' + roomId + '/rpsRound').on('value', (snap) => {
-                const roundNum = snap.val();
-                if (roundNum) {
-                    document.getElementById('resultMessage').textContent = `Round ${roundNum}`;
-                    resetRoundUI();
+                    oppScore = scores[opponentId] || 0;
+                    updateScores();
                 }
             });
         }
 
         function makeChoice(choice) {
-            if (!gameStarted || gameOver) return;
-            if (myChoice) return;
-            if (!opponentId) return;
+            if (!gameStarted || gameOver || myChoice) return;
 
             myChoice = choice;
-            
-            // Show my choice
-            const arenaContent = document.getElementById('arenaContent');
-            arenaContent.innerHTML = `
-                <div class="arena-choices">
-                    <div class="arena-choice">
-                        <div class="arena-choice-label">You</div>
-                        <div class="arena-choice-emoji">${choices[choice]}</div>
-                    </div>
-                    <div class="vs-text">VS</div>
-                    <div class="arena-choice">
-                        <div class="arena-choice-label">Opponent</div>
-                        <div class="arena-choice-emoji" id="opponentChoice">❓</div>
-                    </div>
-                </div>
-            `;
+            document.getElementById('myHandDisplay').textContent = HANDS[choice];
 
-            // Highlight selected
-            document.querySelectorAll('.choice-card').forEach(btn => btn.classList.remove('selected'));
-            document.getElementById('card' + choice.charAt(0).toUpperCase() + choice.slice(1)).classList.add('selected');
-            document.querySelectorAll('.choice-card').forEach(btn => btn.disabled = true);
+            // Highlight
+            document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById(choice + 'Btn').classList.add('selected');
+            document.querySelectorAll('.choice-card').forEach(c => c.disabled = true);
 
-            // Send choice
-            database.ref('gameRooms/' + roomId + '/rpsChoices/' + myPlayerId).set(choice);
-            
-            checkRoundResult();
+            db.ref('gameRooms/' + roomId + '/rpsChoices/' + myPlayerId).set(choice);
+            checkResult();
         }
 
-        function checkRoundResult() {
-            if (!myChoice || !opponentChoice) return;
+        function checkResult() {
+            if (!myChoice || !oppChoice || gameOver) return;
 
-            const result = determineWinner(myChoice, opponentChoice);
-            const resultEl = document.getElementById('resultMessage');
+            clearInterval(timerInterval);
+            const result = determineWinner(myChoice, oppChoice);
+            const display = document.getElementById('resultDisplay');
 
             if (result === 'win') {
                 myScore++;
-                resultEl.textContent = '🎉 You win this round!';
-                resultEl.style.color = '#4caf50';
+                display.textContent = '🎉 You win this round!';
+                display.style.color = '#4CAF50';
             } else if (result === 'lose') {
-                opponentScore++;
-                resultEl.textContent = '💙 Opponent wins this round!';
-                resultEl.style.color = '#e91e63';
+                oppScore++;
+                display.textContent = '💙 Opponent wins!';
+                display.style.color = '#ff4444';
             } else {
-                resultEl.textContent = '🤝 Tie!';
-                resultEl.style.color = '#ff9800';
+                display.textContent = '🤝 Tie!';
+                display.style.color = '#fdcb6e';
             }
 
-            database.ref('gameRooms/' + roomId + '/rpsScores').set({
+            db.ref('gameRooms/' + roomId + '/rpsScores').set({
                 [myPlayerId]: myScore,
-                [opponentId]: opponentScore
+                [opponentId]: oppScore
             });
+            updateScores();
 
-            updateScoreDisplay();
-
-            if (myScore >= WIN_SCORE || opponentScore >= WIN_SCORE) {
+            if (currentRound >= TOTAL_ROUNDS) {
                 gameOver = true;
-                const winner = myScore >= WIN_SCORE ? myName : opponentName;
                 setTimeout(() => {
-                    alert(`🏆 ${winner} wins the game!`);
+                    const winner = myScore > oppScore ? 'YOU WIN! 🏆' : myScore < oppScore ? 'OPPONENT WINS! 💙' : 'IT\'S A TIE! 🤝';
+                    alert(winner);
                     location.href = 'lobby.html';
                 }, 1500);
                 return;
             }
 
-            // Reset after delay
+            // Next round
             setTimeout(() => {
-                const newRound = Math.floor(Math.random() * 1000);
-                database.ref('gameRooms/' + roomId + '/rpsRound').set(newRound);
-                database.ref('gameRooms/' + roomId + '/rpsChoices').remove();
-                resetRoundUI();
+                currentRound++;
+                document.getElementById('roundNum').textContent = currentRound;
+                myChoice = null;
+                oppChoice = null;
+                document.getElementById('myHandDisplay').textContent = '✊';
+                document.getElementById('oppHandDisplay').textContent = '✊';
+                document.getElementById('resultDisplay').textContent = 'Choose your move!';
+                document.querySelectorAll('.choice-card').forEach(c => {
+                    c.disabled = false;
+                    c.classList.remove('selected');
+                });
+                db.ref('gameRooms/' + roomId + '/rpsChoices').remove();
+                startRoundTimer();
             }, 2000);
         }
 
-        function resetRoundUI() {
-            myChoice = null;
-            opponentChoice = null;
-            document.getElementById('arenaContent').innerHTML = `<div class="arena-message">💕 Choose your move!</div>`;
-            document.querySelectorAll('.choice-card').forEach(btn => {
-                btn.disabled = false;
-                btn.classList.remove('selected');
-            });
-        }
-
-        function determineWinner(my, opponent) {
-            if (my === opponent) return 'tie';
-            if ((my === 'rock' && opponent === 'scissors') ||
-                (my === 'paper' && opponent === 'rock') ||
-                (my === 'scissors' && opponent === 'paper')) return 'win';
+        function determineWinner(my, opp) {
+            if (my === opp) return 'tie';
+            if ((my === 'rock' && opp === 'scissors') ||
+                (my === 'paper' && opp === 'rock') ||
+                (my === 'scissors' && opp === 'paper')) return 'win';
             return 'lose';
         }
 
-        function updateScoreDisplay() {
-            document.getElementById('playerScore').textContent = myScore;
-            document.getElementById('aiScore').textContent = opponentScore;
-            document.getElementById('youChip').textContent = `💕 ${myName}: ${myScore}`;
-            document.getElementById('opponentChip').textContent = `💙 ${opponentName}: ${opponentScore}`;
+        function updateScores() {
+            document.getElementById('youScore').textContent = myScore;
+            document.getElementById('oppScore').textContent = oppScore;
+            document.getElementById('roundNum').textContent = currentRound;
         }
 
         function setupChat() {
-            const chatRef = database.ref('gameRooms/' + roomId + '/chat');
-            chatRef.off();
-            chatRef.limitToLast(50).on('child_added', (snap) => {
-                const msg = snap.val();
-                displayMessage(msg.sender, msg.message, msg.sender === myName);
+            const ref = db.ref('gameRooms/' + roomId + '/chat');
+            ref.off();
+            ref.limitToLast(50).on('child_added', s => {
+                const m = s.val();
+                displayMsg(m.sender, m.message, m.sender === myName);
             });
         }
 
         function sendMessage() {
             const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            if (message && roomId) {
-                database.ref('gameRooms/' + roomId + '/chat').push({
-                    sender: myName,
-                    message: message,
+            const msg = input.value.trim();
+            if (msg && roomId) {
+                db.ref('gameRooms/' + roomId + '/chat').push({
+                    sender: myName, message: msg,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
                 input.value = '';
             }
         }
 
-        function displayMessage(sender, message, isYou) {
-            const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages.querySelector('div[style*="padding: 15px"]')) {
-                chatMessages.innerHTML = '';
-            }
+        function displayMsg(sender, msg, isYou) {
+            const c = document.getElementById('chatMessages');
             const div = document.createElement('div');
-            div.className = `chat-message ${isYou ? 'you' : 'opponent'}`;
-            div.innerHTML = `<span class="sender">${sender}</span><span class="text">${message}</span>`;
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            div.className = 'chat-message ' + (isYou ? 'you' : 'opponent');
+            div.innerHTML = '<span class="sender">' + sender + '</span>' + msg;
+            c.appendChild(div);
+            c.scrollTop = c.scrollHeight;
         }
 
-        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+        document.getElementById('chatInput').addEventListener('keypress', e => {
             if (e.key === 'Enter') sendMessage();
         });
 
