@@ -23,7 +23,7 @@
             padding: 15px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.5);
             width: 100%;
-            max-width: 850px;
+            max-width: 800px;
         }
 
         .game-header {
@@ -47,8 +47,8 @@
         .game-title { font-size: 18px; font-weight: bold; color: #ff6b9d; }
 
         .players-info { display: flex; gap: 6px; flex-wrap: wrap; }
-        .player-chip { padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 600; }
-        .player-chip.status { background: rgba(255,255,255,0.1); color: #fdcb6e; font-size: 10px; }
+        .player-chip { padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.1); color: white; }
+        .player-chip.status { color: #fdcb6e; font-size: 10px; }
 
         .status-bar {
             text-align: center;
@@ -71,7 +71,7 @@
             border-radius: 8px;
             overflow: hidden;
             border: 3px solid rgba(255,255,255,0.2);
-            max-width: 450px;
+            max-width: 420px;
             margin: 0 auto;
         }
 
@@ -79,16 +79,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             cursor: pointer;
             position: relative;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        .square.light { background: #fff5f5; }
-        .square.dark { background: #f3e5f5; }
-        .square.selected { box-shadow: inset 0 0 15px rgba(255,0,0,0.7); }
+        .square.light { background: #ffd1dc; }
+        .square.dark { background: #e6e6fa; }
+        .square.selected { box-shadow: inset 0 0 15px rgba(255,0,0,0.8); }
         .square.valid-move::after {
             content: '';
             position: absolute;
@@ -106,26 +106,16 @@
             border: 3px solid rgba(255,0,0,0.6);
         }
 
-        /* RED PIECE (Player 1) */
-        .piece-red {
-            filter: drop-shadow(0 0 5px rgba(255,0,0,0.8));
-        }
-
-        /* VIOLET PIECE (Player 2) */
-        .piece-violet {
-            filter: drop-shadow(0 0 5px rgba(156,39,176,0.8));
-        }
-
         .chat-sidebar {
-            width: 190px;
-            min-width: 190px;
+            width: 180px;
+            min-width: 180px;
             display: flex;
             flex-direction: column;
             background: rgba(255,255,255,0.05);
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
-            max-height: 350px;
+            max-height: 320px;
         }
 
         .chat-header {
@@ -137,13 +127,13 @@
             font-size: 12px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 120px; max-height: 220px; display: flex; flex-direction: column; gap: 4px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 100px; max-height: 200px; display: flex; flex-direction: column; gap: 4px; }
         .chat-messages::-webkit-scrollbar { width: 3px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
 
         .chat-message { padding: 5px 8px; border-radius: 8px; font-size: 10px; max-width: 90%; }
-        .chat-message.you { background: rgba(255,0,0,0.2); align-self: flex-end; }
-        .chat-message.opponent { background: rgba(156,39,176,0.2); align-self: flex-start; }
+        .chat-message.you { background: rgba(255,107,157,0.2); align-self: flex-end; }
+        .chat-message.opponent { background: rgba(116,185,255,0.15); align-self: flex-start; }
         .chat-message .sender { font-weight: bold; font-size: 8px; display: block; }
 
         .chat-input-area { display: flex; gap: 4px; padding: 6px; }
@@ -152,8 +142,8 @@
 
         @media (max-width: 700px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; max-height: 120px; }
-            .chat-messages { max-height: 50px; min-height: 30px; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 100px; }
+            .chat-messages { max-height: 40px; min-height: 25px; }
             .square { font-size: 1rem; }
         }
     </style>
@@ -164,8 +154,8 @@
             <a href="lobby.html" class="back-btn">← Lobby</a>
             <h1 class="game-title">♟️ Chess</h1>
             <div class="players-info">
-                <div class="player-chip" id="youChip">🔴 You</div>
-                <div class="player-chip" id="opponentChip">🟣 Opp</div>
+                <div class="player-chip" id="youChip">You</div>
+                <div class="player-chip" id="opponentChip">Opp</div>
                 <div class="player-chip status" id="statusChip">Connecting...</div>
             </div>
         </div>
@@ -192,6 +182,7 @@
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
 
     <script>
+        // Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCaR33cAwHFTNdSlBuuzoju9yzah8szBmQ",
             authDomain: "usblog-games.firebaseapp.com",
@@ -205,44 +196,50 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // PIECES - RED uses white pieces, VIOLET uses black pieces
-        const PIECES = {
-            red: { king: '🤴', queen: '👸', rook: '🏰', bishop: '🕊️', knight: '🦄', pawn: '❤️' },
-            violet: { king: '🧝', queen: '🧚', rook: '🏯', bishop: '🏹', knight: '🐉', pawn: '💜' }
-        };
+        // Simple pieces - RED (top) vs BLUE (bottom)
+        const RED_PIECES = { king: '🤴', queen: '👸', rook: '🏰', bishop: '🕊️', knight: '🦄', pawn: '🔴' };
+        const BLUE_PIECES = { king: '🧝', queen: '🧚', rook: '🏯', bishop: '🏹', knight: '🐉', pawn: '🔵' };
 
-        let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
-        let mySide = 'red', currentTurn = 'red';
-        let selectedRow = -1, selectedCol = -1;
+        let roomId = null;
+        let myPlayerId = null;
+        let opponentId = null;
+        let myName = '';
+        let opponentName = '';
+        let mySide = 'red';
+        let currentTurn = 'red';
+        let selectedRow = -1;
+        let selectedCol = -1;
         let validMoves = [];
         let board = [];
         let gameStarted = false;
-        let listenersAttached = false;
 
-        // GLOBAL CLICK FUNCTION
-        window.cellClick = function(row, col) {
+        // GLOBAL CLICK
+        window.chessClick = function(row, col) {
             if (!gameStarted) return;
-            if (currentTurn !== mySide) {
-                updateStatus();
-                return;
-            }
+            if (currentTurn !== mySide) return;
             
             const piece = board[row][col];
 
-            // If a square is already selected
-            if (selectedRow >= 0 && selectedCol >= 0) {
+            // If already selected a piece
+            if (selectedRow !== -1) {
                 const isValid = validMoves.some(m => m.r === row && m.c === col);
                 if (isValid) {
-                    makeMove(selectedRow, selectedCol, row, col);
+                    doMove(selectedRow, selectedCol, row, col);
                     return;
                 }
             }
 
-            // Select own piece
+            // Select or deselect
             if (piece && piece.side === mySide) {
-                selectSquare(row, col);
+                selectedRow = row;
+                selectedCol = col;
+                validMoves = getMoves(row, col);
+                renderBoard();
             } else {
-                deselectSquare();
+                selectedRow = -1;
+                selectedCol = -1;
+                validMoves = [];
+                renderBoard();
             }
         };
 
@@ -250,10 +247,11 @@
             auth.onAuthStateChanged(user => {
                 if (!user) { location.href = 'login.html'; return; }
                 myPlayerId = user.uid;
+                
                 db.ref('users/' + user.uid).once('value').then(s => {
                     myName = s.val()?.username || 'Player';
-                    document.getElementById('youChip').textContent = '🔴 ' + myName;
                 });
+                
                 const p = new URLSearchParams(location.search);
                 roomId = p.get('match') || p.get('team');
                 if (!roomId) { location.href = 'lobby.html'; return; }
@@ -277,18 +275,15 @@
                 opponentId = data.player2 || null;
                 opponentName = data.player2Name || 'Opponent';
             } else {
-                mySide = 'violet';
+                mySide = 'blue';
                 opponentId = data.player1 || null;
                 opponentName = data.player1Name || 'Opponent';
             }
 
-            document.getElementById('youChip').textContent = mySide === 'red' ? '🔴 ' + myName : '🟣 ' + myName;
-            document.getElementById('opponentChip').textContent = mySide === 'red' ? '🟣 ' + (opponentName || 'Opp') : '🔴 ' + (opponentName || 'Opp');
-
             if (opponentId) {
                 db.ref('users/' + opponentId).once('value').then(us => {
                     if (us.exists()) opponentName = us.val().username || opponentName;
-                    document.getElementById('opponentChip').textContent = (mySide === 'red' ? '🟣 ' : '🔴 ') + opponentName;
+                    updateChips();
                 });
                 startGame();
             } else {
@@ -298,7 +293,7 @@
                         opponentId = s.val();
                         db.ref('users/' + opponentId).once('value').then(us => {
                             if (us.exists()) opponentName = us.val().username || 'Opponent';
-                            document.getElementById('opponentChip').textContent = (mySide === 'red' ? '🟣 ' : '🔴 ') + opponentName;
+                            updateChips();
                             startGame();
                         });
                     }
@@ -306,12 +301,32 @@
             }
         }
 
+        function updateChips() {
+            document.getElementById('youChip').textContent = (mySide === 'red' ? '🔴 ' : '🔵 ') + myName;
+            document.getElementById('opponentChip').textContent = (mySide === 'red' ? '🔵 ' : '🔴 ') + opponentName;
+        }
+
         function initBoard() {
-            board = Array(8).fill(null).map(() => Array(8).fill(null));
+            board = [];
             const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
+            
+            // Blue pieces at top (rows 0-1)
             for (let col = 0; col < 8; col++) {
-                board[0][col] = { type: backRow[col], side: 'violet' };
-                board[1][col] = { type: 'pawn', side: 'violet' };
+                board[0] = board[0] || [];
+                board[1] = board[1] || [];
+                board[0][col] = { type: backRow[col], side: 'blue' };
+                board[1][col] = { type: 'pawn', side: 'blue' };
+            }
+            
+            // Empty middle
+            for (let row = 2; row < 6; row++) {
+                board[row] = Array(8).fill(null);
+            }
+            
+            // Red pieces at bottom (rows 6-7)
+            for (let col = 0; col < 8; col++) {
+                board[6] = board[6] || [];
+                board[7] = board[7] || [];
                 board[6][col] = { type: 'pawn', side: 'red' };
                 board[7][col] = { type: backRow[col], side: 'red' };
             }
@@ -329,141 +344,136 @@
             updateStatus();
             setupChat();
 
-            if (!listenersAttached) {
-                listenersAttached = true;
-                db.ref('gameRooms/' + roomId + '/chessBoard').on('value', snap => {
-                    const data = snap.val();
-                    if (data && !gameStarted === false) {
-                        board = data;
-                        renderBoard();
-                    }
-                });
-                db.ref('gameRooms/' + roomId + '/chessTurn').on('value', snap => {
-                    const turn = snap.val();
-                    if (turn) {
-                        currentTurn = turn;
-                        updateStatus();
-                    }
-                });
-            }
+            // Listen for board changes
+            db.ref('gameRooms/' + roomId + '/board').on('value', snap => {
+                const data = snap.val();
+                if (data) {
+                    board = data;
+                    renderBoard();
+                }
+            });
 
+            // Listen for turn changes
+            db.ref('gameRooms/' + roomId + '/turn').on('value', snap => {
+                const turn = snap.val();
+                if (turn) {
+                    currentTurn = turn;
+                    updateStatus();
+                }
+            });
+
+            // Host initializes
             if (mySide === 'red') {
-                db.ref('gameRooms/' + roomId + '/chessBoard').set(board);
-                db.ref('gameRooms/' + roomId + '/chessTurn').set('red');
+                db.ref('gameRooms/' + roomId + '/board').set(board);
+                db.ref('gameRooms/' + roomId + '/turn').set('red');
             }
         }
 
         function updateStatus() {
             const sb = document.getElementById('statusBar');
             if (currentTurn === mySide) {
-                sb.textContent = mySide === 'red' ? '🔴 YOUR TURN - CLICK A PIECE!' : '🟣 YOUR TURN - CLICK A PIECE!';
-                sb.style.color = mySide === 'red' ? '#ff4444' : '#9c27b0';
+                sb.textContent = 'YOUR TURN - CLICK A PIECE!';
+                sb.style.color = mySide === 'red' ? '#ff4444' : '#4488ff';
             } else {
-                sb.textContent = (mySide === 'red' ? '🟣 ' : '🔴 ') + opponentName + ' IS THINKING...';
-                sb.style.color = mySide === 'red' ? '#9c27b0' : '#ff4444';
+                sb.textContent = opponentName + ' IS THINKING...';
+                sb.style.color = '#fdcb6e';
             }
         }
 
-        function getValidMoves(row, col) {
+        function getMoves(row, col) {
             const piece = board[row][col];
             if (!piece) return [];
             const moves = [];
+            
             switch (piece.type) {
-                case 'pawn': getPawnMoves(row, col, piece.side, moves); break;
-                case 'knight': getKnightMoves(row, col, piece.side, moves); break;
-                case 'bishop': getBishopMoves(row, col, piece.side, moves); break;
-                case 'rook': getRookMoves(row, col, piece.side, moves); break;
-                case 'queen': getBishopMoves(row, col, piece.side, moves); getRookMoves(row, col, piece.side, moves); break;
-                case 'king': getKingMoves(row, col, piece.side, moves); break;
+                case 'pawn':
+                    const dir = piece.side === 'red' ? -1 : 1;
+                    const startRow = piece.side === 'red' ? 6 : 1;
+                    if (board[row + dir] && !board[row + dir][col]) {
+                        moves.push({ r: row + dir, c: col });
+                        if (row === startRow && !board[row + 2*dir][col]) {
+                            moves.push({ r: row + 2*dir, c: col });
+                        }
+                    }
+                    for (const dc of [-1, 1]) {
+                        const nc = col + dc;
+                        if (nc >= 0 && nc < 8 && board[row + dir]) {
+                            const t = board[row + dir][nc];
+                            if (t && t.side !== piece.side) moves.push({ r: row + dir, c: nc });
+                        }
+                    }
+                    break;
+                    
+                case 'knight':
+                    const knightOffsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+                    for (const [dr, dc] of knightOffsets) {
+                        const nr = row + dr, nc = col + dc;
+                        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                            const t = board[nr][nc];
+                            if (!t || t.side !== piece.side) moves.push({ r: nr, c: nc });
+                        }
+                    }
+                    break;
+                    
+                case 'bishop':
+                    for (const [dr, dc] of [[1,1],[1,-1],[-1,1],[-1,-1]]) {
+                        let nr = row + dr, nc = col + dc;
+                        while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                            const t = board[nr][nc];
+                            if (!t) moves.push({ r: nr, c: nc });
+                            else { if (t.side !== piece.side) moves.push({ r: nr, c: nc }); break; }
+                            nr += dr; nc += dc;
+                        }
+                    }
+                    break;
+                    
+                case 'rook':
+                    for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+                        let nr = row + dr, nc = col + dc;
+                        while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                            const t = board[nr][nc];
+                            if (!t) moves.push({ r: nr, c: nc });
+                            else { if (t.side !== piece.side) moves.push({ r: nr, c: nc }); break; }
+                            nr += dr; nc += dc;
+                        }
+                    }
+                    break;
+                    
+                case 'queen':
+                    for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]]) {
+                        let nr = row + dr, nc = col + dc;
+                        while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                            const t = board[nr][nc];
+                            if (!t) moves.push({ r: nr, c: nc });
+                            else { if (t.side !== piece.side) moves.push({ r: nr, c: nc }); break; }
+                            nr += dr; nc += dc;
+                        }
+                    }
+                    break;
+                    
+                case 'king':
+                    for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
+                        const nr = row + dr, nc = col + dc;
+                        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                            const t = board[nr][nc];
+                            if (!t || t.side !== piece.side) moves.push({ r: nr, c: nc });
+                        }
+                    }
+                    break;
             }
             return moves;
         }
 
-        function getPawnMoves(row, col, side, moves) {
-            const dir = side === 'red' ? -1 : 1;
-            const startRow = side === 'red' ? 6 : 1;
-            if (row + dir >= 0 && row + dir < 8 && !board[row + dir][col]) {
-                moves.push({ r: row + dir, c: col });
-                if (row === startRow && !board[row + 2*dir][col]) moves.push({ r: row + 2*dir, c: col });
-            }
-            for (const dc of [-1, 1]) {
-                const nc = col + dc;
-                if (nc >= 0 && nc < 8 && row + dir >= 0 && row + dir < 8) {
-                    const t = board[row + dir][nc];
-                    if (t && t.side !== side) moves.push({ r: row + dir, c: nc });
-                }
-            }
-        }
-
-        function getKnightMoves(row, col, side, moves) {
-            const offsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-            for (const [dr, dc] of offsets) {
-                const nr = row + dr, nc = col + dc;
-                if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                    const t = board[nr][nc];
-                    if (!t || t.side !== side) moves.push({ r: nr, c: nc });
-                }
-            }
-        }
-
-        function getBishopMoves(row, col, side, moves) {
-            for (const [dr, dc] of [[1,1],[1,-1],[-1,1],[-1,-1]]) {
-                let nr = row + dr, nc = col + dc;
-                while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                    const t = board[nr][nc];
-                    if (!t) moves.push({ r: nr, c: nc });
-                    else { if (t.side !== side) moves.push({ r: nr, c: nc }); break; }
-                    nr += dr; nc += dc;
-                }
-            }
-        }
-
-        function getRookMoves(row, col, side, moves) {
-            for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
-                let nr = row + dr, nc = col + dc;
-                while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                    const t = board[nr][nc];
-                    if (!t) moves.push({ r: nr, c: nc });
-                    else { if (t.side !== side) moves.push({ r: nr, c: nc }); break; }
-                    nr += dr; nc += dc;
-                }
-            }
-        }
-
-        function getKingMoves(row, col, side, moves) {
-            for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
-                const nr = row + dr, nc = col + dc;
-                if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                    const t = board[nr][nc];
-                    if (!t || t.side !== side) moves.push({ r: nr, c: nc });
-                }
-            }
-        }
-
-        function selectSquare(row, col) {
-            selectedRow = row;
-            selectedCol = col;
-            validMoves = getValidMoves(row, col);
-            renderBoard();
-        }
-
-        function deselectSquare() {
-            selectedRow = -1;
-            selectedCol = -1;
-            validMoves = [];
-            renderBoard();
-        }
-
-        function makeMove(fromR, fromC, toR, toC) {
+        function doMove(fromR, fromC, toR, toC) {
             board[toR][toC] = board[fromR][fromC];
             board[fromR][fromC] = null;
             selectedRow = -1;
             selectedCol = -1;
             validMoves = [];
-            currentTurn = currentTurn === 'red' ? 'violet' : 'red';
+            currentTurn = currentTurn === 'red' ? 'blue' : 'red';
             
-            db.ref('gameRooms/' + roomId + '/chessBoard').set(board);
-            db.ref('gameRooms/' + roomId + '/chessTurn').set(currentTurn);
+            db.ref('gameRooms/' + roomId + '/board').set(board);
+            db.ref('gameRooms/' + roomId + '/turn').set(currentTurn);
             
             renderBoard();
             updateStatus();
@@ -478,12 +488,11 @@
                 for (let col = 0; col < 8; col++) {
                     const sq = document.createElement('div');
                     sq.className = 'square ' + ((row + col) % 2 === 0 ? 'light' : 'dark');
-                    sq.setAttribute('onclick', 'cellClick(' + row + ',' + col + ')');
+                    sq.setAttribute('onclick', 'chessClick(' + row + ',' + col + ')');
                     
                     const piece = board[row] ? board[row][col] : null;
                     if (piece) {
-                        sq.textContent = PIECES[piece.side][piece.type];
-                        sq.classList.add(piece.side === 'red' ? 'piece-red' : 'piece-violet');
+                        sq.textContent = piece.side === 'red' ? RED_PIECES[piece.type] : BLUE_PIECES[piece.type];
                     }
                     
                     if (selectedRow === row && selectedCol === col) {
