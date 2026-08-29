@@ -7,32 +7,46 @@
     <style>
         :root {
             --primary: #ff6b9d;
+            --secondary: #e84393;
             --blue: #74b9ff;
+            --blue-light: #a8d8ff;
             --gold: #fdcb6e;
+            --gold-light: #ffeaa7;
             --dark: #1a1a2e;
+            --darker: #0a0a1a;
+            --purple: #2d1b69;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
             --white: #ffffff;
             --red: #ff4444;
+            --green: #4CAF50;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Segoe UI', 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1e1b4b, #4c1d95, #9d174d);
+            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 30%, #9d174d 60%, #f472b6 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 15px;
+            overflow-x: hidden;
         }
 
         .game-shell {
             background: rgba(30, 27, 75, 0.95);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1.5px solid rgba(255, 255, 255, 0.25);
             border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), 0 0 40px rgba(255, 107, 157, 0.15);
             width: 100%;
             max-width: 900px;
         }
@@ -44,10 +58,12 @@
             justify-content: space-between;
             gap: 10px;
             margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .back-btn {
-            color: white;
+            color: var(--white);
             text-decoration: none;
             padding: 8px 16px;
             background: rgba(255, 255, 255, 0.1);
@@ -56,9 +72,16 @@
             font-weight: 600;
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .back-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .back-btn:hover {
+            background: rgba(255, 107, 157, 0.2);
+            border-color: var(--primary);
+            transform: translateX(-3px);
+        }
 
         .game-title {
             font-size: 22px;
@@ -67,9 +90,14 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            letter-spacing: 0.5px;
         }
 
-        .players-info { display: flex; gap: 8px; flex-wrap: wrap; }
+        .players-info {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
 
         .player-chip {
             padding: 6px 14px;
@@ -77,23 +105,27 @@
             font-size: 12px;
             font-weight: 600;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .player-chip.you {
             background: rgba(255, 107, 157, 0.2);
-            border: 1px solid #ff6b9d;
-            color: #ff6b9d;
+            border: 1px solid var(--primary);
+            color: var(--primary);
         }
 
         .player-chip.opponent {
             background: rgba(116, 185, 255, 0.2);
-            border: 1px solid #74b9ff;
-            color: #74b9ff;
+            border: 1px solid var(--blue);
+            color: var(--blue);
         }
 
         .player-chip.status {
             background: rgba(255, 255, 255, 0.1);
-            color: #fdcb6e;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--gold);
             font-size: 10px;
         }
 
@@ -105,7 +137,9 @@
             font-weight: bold;
             font-size: 14px;
             background: rgba(255, 255, 255, 0.1);
-            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--white);
+            transition: all 0.3s;
         }
 
         .main-layout {
@@ -114,7 +148,10 @@
             align-items: flex-start;
         }
 
-        .game-area { flex: 1; min-width: 0; }
+        .game-area {
+            flex: 1;
+            min-width: 0;
+        }
 
         .chess-board {
             display: grid;
@@ -137,11 +174,17 @@
             position: relative;
             user-select: none;
             -webkit-user-select: none;
+            transition: all 0.2s;
+            pointer-events: auto;
         }
 
         .square.light { background: #ffd1dc; }
         .square.dark { background: #e6e6fa; }
         
+        .square:hover {
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
         .square.selected {
             box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.9);
         }
@@ -153,6 +196,7 @@
             height: 30%;
             border-radius: 50%;
             background: rgba(76, 175, 80, 0.7);
+            animation: pulseDot 1s infinite;
         }
         
         .square.valid-capture::after {
@@ -162,6 +206,27 @@
             height: 85%;
             border-radius: 50%;
             border: 4px solid rgba(255, 0, 0, 0.6);
+            animation: pulseCapture 1s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes pulseCapture {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .square.check {
+            background: #ff4444 !important;
+            animation: checkFlash 0.5s infinite;
+        }
+
+        @keyframes checkFlash {
+            0%, 100% { background: #ff4444; }
+            50% { background: #ff8888; }
         }
 
         .info-bar {
@@ -179,6 +244,9 @@
             padding: 6px 12px;
             border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .chat-sidebar {
@@ -197,7 +265,7 @@
             padding: 10px;
             background: rgba(255, 107, 157, 0.15);
             text-align: center;
-            color: #ff6b9d;
+            color: var(--primary);
             font-weight: bold;
             font-size: 13px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -215,7 +283,7 @@
         }
 
         .chat-messages::-webkit-scrollbar { width: 4px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 2px; }
 
         .chat-message {
             padding: 7px 10px;
@@ -223,6 +291,12 @@
             font-size: 11px;
             max-width: 90%;
             word-wrap: break-word;
+            animation: msgIn 0.3s ease;
+        }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .chat-message.you {
@@ -244,8 +318,8 @@
             margin-bottom: 2px;
         }
 
-        .chat-message.you .sender { color: #ff6b9d; }
-        .chat-message.opponent .sender { color: #74b9ff; }
+        .chat-message.you .sender { color: var(--primary); }
+        .chat-message.opponent .sender { color: var(--blue); }
         .chat-message .text { color: rgba(255, 255, 255, 0.9); }
 
         .chat-input-area {
@@ -264,9 +338,13 @@
             color: white;
             outline: none;
             font-size: 11px;
+            transition: all 0.3s;
         }
 
-        .chat-input-area input:focus { border-color: #ff6b9d; }
+        .chat-input-area input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
+        }
 
         .chat-input-area button {
             padding: 8px 14px;
@@ -277,7 +355,40 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 11px;
+            transition: all 0.3s;
         }
+
+        .chat-input-area button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .disconnect-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .disconnect-overlay.show { display: flex; }
+
+        .disconnect-content {
+            text-align: center;
+            background: rgba(26, 26, 46, 0.95);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            border: 2px solid var(--red);
+        }
+
+        .disconnect-emoji { font-size: 4rem; margin-bottom: 1rem; }
+        .disconnect-title { font-size: 1.3rem; font-weight: bold; color: var(--red); margin-bottom: 0.5rem; }
+        .disconnect-countdown { font-size: 2.5rem; font-weight: bold; color: var(--gold); }
 
         @media (max-width: 750px) {
             .main-layout { flex-direction: column; }
@@ -285,6 +396,7 @@
             .chat-messages { max-height: 90px; min-height: 60px; }
             .game-title { font-size: 16px; }
             .square { font-size: 1.2rem; }
+            .game-shell { padding: 10px; }
         }
     </style>
 </head>
@@ -307,7 +419,8 @@
                 <div class="chess-board" id="chessBoard"></div>
                 <div class="info-bar">
                     <div class="info-pill">♟️ Click piece to select</div>
-                    <div class="info-pill">🟢 Green dots = valid moves</div>
+                    <div class="info-pill">🟢 Green = valid move</div>
+                    <div class="info-pill">🔴 Red = capture</div>
                     <div class="info-pill">🌐 Real-Time 1vs1</div>
                 </div>
             </div>
@@ -316,10 +429,18 @@
                 <div class="chat-header">💬 Chat</div>
                 <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Type message...">
+                    <input type="text" id="chatInput" placeholder="Type message..." maxlength="200">
                     <button onclick="sendMessage()">Send</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="disconnect-overlay" id="disconnectOverlay">
+        <div class="disconnect-content">
+            <div class="disconnect-emoji">💔</div>
+            <div class="disconnect-title" id="disconnectTitle">Opponent left!</div>
+            <div class="disconnect-countdown" id="disconnectCountdown">5</div>
         </div>
     </div>
 
@@ -328,6 +449,9 @@
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
 
     <script>
+        // =====================================================
+        // FIREBASE CONFIGURATION
+        // =====================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCaR33cAwHFTNdSlBuuzoju9yzah8szBmQ",
             authDomain: "usblog-games.firebaseapp.com",
@@ -341,107 +465,143 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
+        // =====================================================
+        // CHESS PIECES
+        // =====================================================
         const PIECES = {
             white: { K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙' },
             black: { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞', P: '♟' }
         };
 
+        // =====================================================
+        // GAME STATE
+        // =====================================================
         let roomId = null;
-        let myId = null;
-        let oppId = null;
+        let myPlayerId = null;
+        let opponentId = null;
         let myName = '';
-        let oppName = '';
+        let opponentName = '';
         let myColor = 'white';
-        let turn = 'white';
-        let selR = -1;
-        let selC = -1;
+        let currentTurn = 'white';
+        let selectedRow = -1;
+        let selectedCol = -1;
         let validMoves = [];
         let board = [];
-        let started = false;
+        let gameStarted = false;
+        let gameOver = false;
+        let oppLastSeen = Date.now();
+        let listenersAttached = false;
 
-        window.clickSquare = function(r, c) {
-            if (!started) return;
-            if (turn !== myColor) return;
+        // =====================================================
+        // GLOBAL CLICK FUNCTION - Always accessible
+        // =====================================================
+        window.clickSquare = function(row, col) {
+            if (!gameStarted || gameOver) return;
+            if (currentTurn !== myColor) return;
             
-            const piece = board[r][c];
+            const piece = board[row][col];
 
-            if (selR !== -1) {
-                const valid = validMoves.some(m => m.r === r && m.c === c);
-                if (valid) {
-                    board[r][c] = board[selR][selC];
-                    board[selR][selC] = null;
-                    if (board[r][c] && board[r][c].type === 'P' && (r === 0 || r === 7)) {
-                        board[r][c] = { type: 'Q', color: board[r][c].color };
-                    }
-                    selR = -1; selC = -1; validMoves = [];
-                    turn = turn === 'white' ? 'black' : 'white';
-                    db.ref('gameRooms/' + roomId + '/board').set(board);
-                    db.ref('gameRooms/' + roomId + '/turn').set(turn);
-                    renderBoard();
-                    updateStatus();
+            // If a piece is already selected
+            if (selectedRow !== -1 && selectedCol !== -1) {
+                const isValid = validMoves.some(m => m.r === row && m.c === col);
+                if (isValid) {
+                    makeMove(selectedRow, selectedCol, row, col);
                     return;
                 }
             }
 
+            // Select own piece
             if (piece && piece.color === myColor) {
-                selR = r; selC = c;
-                validMoves = getMoves(r, c);
+                selectedRow = row;
+                selectedCol = col;
+                validMoves = getLegalMoves(row, col);
                 renderBoard();
             } else {
-                selR = -1; selC = -1; validMoves = [];
+                // Deselect
+                selectedRow = -1;
+                selectedCol = -1;
+                validMoves = [];
                 renderBoard();
             }
         };
 
+        // =====================================================
+        // INITIALIZATION
+        // =====================================================
         function init() {
             auth.onAuthStateChanged(user => {
-                if (!user) { location.href = 'login.html'; return; }
-                myId = user.uid;
-                db.ref('users/' + myId).once('value').then(s => {
-                    myName = s.val()?.username || 'Player';
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                myPlayerId = user.uid;
+                
+                // Get my login username
+                db.ref('users/' + myPlayerId).once('value').then(snap => {
+                    myName = snap.val()?.username || 'Player';
                 });
-                const p = new URLSearchParams(location.search);
-                roomId = p.get('match') || p.get('team');
-                if (!roomId) { location.href = 'lobby.html'; return; }
+                
+                const params = new URLSearchParams(window.location.search);
+                roomId = params.get('match') || params.get('team');
+                
+                if (!roomId) {
+                    window.location.href = 'lobby.html';
+                    return;
+                }
+                
                 setupRoom();
             });
         }
 
+        // =====================================================
+        // ROOM SETUP
+        // =====================================================
         function setupRoom() {
-            db.ref('matchmaking/' + roomId).once('value').then(s => {
-                if (s.exists()) setupPlayers(s.val());
-                else db.ref('teams/' + roomId).once('value').then(ts => {
-                    if (ts.exists()) setupPlayers(ts.val());
-                    else location.href = 'lobby.html';
-                });
+            db.ref('matchmaking/' + roomId).once('value').then(snap => {
+                if (snap.exists()) {
+                    setupPlayers(snap.val());
+                } else {
+                    db.ref('teams/' + roomId).once('value').then(teamSnap => {
+                        if (teamSnap.exists()) {
+                            setupPlayers(teamSnap.val());
+                        } else {
+                            window.location.href = 'lobby.html';
+                        }
+                    });
+                }
             });
         }
 
-        function setupPlayers(data) {
-            if (data.player1 === myId) {
+        function setupPlayers(roomData) {
+            if (roomData.player1 === myPlayerId) {
                 myColor = 'white';
-                oppId = data.player2 || null;
-                oppName = data.player2Name || 'Opponent';
+                opponentId = roomData.player2 || null;
+                opponentName = roomData.player2Name || 'Opponent';
             } else {
                 myColor = 'black';
-                oppId = data.player1 || null;
-                oppName = data.player1Name || 'Opponent';
+                opponentId = roomData.player1 || null;
+                opponentName = roomData.player1Name || 'Opponent';
             }
 
-            if (oppId) {
-                db.ref('users/' + oppId).once('value').then(s => {
-                    if (s.exists()) oppName = s.val().username || oppName;
-                    updateChips();
+            if (opponentId) {
+                // Get opponent's login username
+                db.ref('users/' + opponentId).once('value').then(snap => {
+                    if (snap.exists()) {
+                        opponentName = snap.val().username || opponentName;
+                    }
+                    updatePlayerChips();
                 });
                 startGame();
             } else {
                 document.getElementById('statusChip').textContent = '⏳ Waiting...';
-                db.ref('matchmaking/' + roomId + '/player2').on('value', s => {
-                    if (s.val()) {
-                        oppId = s.val();
-                        db.ref('users/' + oppId).once('value').then(us => {
-                            if (us.exists()) oppName = us.val().username || 'Opponent';
-                            updateChips();
+                db.ref('matchmaking/' + roomId + '/player2').on('value', snap => {
+                    if (snap.val()) {
+                        opponentId = snap.val();
+                        db.ref('users/' + opponentId).once('value').then(userSnap => {
+                            if (userSnap.exists()) {
+                                opponentName = userSnap.val().username || 'Opponent';
+                            }
+                            updatePlayerChips();
                             startGame();
                         });
                     }
@@ -449,168 +609,391 @@
             }
         }
 
-        function updateChips() {
+        function updatePlayerChips() {
             document.getElementById('youChip').textContent = '💕 ' + myName;
-            document.getElementById('opponentChip').textContent = '💙 ' + oppName;
+            document.getElementById('opponentChip').textContent = '💙 ' + opponentName;
         }
 
+        // =====================================================
+        // BOARD INITIALIZATION
+        // =====================================================
         function initBoard() {
             board = [];
-            const br = ['R','N','B','Q','K','B','N','R'];
-            for (let r = 0; r < 8; r++) board[r] = Array(8).fill(null);
-            for (let c = 0; c < 8; c++) {
-                board[0][c] = {type: br[c], color: 'black'};
-                board[1][c] = {type: 'P', color: 'black'};
-                board[6][c] = {type: 'P', color: 'white'};
-                board[7][c] = {type: br[c], color: 'white'};
+            const backRow = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
+            
+            for (let row = 0; row < 8; row++) {
+                board[row] = Array(8).fill(null);
+            }
+            
+            // Black pieces at top
+            for (let col = 0; col < 8; col++) {
+                board[0][col] = { type: backRow[col], color: 'black' };
+                board[1][col] = { type: 'P', color: 'black' };
+            }
+            
+            // White pieces at bottom
+            for (let col = 0; col < 8; col++) {
+                board[6][col] = { type: 'P', color: 'white' };
+                board[7][col] = { type: backRow[col], color: 'white' };
             }
         }
 
+        // =====================================================
+        // GAME START
+        // =====================================================
         function startGame() {
-            started = true;
+            gameStarted = true;
+            oppLastSeen = Date.now();
             document.getElementById('statusChip').textContent = '🟢 LIVE';
+            
             initBoard();
-            turn = 'white';
+            selectedRow = -1;
+            selectedCol = -1;
+            validMoves = [];
+            currentTurn = 'white';
+            
             renderBoard();
             updateStatus();
             setupChat();
-
-            db.ref('gameRooms/' + roomId + '/board').on('value', s => {
-                const d = s.val();
-                if (d) { board = d; renderBoard(); }
-            });
-            db.ref('gameRooms/' + roomId + '/turn').on('value', s => {
-                const t = s.val();
-                if (t) { turn = t; updateStatus(); }
-            });
-
+            
+            if (!listenersAttached) {
+                listenersAttached = true;
+                
+                // Listen for board changes
+                db.ref('gameRooms/' + roomId + '/chessBoard').on('value', snap => {
+                    const data = snap.val();
+                    if (data) {
+                        board = data;
+                        renderBoard();
+                    }
+                });
+                
+                // Listen for turn changes
+                db.ref('gameRooms/' + roomId + '/chessTurn').on('value', snap => {
+                    const turn = snap.val();
+                    if (turn) {
+                        currentTurn = turn;
+                        updateStatus();
+                    }
+                });
+                
+                // Listen for opponent disconnect
+                db.ref('gameRooms/' + roomId + '/players/' + opponentId).on('value', snap => {
+                    if (snap.val()) {
+                        oppLastSeen = Date.now();
+                    }
+                });
+            }
+            
+            // Host initializes the board
             if (myColor === 'white') {
-                db.ref('gameRooms/' + roomId + '/board').set(board);
-                db.ref('gameRooms/' + roomId + '/turn').set('white');
+                db.ref('gameRooms/' + roomId + '/chessBoard').set(board);
+                db.ref('gameRooms/' + roomId + '/chessTurn').set('white');
             }
+            
+            // Disconnect check every 5 seconds
+            setInterval(() => {
+                if (gameStarted && !gameOver && Date.now() - oppLastSeen > 15000) {
+                    gameOver = true;
+                    showDisconnect();
+                }
+            }, 5000);
         }
 
+        function showDisconnect() {
+            document.getElementById('disconnectTitle').textContent = opponentName + ' has left!';
+            document.getElementById('disconnectOverlay').classList.add('show');
+            
+            let count = 5;
+            document.getElementById('disconnectCountdown').textContent = count;
+            
+            const interval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    document.getElementById('disconnectCountdown').textContent = count;
+                } else {
+                    clearInterval(interval);
+                    window.location.href = 'lobby.html';
+                }
+            }, 1000);
+        }
+
+        // =====================================================
+        // STATUS UPDATE
+        // =====================================================
         function updateStatus() {
-            const sb = document.getElementById('statusBar');
-            if (turn === myColor) {
-                sb.textContent = '💕 YOUR TURN - CLICK A PIECE!';
-                sb.style.color = '#ff6b9d';
+            const statusBar = document.getElementById('statusBar');
+            
+            if (currentTurn === myColor) {
+                statusBar.textContent = '💕 YOUR TURN - CLICK A PIECE!';
+                statusBar.style.color = '#ff6b9d';
             } else {
-                sb.textContent = '💙 ' + oppName + ' IS THINKING...';
-                sb.style.color = '#74b9ff';
+                statusBar.textContent = '💙 ' + opponentName + ' IS THINKING...';
+                statusBar.style.color = '#74b9ff';
             }
         }
 
-        function getMoves(r, c) {
-            const p = board[r][c];
-            if (!p) return [];
-            const ms = [];
-            const t = p.type, col = p.color;
+        // =====================================================
+        // MOVE GENERATION - Complete Chess Physics
+        // =====================================================
+        function getLegalMoves(row, col) {
+            const piece = board[row][col];
+            if (!piece) return [];
+            
+            const moves = [];
+            const type = piece.type;
+            const color = piece.color;
+            
+            switch (type) {
+                case 'P':
+                    generatePawnMoves(row, col, color, moves);
+                    break;
+                case 'N':
+                    generateKnightMoves(row, col, color, moves);
+                    break;
+                case 'B':
+                    generateBishopMoves(row, col, color, moves);
+                    break;
+                case 'R':
+                    generateRookMoves(row, col, color, moves);
+                    break;
+                case 'Q':
+                    generateBishopMoves(row, col, color, moves);
+                    generateRookMoves(row, col, color, moves);
+                    break;
+                case 'K':
+                    generateKingMoves(row, col, color, moves);
+                    break;
+            }
+            
+            return moves;
+        }
 
-            if (t === 'P') {
-                const d = col === 'white' ? -1 : 1;
-                const sr = col === 'white' ? 6 : 1;
-                if (r+d >= 0 && r+d < 8 && !board[r+d][c]) {
-                    ms.push({r: r+d, c: c});
-                    if (r === sr && !board[r+2*d][c]) ms.push({r: r+2*d, c: c});
+        function generatePawnMoves(row, col, color, moves) {
+            const direction = color === 'white' ? -1 : 1;
+            const startRow = color === 'white' ? 6 : 1;
+            
+            // Forward move
+            const newRow = row + direction;
+            if (newRow >= 0 && newRow < 8 && !board[newRow][col]) {
+                moves.push({ r: newRow, c: col });
+                
+                // Double forward from start
+                const doubleRow = row + 2 * direction;
+                if (row === startRow && !board[doubleRow][col]) {
+                    moves.push({ r: doubleRow, c: col });
                 }
-                for (const dc of [-1, 1]) {
-                    const nc = c + dc;
-                    if (nc >= 0 && nc < 8 && r+d >= 0 && r+d < 8) {
-                        if (board[r+d][nc] && board[r+d][nc].color !== col) ms.push({r: r+d, c: nc});
-                    }
-                }
-            } else if (t === 'N') {
-                const offs = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-                for (const [dr, dc] of offs) {
-                    const nr = r+dr, nc = c+dc;
-                    if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                        if (!board[nr][nc] || board[nr][nc].color !== col) ms.push({r: nr, c: nc});
-                    }
-                }
-            } else if (t === 'B' || t === 'R' || t === 'Q') {
-                const dirs = t === 'B' ? [[1,1],[1,-1],[-1,1],[-1,-1]] : t === 'R' ? [[0,1],[0,-1],[1,0],[-1,0]] : [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
-                for (const [dr, dc] of dirs) {
-                    let nr = r+dr, nc = c+dc;
-                    while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                        if (!board[nr][nc]) ms.push({r: nr, c: nc});
-                        else { if (board[nr][nc].color !== col) ms.push({r: nr, c: nc}); break; }
-                        nr += dr; nc += dc;
-                    }
-                }
-            } else if (t === 'K') {
-                for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
-                    const nr = r+dr, nc = c+dc;
-                    if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                        if (!board[nr][nc] || board[nr][nc].color !== col) ms.push({r: nr, c: nc});
+            }
+            
+            // Diagonal captures
+            for (const dc of [-1, 1]) {
+                const newCol = col + dc;
+                if (newCol >= 0 && newCol < 8 && newRow >= 0 && newRow < 8) {
+                    const target = board[newRow][newCol];
+                    if (target && target.color !== color) {
+                        moves.push({ r: newRow, c: newCol });
                     }
                 }
             }
-            return ms;
         }
 
+        function generateKnightMoves(row, col, color, moves) {
+            const offsets = [
+                [-2, -1], [-2, 1], [-1, -2], [-1, 2],
+                [1, -2], [1, 2], [2, -1], [2, 1]
+            ];
+            
+            for (const [dr, dc] of offsets) {
+                const newRow = row + dr;
+                const newCol = col + dc;
+                
+                if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+                    const target = board[newRow][newCol];
+                    if (!target || target.color !== color) {
+                        moves.push({ r: newRow, c: newCol });
+                    }
+                }
+            }
+        }
+
+        function generateBishopMoves(row, col, color, moves) {
+            const directions = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+            
+            for (const [dr, dc] of directions) {
+                let newRow = row + dr;
+                let newCol = col + dc;
+                
+                while (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+                    const target = board[newRow][newCol];
+                    
+                    if (!target) {
+                        moves.push({ r: newRow, c: newCol });
+                    } else {
+                        if (target.color !== color) {
+                            moves.push({ r: newRow, c: newCol });
+                        }
+                        break;
+                    }
+                    
+                    newRow += dr;
+                    newCol += dc;
+                }
+            }
+        }
+
+        function generateRookMoves(row, col, color, moves) {
+            const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+            
+            for (const [dr, dc] of directions) {
+                let newRow = row + dr;
+                let newCol = col + dc;
+                
+                while (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+                    const target = board[newRow][newCol];
+                    
+                    if (!target) {
+                        moves.push({ r: newRow, c: newCol });
+                    } else {
+                        if (target.color !== color) {
+                            moves.push({ r: newRow, c: newCol });
+                        }
+                        break;
+                    }
+                    
+                    newRow += dr;
+                    newCol += dc;
+                }
+            }
+        }
+
+        function generateKingMoves(row, col, color, moves) {
+            const directions = [
+                [-1, -1], [-1, 0], [-1, 1],
+                [0, -1], [0, 1],
+                [1, -1], [1, 0], [1, 1]
+            ];
+            
+            for (const [dr, dc] of directions) {
+                const newRow = row + dr;
+                const newCol = col + dc;
+                
+                if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+                    const target = board[newRow][newCol];
+                    if (!target || target.color !== color) {
+                        moves.push({ r: newRow, c: newCol });
+                    }
+                }
+            }
+        }
+
+        // =====================================================
+        // MAKE MOVE
+        // =====================================================
+        function makeMove(fromRow, fromCol, toRow, toCol) {
+            board[toRow][toCol] = board[fromRow][fromCol];
+            board[fromRow][fromCol] = null;
+            
+            // Pawn promotion - auto to Queen
+            if (board[toRow][toCol] && board[toRow][toCol].type === 'P') {
+                if (toRow === 0 || toRow === 7) {
+                    board[toRow][toCol] = { type: 'Q', color: board[toRow][toCol].color };
+                }
+            }
+            
+            selectedRow = -1;
+            selectedCol = -1;
+            validMoves = [];
+            
+            currentTurn = currentTurn === 'white' ? 'black' : 'white';
+            
+            // Sync to Firebase
+            db.ref('gameRooms/' + roomId + '/chessBoard').set(board);
+            db.ref('gameRooms/' + roomId + '/chessTurn').set(currentTurn);
+            
+            renderBoard();
+            updateStatus();
+        }
+
+        // =====================================================
+        // RENDER BOARD
+        // =====================================================
         function renderBoard() {
-            const el = document.getElementById('chessBoard');
-            if (!el) return;
-            el.innerHTML = '';
-            for (let r = 0; r < 8; r++) {
-                for (let c = 0; c < 8; c++) {
-                    const sq = document.createElement('div');
-                    sq.className = 'square ' + ((r+c)%2===0 ? 'light' : 'dark');
-                    sq.onclick = function() { clickSquare(r, c); };
+            const boardEl = document.getElementById('chessBoard');
+            if (!boardEl) return;
+            boardEl.innerHTML = '';
+            
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    square.className = 'square ' + ((row + col) % 2 === 0 ? 'light' : 'dark');
+                    square.setAttribute('onclick', 'clickSquare(' + row + ',' + col + ')');
                     
-                    const p = board[r] ? board[r][c] : null;
-                    if (p) {
-                        sq.textContent = PIECES[p.color][p.type];
-                        sq.style.color = p.color === 'white' ? '#d32f2f' : '#333333';
+                    const piece = board[row] ? board[row][col] : null;
+                    
+                    if (piece) {
+                        square.textContent = PIECES[piece.color][piece.type];
+                        square.style.color = piece.color === 'white' ? '#d32f2f' : '#333333';
                     }
                     
-                    if (selR === r && selC === c) sq.classList.add('selected');
-                    if (validMoves.some(m => m.r === r && m.c === c)) {
-                        if (board[r] && board[r][c]) sq.classList.add('valid-capture');
-                        else sq.classList.add('valid-move');
+                    if (selectedRow === row && selectedCol === col) {
+                        square.classList.add('selected');
                     }
                     
-                    el.appendChild(sq);
+                    if (validMoves.some(m => m.r === row && m.c === col)) {
+                        if (board[row] && board[row][col]) {
+                            square.classList.add('valid-capture');
+                        } else {
+                            square.classList.add('valid-move');
+                        }
+                    }
+                    
+                    boardEl.appendChild(square);
                 }
             }
         }
 
+        // =====================================================
+        // CHAT SYSTEM
+        // =====================================================
         function setupChat() {
-            const ref = db.ref('gameRooms/' + roomId + '/chat');
-            ref.off();
-            ref.limitToLast(50).on('child_added', s => {
-                const m = s.val();
-                displayMsg(m.sender, m.message, m.sender === myName);
+            const chatRef = db.ref('gameRooms/' + roomId + '/chat');
+            chatRef.off();
+            chatRef.limitToLast(50).on('child_added', snap => {
+                const msg = snap.val();
+                displayMessage(msg.sender, msg.message, msg.sender === myName);
             });
         }
 
         function sendMessage() {
             const input = document.getElementById('chatInput');
-            const msg = input.value.trim();
-            if (msg && roomId) {
+            const message = input.value.trim();
+            
+            if (message && roomId) {
                 db.ref('gameRooms/' + roomId + '/chat').push({
-                    sender: myName, message: msg,
+                    sender: myName,
+                    message: message,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
                 input.value = '';
             }
         }
 
-        function displayMsg(sender, msg, isYou) {
-            const c = document.getElementById('chatMessages');
+        function displayMessage(sender, message, isYou) {
+            const chatMessages = document.getElementById('chatMessages');
             const div = document.createElement('div');
             div.className = 'chat-message ' + (isYou ? 'you' : 'opponent');
-            div.innerHTML = '<span class="sender">' + sender + '</span><span class="text">' + msg + '</span>';
-            c.appendChild(div);
-            c.scrollTop = c.scrollHeight;
+            div.innerHTML = '<span class="sender">' + sender + '</span><span class="text">' + message + '</span>';
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         document.getElementById('chatInput').addEventListener('keypress', e => {
             if (e.key === 'Enter') sendMessage();
         });
 
-        document.addEventListener('DOMContentLoaded', init);
+        // =====================================================
+        // START
+        // =====================================================        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
