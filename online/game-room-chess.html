@@ -23,7 +23,7 @@
             padding: 15px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.5);
             width: 100%;
-            max-width: 800px;
+            max-width: 850px;
         }
 
         .game-header {
@@ -47,16 +47,18 @@
         .game-title { font-size: 18px; font-weight: bold; color: #ff6b9d; }
 
         .players-info { display: flex; gap: 6px; flex-wrap: wrap; }
-        .player-chip { padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.1); color: white; }
-        .player-chip.status { color: #fdcb6e; font-size: 10px; }
+        .player-chip { padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 600; }
+        .player-chip.red { background: rgba(255,68,68,0.2); border: 1px solid #ff4444; color: #ff4444; }
+        .player-chip.violet { background: rgba(156,39,176,0.2); border: 1px solid #9c27b0; color: #ce93d8; }
+        .player-chip.status { background: rgba(255,255,255,0.1); color: #fdcb6e; font-size: 10px; }
 
         .status-bar {
             text-align: center;
-            padding: 8px;
+            padding: 10px;
             border-radius: 10px;
             margin-bottom: 8px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 15px;
             background: rgba(255,255,255,0.1);
             color: white;
         }
@@ -71,7 +73,7 @@
             border-radius: 8px;
             overflow: hidden;
             border: 3px solid rgba(255,255,255,0.2);
-            max-width: 420px;
+            max-width: 430px;
             margin: 0 auto;
         }
 
@@ -84,26 +86,29 @@
             position: relative;
             user-select: none;
             -webkit-user-select: none;
+            pointer-events: auto;
         }
 
         .square.light { background: #ffd1dc; }
         .square.dark { background: #e6e6fa; }
         .square.selected { box-shadow: inset 0 0 15px rgba(255,0,0,0.8); }
+        
         .square.valid-move::after {
             content: '';
             position: absolute;
-            width: 25%;
-            height: 25%;
+            width: 30%;
+            height: 30%;
             border-radius: 50%;
-            background: rgba(76,175,80,0.8);
+            background: rgba(76,175,80,0.7);
         }
+        
         .square.valid-capture::after {
             content: '';
             position: absolute;
-            width: 80%;
-            height: 80%;
+            width: 85%;
+            height: 85%;
             border-radius: 50%;
-            border: 3px solid rgba(255,0,0,0.6);
+            border: 4px solid rgba(255,0,0,0.6);
         }
 
         .chat-sidebar {
@@ -115,7 +120,7 @@
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
-            max-height: 320px;
+            max-height: 340px;
         }
 
         .chat-header {
@@ -127,13 +132,13 @@
             font-size: 12px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 100px; max-height: 200px; display: flex; flex-direction: column; gap: 4px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 100px; max-height: 210px; display: flex; flex-direction: column; gap: 4px; }
         .chat-messages::-webkit-scrollbar { width: 3px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
 
         .chat-message { padding: 5px 8px; border-radius: 8px; font-size: 10px; max-width: 90%; }
         .chat-message.you { background: rgba(255,107,157,0.2); align-self: flex-end; }
-        .chat-message.opponent { background: rgba(116,185,255,0.15); align-self: flex-start; }
+        .chat-message.opponent { background: rgba(156,39,176,0.2); align-self: flex-start; }
         .chat-message .sender { font-weight: bold; font-size: 8px; display: block; }
 
         .chat-input-area { display: flex; gap: 4px; padding: 6px; }
@@ -154,8 +159,8 @@
             <a href="lobby.html" class="back-btn">← Lobby</a>
             <h1 class="game-title">♟️ Chess</h1>
             <div class="players-info">
-                <div class="player-chip" id="youChip">You</div>
-                <div class="player-chip" id="opponentChip">Opp</div>
+                <div class="player-chip red" id="youChip">🔴 You</div>
+                <div class="player-chip violet" id="opponentChip">🟣 Opp</div>
                 <div class="player-chip status" id="statusChip">Connecting...</div>
             </div>
         </div>
@@ -182,7 +187,6 @@
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
 
     <script>
-        // Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCaR33cAwHFTNdSlBuuzoju9yzah8szBmQ",
             authDomain: "usblog-games.firebaseapp.com",
@@ -196,32 +200,25 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // Simple pieces - RED (top) vs BLUE (bottom)
-        const RED_PIECES = { king: '🤴', queen: '👸', rook: '🏰', bishop: '🕊️', knight: '🦄', pawn: '🔴' };
-        const BLUE_PIECES = { king: '🧝', queen: '🧚', rook: '🏯', bishop: '🏹', knight: '🐉', pawn: '🔵' };
+        // Piece symbols - RED uses standard white pieces, VIOLET uses black pieces
+        const RED_PIECES = { K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙' };
+        const VIOLET_PIECES = { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞', P: '♟' };
 
-        let roomId = null;
-        let myPlayerId = null;
-        let opponentId = null;
-        let myName = '';
-        let opponentName = '';
-        let mySide = 'red';
-        let currentTurn = 'red';
-        let selectedRow = -1;
-        let selectedCol = -1;
+        let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
+        let myColor = 'red', currentTurn = 'red';
+        let selectedRow = -1, selectedCol = -1;
         let validMoves = [];
         let board = [];
         let gameStarted = false;
 
-        // GLOBAL CLICK
+        // GLOBAL CLICK FUNCTION
         window.chessClick = function(row, col) {
             if (!gameStarted) return;
-            if (currentTurn !== mySide) return;
+            if (currentTurn !== myColor) return;
             
             const piece = board[row][col];
 
-            // If already selected a piece
-            if (selectedRow !== -1) {
+            if (selectedRow !== -1 && selectedCol !== -1) {
                 const isValid = validMoves.some(m => m.r === row && m.c === col);
                 if (isValid) {
                     doMove(selectedRow, selectedCol, row, col);
@@ -229,11 +226,10 @@
                 }
             }
 
-            // Select or deselect
-            if (piece && piece.side === mySide) {
+            if (piece && piece.color === myColor) {
                 selectedRow = row;
                 selectedCol = col;
-                validMoves = getMoves(row, col);
+                validMoves = getLegalMoves(row, col);
                 renderBoard();
             } else {
                 selectedRow = -1;
@@ -247,11 +243,9 @@
             auth.onAuthStateChanged(user => {
                 if (!user) { location.href = 'login.html'; return; }
                 myPlayerId = user.uid;
-                
                 db.ref('users/' + user.uid).once('value').then(s => {
                     myName = s.val()?.username || 'Player';
                 });
-                
                 const p = new URLSearchParams(location.search);
                 roomId = p.get('match') || p.get('team');
                 if (!roomId) { location.href = 'lobby.html'; return; }
@@ -271,11 +265,11 @@
 
         function setupPlayers(data) {
             if (data.player1 === myPlayerId) {
-                mySide = 'red';
+                myColor = 'red';
                 opponentId = data.player2 || null;
                 opponentName = data.player2Name || 'Opponent';
             } else {
-                mySide = 'blue';
+                myColor = 'violet';
                 opponentId = data.player1 || null;
                 opponentName = data.player1Name || 'Opponent';
             }
@@ -302,33 +296,31 @@
         }
 
         function updateChips() {
-            document.getElementById('youChip').textContent = (mySide === 'red' ? '🔴 ' : '🔵 ') + myName;
-            document.getElementById('opponentChip').textContent = (mySide === 'red' ? '🔵 ' : '🔴 ') + opponentName;
+            document.getElementById('youChip').textContent = (myColor === 'red' ? '🔴 ' : '🟣 ') + myName;
+            document.getElementById('opponentChip').textContent = (myColor === 'red' ? '🟣 ' : '🔴 ') + opponentName;
         }
 
         function initBoard() {
             board = [];
-            const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
+            const backRow = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
             
-            // Blue pieces at top (rows 0-1)
-            for (let col = 0; col < 8; col++) {
-                board[0] = board[0] || [];
-                board[1] = board[1] || [];
-                board[0][col] = { type: backRow[col], side: 'blue' };
-                board[1][col] = { type: 'pawn', side: 'blue' };
+            for (let row = 0; row < 8; row++) {
+                board[row] = [];
+                for (let col = 0; col < 8; col++) {
+                    board[row][col] = null;
+                }
             }
             
-            // Empty middle
-            for (let row = 2; row < 6; row++) {
-                board[row] = Array(8).fill(null);
+            // Violet pieces at top (rows 0-1)
+            for (let col = 0; col < 8; col++) {
+                board[0][col] = { type: backRow[col], color: 'violet' };
+                board[1][col] = { type: 'P', color: 'violet' };
             }
             
             // Red pieces at bottom (rows 6-7)
             for (let col = 0; col < 8; col++) {
-                board[6] = board[6] || [];
-                board[7] = board[7] || [];
-                board[6][col] = { type: 'pawn', side: 'red' };
-                board[7][col] = { type: backRow[col], side: 'red' };
+                board[6][col] = { type: 'P', color: 'red' };
+                board[7][col] = { type: backRow[col], color: 'red' };
             }
         }
 
@@ -344,7 +336,6 @@
             updateStatus();
             setupChat();
 
-            // Listen for board changes
             db.ref('gameRooms/' + roomId + '/board').on('value', snap => {
                 const data = snap.val();
                 if (data) {
@@ -353,7 +344,6 @@
                 }
             });
 
-            // Listen for turn changes
             db.ref('gameRooms/' + roomId + '/turn').on('value', snap => {
                 const turn = snap.val();
                 if (turn) {
@@ -362,8 +352,7 @@
                 }
             });
 
-            // Host initializes
-            if (mySide === 'red') {
+            if (myColor === 'red') {
                 db.ref('gameRooms/' + roomId + '/board').set(board);
                 db.ref('gameRooms/' + roomId + '/turn').set('red');
             }
@@ -371,27 +360,27 @@
 
         function updateStatus() {
             const sb = document.getElementById('statusBar');
-            if (currentTurn === mySide) {
-                sb.textContent = 'YOUR TURN - CLICK A PIECE!';
-                sb.style.color = mySide === 'red' ? '#ff4444' : '#4488ff';
+            if (currentTurn === myColor) {
+                sb.textContent = myColor === 'red' ? '🔴 YOUR TURN - CLICK A PIECE!' : '🟣 YOUR TURN - CLICK A PIECE!';
+                sb.style.color = myColor === 'red' ? '#ff4444' : '#ce93d8';
             } else {
-                sb.textContent = opponentName + ' IS THINKING...';
+                sb.textContent = (myColor === 'red' ? '🟣 ' : '🔴 ') + opponentName + ' IS THINKING...';
                 sb.style.color = '#fdcb6e';
             }
         }
 
-        function getMoves(row, col) {
+        function getLegalMoves(row, col) {
             const piece = board[row][col];
             if (!piece) return [];
             const moves = [];
             
             switch (piece.type) {
-                case 'pawn':
-                    const dir = piece.side === 'red' ? -1 : 1;
-                    const startRow = piece.side === 'red' ? 6 : 1;
+                case 'P':
+                    const dir = piece.color === 'red' ? -1 : 1;
+                    const startRow = piece.color === 'red' ? 6 : 1;
                     if (board[row + dir] && !board[row + dir][col]) {
                         moves.push({ r: row + dir, c: col });
-                        if (row === startRow && !board[row + 2*dir][col]) {
+                        if (row === startRow && board[row + 2*dir] && !board[row + 2*dir][col]) {
                             moves.push({ r: row + 2*dir, c: col });
                         }
                     }
@@ -399,64 +388,45 @@
                         const nc = col + dc;
                         if (nc >= 0 && nc < 8 && board[row + dir]) {
                             const t = board[row + dir][nc];
-                            if (t && t.side !== piece.side) moves.push({ r: row + dir, c: nc });
+                            if (t && t.color !== piece.color) moves.push({ r: row + dir, c: nc });
                         }
                     }
                     break;
                     
-                case 'knight':
-                    const knightOffsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-                    for (const [dr, dc] of knightOffsets) {
+                case 'N':
+                    const offsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+                    for (const [dr, dc] of offsets) {
                         const nr = row + dr, nc = col + dc;
                         if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                             const t = board[nr][nc];
-                            if (!t || t.side !== piece.side) moves.push({ r: nr, c: nc });
+                            if (!t || t.color !== piece.color) moves.push({ r: nr, c: nc });
                         }
                     }
                     break;
                     
-                case 'bishop':
-                    for (const [dr, dc] of [[1,1],[1,-1],[-1,1],[-1,-1]]) {
+                case 'B':
+                case 'R':
+                case 'Q':
+                    const dirs = piece.type === 'B' ? [[1,1],[1,-1],[-1,1],[-1,-1]] :
+                                 piece.type === 'R' ? [[0,1],[0,-1],[1,0],[-1,0]] :
+                                 [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
+                    for (const [dr, dc] of dirs) {
                         let nr = row + dr, nc = col + dc;
                         while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                             const t = board[nr][nc];
                             if (!t) moves.push({ r: nr, c: nc });
-                            else { if (t.side !== piece.side) moves.push({ r: nr, c: nc }); break; }
+                            else { if (t.color !== piece.color) moves.push({ r: nr, c: nc }); break; }
                             nr += dr; nc += dc;
                         }
                     }
                     break;
                     
-                case 'rook':
-                    for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
-                        let nr = row + dr, nc = col + dc;
-                        while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                            const t = board[nr][nc];
-                            if (!t) moves.push({ r: nr, c: nc });
-                            else { if (t.side !== piece.side) moves.push({ r: nr, c: nc }); break; }
-                            nr += dr; nc += dc;
-                        }
-                    }
-                    break;
-                    
-                case 'queen':
-                    for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]]) {
-                        let nr = row + dr, nc = col + dc;
-                        while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                            const t = board[nr][nc];
-                            if (!t) moves.push({ r: nr, c: nc });
-                            else { if (t.side !== piece.side) moves.push({ r: nr, c: nc }); break; }
-                            nr += dr; nc += dc;
-                        }
-                    }
-                    break;
-                    
-                case 'king':
+                case 'K':
                     for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
                         const nr = row + dr, nc = col + dc;
                         if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                             const t = board[nr][nc];
-                            if (!t || t.side !== piece.side) moves.push({ r: nr, c: nc });
+                            if (!t || t.color !== piece.color) moves.push({ r: nr, c: nc });
                         }
                     }
                     break;
@@ -467,10 +437,16 @@
         function doMove(fromR, fromC, toR, toC) {
             board[toR][toC] = board[fromR][fromC];
             board[fromR][fromC] = null;
+            
+            // Pawn promotion
+            if (board[toR][toC].type === 'P' && (toR === 0 || toR === 7)) {
+                board[toR][toC] = { type: 'Q', color: board[toR][toC].color };
+            }
+            
             selectedRow = -1;
             selectedCol = -1;
             validMoves = [];
-            currentTurn = currentTurn === 'red' ? 'blue' : 'red';
+            currentTurn = currentTurn === 'red' ? 'violet' : 'red';
             
             db.ref('gameRooms/' + roomId + '/board').set(board);
             db.ref('gameRooms/' + roomId + '/turn').set(currentTurn);
@@ -492,7 +468,8 @@
                     
                     const piece = board[row] ? board[row][col] : null;
                     if (piece) {
-                        sq.textContent = piece.side === 'red' ? RED_PIECES[piece.type] : BLUE_PIECES[piece.type];
+                        sq.textContent = piece.color === 'red' ? RED_PIECES[piece.type] : VIOLET_PIECES[piece.type];
+                        sq.style.color = piece.color === 'red' ? '#d32f2f' : '#7b1fa2';
                     }
                     
                     if (selectedRow === row && selectedCol === col) {
