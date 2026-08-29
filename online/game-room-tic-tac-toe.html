@@ -65,14 +65,14 @@
 
         .turn-indicator {
             text-align: center;
-            padding: 8px;
+            padding: 10px;
             border-radius: 10px;
             margin-bottom: 8px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 14px;
         }
-        .turn-indicator.your-turn { background: rgba(255,107,157,0.25); color: #ff6b9d; border: 1px solid #ff6b9d; }
-        .turn-indicator.opponent-turn { background: rgba(116,185,255,0.2); color: #74b9ff; border: 1px solid #74b9ff; }
+        .turn-indicator.your-turn { background: rgba(255,107,157,0.25); color: #ff6b9d; border: 2px solid #ff6b9d; }
+        .turn-indicator.opponent-turn { background: rgba(116,185,255,0.2); color: #74b9ff; border: 2px solid #74b9ff; }
 
         .board-wrap {
             border-radius: 10px;
@@ -175,52 +175,22 @@
         .chat-messages::-webkit-scrollbar { width: 3px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
 
-        .chat-message {
-            padding: 6px 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            max-width: 90%;
-        }
-        .chat-message.you {
-            background: rgba(255,107,157,0.2);
-            border: 1px solid rgba(255,107,157,0.3);
-            align-self: flex-end;
-        }
-        .chat-message.opponent {
-            background: rgba(116,185,255,0.15);
-            border: 1px solid rgba(116,185,255,0.25);
-            align-self: flex-start;
-        }
+        .chat-message { padding: 6px 10px; border-radius: 10px; font-size: 11px; max-width: 90%; }
+        .chat-message.you { background: rgba(255,107,157,0.2); border: 1px solid rgba(255,107,157,0.3); align-self: flex-end; }
+        .chat-message.opponent { background: rgba(116,185,255,0.15); border: 1px solid rgba(116,185,255,0.25); align-self: flex-start; }
         .chat-message .sender { font-weight: bold; font-size: 9px; display: block; }
         .chat-message.you .sender { color: #ff6b9d; }
         .chat-message.opponent .sender { color: #74b9ff; }
 
         .chat-input-area { display: flex; gap: 5px; padding: 8px; }
-        .chat-input-area input {
-            flex: 1;
-            padding: 7px 12px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.08);
-            color: white;
-            outline: none;
-            font-size: 11px;
-        }
-        .chat-input-area button {
-            padding: 7px 14px;
-            border-radius: 16px;
-            border: none;
-            background: #ff6b9d;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 10px;
-        }
+        .chat-input-area input { flex: 1; padding: 7px 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
+        .chat-input-area button { padding: 7px 14px; border-radius: 16px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 10px; }
 
         @media (max-width: 800px) {
             .main-layout { flex-direction: column; }
             .chat-sidebar { width: 100%; min-width: auto; max-height: 150px; }
             .chat-messages { max-height: 70px; min-height: 40px; }
+            .game-title { font-size: 14px; }
         }
     </style>
 </head>
@@ -279,6 +249,7 @@
         let macroBoard = Array(9).fill(null);
         let miniBoards = Array(9).fill(null).map(() => Array(9).fill(null));
         let listenersAttached = false;
+        let myTurnListener = null;
 
         function init() {
             auth.onAuthStateChanged(user => {
@@ -341,7 +312,6 @@
             gameStarted = true;
             document.getElementById('statusChip').textContent = '🟢 LIVE';
             
-            // Reset board
             macroBoard = Array(9).fill(null);
             miniBoards = Array(9).fill(null).map(() => Array(9).fill(null));
             currentTurn = 'pink';
@@ -353,7 +323,7 @@
             if (!listenersAttached) {
                 listenersAttached = true;
                 
-                // SINGLE LISTENER for combined board state
+                // SINGLE LISTENER - Updates everything on any change
                 db.ref('gameRooms/' + roomId + '/tttState').on('value', snap => {
                     const data = snap.val();
                     if (data) {
@@ -367,7 +337,7 @@
 
                 db.ref('gameRooms/' + roomId + '/tttWinner').on('value', snap => {
                     const winner = snap.val();
-                    if (winner) {
+                    if (winner && !gameOver) {
                         gameOver = true;
                         renderBoard();
                         showWin(winner);
@@ -375,7 +345,7 @@
                 });
             }
 
-            // Host initializes
+            // Host initializes board
             if (myColor === 'pink') {
                 db.ref('gameRooms/' + roomId + '/tttState').set({
                     macro: macroBoard,
@@ -389,10 +359,10 @@
             const ind = document.getElementById('turnIndicator');
             if (gameOver) return;
             if (currentTurn === myColor) {
-                ind.textContent = '💕 YOUR TURN!';
+                ind.textContent = '💕 YOUR TURN - CLICK A CELL!';
                 ind.className = 'turn-indicator your-turn';
             } else {
-                ind.textContent = '💙 ' + opponentName + '\'S TURN...';
+                ind.textContent = '💙 ' + opponentName + '\'S TURN - WAITING...';
                 ind.className = 'turn-indicator opponent-turn';
             }
         }
@@ -420,10 +390,14 @@
 
         function makeMove(macroIdx, miniIdx) {
             if (!gameStarted || gameOver) return;
-            if (currentTurn !== myColor) return;
+            if (currentTurn !== myColor) {
+                updateTurnIndicator();
+                return;
+            }
             if (macroBoard[macroIdx] !== null) return;
             if (miniBoards[macroIdx][miniIdx] !== null) return;
 
+            // Make move
             miniBoards[macroIdx][miniIdx] = myColor;
             
             const mw = checkMiniWin(macroIdx);
@@ -432,9 +406,10 @@
 
             const gw = checkMacroWin();
             
+            // Switch turn
             currentTurn = currentTurn === 'pink' ? 'blue' : 'pink';
 
-            // SINGLE SYNC - combined state
+            // SYNC EVERYTHING IN ONE UPDATE
             db.ref('gameRooms/' + roomId + '/tttState').set({
                 macro: macroBoard,
                 mini: miniBoards,
@@ -480,9 +455,14 @@
                         const val = miniBoards[mi] ? miniBoards[mi][si] : null;
                         if (val === 'pink') { sc.textContent = '💕'; sc.classList.add('pink'); }
                         else if (val === 'blue') { sc.textContent = '💙'; sc.classList.add('blue'); }
-                        sc.addEventListener('click', (function(m, s) {
-                            return function() { makeMove(m, s); };
-                        })(mi, si));
+                        
+                        // Use closure to capture mi and si correctly
+                        (function(macroIdx, miniIdx) {
+                            sc.addEventListener('click', function() {
+                                makeMove(macroIdx, miniIdx);
+                            });
+                        })(mi, si);
+                        
                         mb.appendChild(sc);
                     }
                     mc.appendChild(mb);
