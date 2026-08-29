@@ -11,6 +11,7 @@
             --gold: #fdcb6e;
             --dark: #1a1a2e;
             --white: #ffffff;
+            --red: #ff4444;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,7 +32,7 @@
             padding: 15px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.5);
             width: 100%;
-            max-width: 750px;
+            max-width: 800px;
         }
 
         .game-header {
@@ -95,10 +96,9 @@
             font-weight: 800;
             color: #fdcb6e;
             margin-bottom: 8px;
-            text-shadow: 0 0 15px rgba(253,203,110,0.5);
         }
 
-        .main-layout { display: flex; gap: 8px; }
+        .main-layout { display: flex; gap: 10px; }
         .game-area { flex: 1; min-width: 0; }
 
         .arena {
@@ -123,18 +123,9 @@
 
         .hand-box { text-align: center; }
         .hand-label { font-size: 9px; color: rgba(255,255,255,0.6); margin-bottom: 3px; }
-
         .hand-emoji { font-size: 2.5rem; transition: all 0.3s; }
-
-        .hand-emoji.hidden {
-            opacity: 0.2;
-            filter: blur(4px);
-            transform: scale(0.8);
-        }
-
-        .hand-emoji.revealed {
-            animation: reveal 0.4s ease;
-        }
+        .hand-emoji.hidden { opacity: 0.2; filter: blur(4px); }
+        .hand-emoji.revealed { animation: reveal 0.4s ease; }
 
         @keyframes reveal {
             0% { transform: scale(0) rotate(-180deg); }
@@ -176,44 +167,134 @@
         .hand-emoji-small { font-size: 1.8rem; display: block; }
         .hand-name { font-size: 10px; color: white; font-weight: 600; }
 
+        /* BIGGER CHAT */
         .chat-sidebar {
-            width: 180px;
-            min-width: 180px;
+            width: 240px;
+            min-width: 240px;
             display: flex;
             flex-direction: column;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
             overflow: hidden;
-            max-height: 320px;
+            max-height: 380px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
         .chat-header {
-            padding: 6px;
-            background: rgba(255,107,157,0.15);
+            padding: 10px;
+            background: rgba(255,107,157,0.2);
             text-align: center;
             color: #ff6b9d;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 6px; min-height: 80px; max-height: 200px; }
-        .chat-messages::-webkit-scrollbar { width: 3px; }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            min-height: 180px;
+            max-height: 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar { width: 4px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
 
-        .chat-message { margin-bottom: 4px; padding: 4px 7px; border-radius: 7px; font-size: 10px; }
-        .chat-message.you { background: rgba(255,107,157,0.15); margin-left: 8px; }
-        .chat-message.opponent { background: rgba(116,185,255,0.15); margin-right: 8px; }
-        .chat-message .sender { font-weight: bold; font-size: 8px; display: block; }
+        .chat-message {
+            padding: 7px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            max-width: 90%;
+            word-wrap: break-word;
+            animation: msgIn 0.3s ease;
+        }
 
-        .chat-input-area { display: flex; gap: 3px; padding: 5px; }
-        .chat-input-area input { flex: 1; padding: 5px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 10px; }
-        .chat-input-area button { padding: 5px 10px; border-radius: 12px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 9px; }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-message.you {
+            background: rgba(255,107,157,0.2);
+            border: 1px solid rgba(255,107,157,0.3);
+            align-self: flex-end;
+        }
+        .chat-message.opponent {
+            background: rgba(116,185,255,0.15);
+            border: 1px solid rgba(116,185,255,0.25);
+            align-self: flex-start;
+        }
+
+        .chat-message .sender { font-weight: bold; font-size: 9px; display: block; margin-bottom: 2px; }
+        .chat-message.you .sender { color: #ff6b9d; }
+        .chat-message.opponent .sender { color: #74b9ff; }
+        .chat-message .text { color: rgba(255,255,255,0.95); }
+
+        .chat-input-area {
+            display: flex;
+            gap: 5px;
+            padding: 8px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.08);
+            color: white;
+            outline: none;
+            font-size: 11px;
+        }
+        .chat-input-area input:focus { border-color: #ff6b9d; }
+        .chat-input-area button {
+            padding: 8px 14px;
+            border-radius: 16px;
+            border: none;
+            background: #ff6b9d;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        /* Disconnect Overlay */
+        .disconnect-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .disconnect-overlay.show { display: flex; }
+
+        .disconnect-content {
+            text-align: center;
+            background: rgba(26,26,46,0.95);
+            padding: 2rem 3rem;
+            border-radius: 20px;
+            border: 2px solid #ff4444;
+        }
+
+        .disconnect-emoji { font-size: 4rem; margin-bottom: 1rem; }
+        .disconnect-title { font-size: 1.3rem; font-weight: bold; color: #ff4444; margin-bottom: 0.5rem; }
+        .disconnect-countdown { font-size: 3rem; font-weight: bold; color: #fdcb6e; }
 
         @media (max-width: 650px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; max-height: 100px; }
-            .chat-messages { max-height: 40px; min-height: 25px; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 150px; }
+            .chat-messages { max-height: 80px; min-height: 50px; }
         }
     </style>
 </head>
@@ -277,13 +358,22 @@
             </div>
 
             <div class="chat-sidebar">
-                <div class="chat-header">💬 Chat</div>
+                <div class="chat-header">💬 Live Chat</div>
                 <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Message...">
+                    <input type="text" id="chatInput" placeholder="Type message...">
                     <button onclick="sendMessage()">Send</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Disconnect Overlay -->
+    <div class="disconnect-overlay" id="disconnectOverlay">
+        <div class="disconnect-content">
+            <div class="disconnect-emoji">💔</div>
+            <div class="disconnect-title" id="disconnectTitle">Opponent left!</div>
+            <div class="disconnect-countdown" id="disconnectCountdown">5</div>
         </div>
     </div>
 
@@ -305,19 +395,15 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        const TOTAL_ROUNDS = 25;
-        const ROUND_TIME = 5;
-        const RESULT_TIME = 3;
+        const TOTAL_ROUNDS = 25, ROUND_TIME = 5, RESULT_TIME = 3;
         const HANDS = { rock: '✊', paper: '✋', scissors: '✌️' };
 
         let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
-        let myScore = 0, oppScore = 0;
-        let currentRound = 1;
+        let myScore = 0, oppScore = 0, currentRound = 1;
         let myChoice = null, oppChoice = null;
-        let timerInterval = null;
-        let timeLeft = ROUND_TIME;
-        let phase = 'choosing';
-        let gameOver = false;
+        let timerInterval = null, timeLeft = ROUND_TIME;
+        let phase = 'choosing', gameOver = false;
+        let oppLastSeen = Date.now();
 
         function init() {
             auth.onAuthStateChanged(user => {
@@ -356,9 +442,37 @@
         }
 
         function startGame() {
+            oppLastSeen = Date.now();
             setupChat();
             setupListeners();
             startChoosingPhase();
+            
+            // Disconnect check every 3 seconds
+            setInterval(() => {
+                if (!gameOver && Date.now() - oppLastSeen > 8000) {
+                    gameOver = true;
+                    showDisconnect();
+                }
+            }, 3000);
+        }
+
+        function showDisconnect() {
+            clearInterval(timerInterval);
+            document.getElementById('disconnectTitle').textContent = opponentName + ' has left!';
+            document.getElementById('disconnectOverlay').classList.add('show');
+            
+            let count = 5;
+            document.getElementById('disconnectCountdown').textContent = count;
+            
+            const countdown = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    document.getElementById('disconnectCountdown').textContent = count;
+                } else {
+                    clearInterval(countdown);
+                    location.href = 'lobby.html';
+                }
+            }, 1000);
         }
 
         function startChoosingPhase() {
@@ -399,11 +513,12 @@
         function setupListeners() {
             db.ref('gameRooms/' + roomId + '/rpsChoices').on('value', s => {
                 const data = s.val();
-                // ONLY check opponent choice when in choosing phase
-                if (data && data[opponentId] && !oppChoice && phase === 'choosing') {
-                    oppChoice = data[opponentId];
-                    // DON'T show opponent hand yet - keep hidden
-                    checkResult();
+                if (data && data[opponentId]) {
+                    oppLastSeen = Date.now();
+                    if (!oppChoice && phase === 'choosing') {
+                        oppChoice = data[opponentId];
+                        checkResult();
+                    }
                 }
             });
 
@@ -434,13 +549,11 @@
         }
 
         function checkResult() {
-            // Only proceed if BOTH have chosen
             if (!myChoice || !oppChoice || phase !== 'choosing') return;
 
             clearInterval(timerInterval);
             phase = 'result';
 
-            // NOW reveal opponent's hand
             document.getElementById('oppHand').textContent = HANDS[oppChoice];
             document.getElementById('oppHand').classList.remove('hidden');
             document.getElementById('oppHand').classList.add('revealed');
@@ -448,22 +561,18 @@
 
             const result = determineWinner(myChoice, oppChoice);
             const display = document.getElementById('resultDisplay');
-            const status = document.getElementById('statusBar');
 
             if (result === 'win') {
                 myScore++;
                 display.textContent = '🎉 YOU WIN!';
                 display.style.color = '#4CAF50';
-                status.textContent = '🏆 ROUND WON';
             } else if (result === 'lose') {
                 oppScore++;
                 display.textContent = '💙 OPPONENT WINS!';
                 display.style.color = '#ff4444';
-                status.textContent = '💔 ROUND LOST';
             } else {
                 display.textContent = '🤝 TIE!';
                 display.style.color = '#fdcb6e';
-                status.textContent = '🤝 TIE ROUND';
             }
 
             document.getElementById('youScore').textContent = myScore;
@@ -477,7 +586,7 @@
             if (currentRound >= TOTAL_ROUNDS) {
                 gameOver = true;
                 setTimeout(() => {
-                    const msg = myScore > oppScore ? '🏆 YOU WIN THE GAME!' : myScore < oppScore ? '💙 OPPONENT WINS!' : '🤝 TIE GAME!';
+                    const msg = myScore > oppScore ? '🏆 YOU WIN!' : myScore < oppScore ? '💙 OPPONENT WINS!' : '🤝 TIE!';
                     alert(msg);
                     location.href = 'lobby.html';
                 }, RESULT_TIME * 1000);
@@ -525,7 +634,7 @@
             const c = document.getElementById('chatMessages');
             const div = document.createElement('div');
             div.className = 'chat-message ' + (isYou ? 'you' : 'opponent');
-            div.innerHTML = '<span class="sender">' + sender + '</span>' + msg;
+            div.innerHTML = '<span class="sender">' + sender + '</span><span class="text">' + msg + '</span>';
             c.appendChild(div);
             c.scrollTop = c.scrollHeight;
         }
