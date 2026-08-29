@@ -11,8 +11,6 @@
             --gold: #fdcb6e;
             --dark: #1a1a2e;
             --white: #ffffff;
-            --red: #ff4444;
-            --green: #4CAF50;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,7 +23,6 @@
             align-items: center;
             justify-content: center;
             padding: 10px;
-            overflow-x: hidden;
         }
 
         .game-shell {
@@ -39,10 +36,8 @@
 
         .game-header {
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
             margin-bottom: 10px;
         }
 
@@ -55,25 +50,21 @@
             font-size: 12px;
         }
 
-        .game-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #ff6b9d;
-        }
+        .game-title { font-size: 18px; font-weight: bold; color: #ff6b9d; }
 
         .scoreboard {
             display: flex;
             gap: 8px;
-            flex-wrap: wrap;
             justify-content: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
         }
 
         .score-card {
-            border-radius: 14px;
-            padding: 10px 20px;
+            border-radius: 12px;
+            padding: 8px 18px;
             text-align: center;
-            min-width: 100px;
+            min-width: 80px;
             border: 2px solid;
         }
 
@@ -81,53 +72,45 @@
         .score-card.opp { border-color: #74b9ff; background: rgba(116,185,255,0.15); }
         .score-card.round { border-color: #fdcb6e; background: rgba(253,203,110,0.1); }
 
-        .score-label { font-size: 10px; color: rgba(255,255,255,0.7); display: block; margin-bottom: 3px; }
-        .score-value { font-size: 28px; font-weight: 800; }
+        .score-label { font-size: 9px; color: rgba(255,255,255,0.7); display: block; }
+        .score-value { font-size: 24px; font-weight: 800; }
         .score-card.you .score-value { color: #ff6b9d; }
         .score-card.opp .score-value { color: #74b9ff; }
-        .score-card.round .score-value { color: #fdcb6e; font-size: 20px; }
+        .score-card.round .score-value { color: #fdcb6e; font-size: 16px; }
 
-        .phase-indicator {
+        .status-bar {
             text-align: center;
-            margin-bottom: 10px;
             padding: 8px;
-            border-radius: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
             font-weight: bold;
-            font-size: 14px;
-        }
-
-        .phase-choosing { background: rgba(255,255,255,0.1); color: #fdcb6e; }
-        .phase-waiting { background: rgba(255,255,255,0.05); color: #74b9ff; }
-        .phase-result { background: rgba(0,0,0,0.3); color: #fff; }
-
-        .timer-large {
-            font-size: 50px;
-            font-weight: 800;
-            text-align: center;
-            margin: 10px 0;
+            font-size: 13px;
+            background: rgba(255,255,255,0.1);
             color: #fdcb6e;
-            text-shadow: 0 0 20px rgba(253,203,110,0.6);
-            animation: pulseTimer 1s infinite;
         }
 
-        @keyframes pulseTimer {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
+        .timer-display {
+            text-align: center;
+            font-size: 40px;
+            font-weight: 800;
+            color: #fdcb6e;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(253,203,110,0.5);
         }
 
-        .main-layout { display: flex; gap: 10px; }
+        .main-layout { display: flex; gap: 8px; }
         .game-area { flex: 1; min-width: 0; }
 
         .arena {
             background: rgba(0,0,0,0.3);
-            border-radius: 14px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 15px;
             text-align: center;
-            min-height: 100px;
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border: 2px solid rgba(255,255,255,0.1);
         }
 
@@ -139,25 +122,31 @@
         }
 
         .hand-box { text-align: center; }
+        .hand-label { font-size: 9px; color: rgba(255,255,255,0.6); margin-bottom: 3px; }
 
-        .hand-label { font-size: 10px; color: rgba(255,255,255,0.6); margin-bottom: 5px; }
+        .hand-emoji { font-size: 2.5rem; transition: all 0.3s; }
 
-        .hand-emoji {
-            font-size: 3rem;
-            transition: all 0.3s;
+        .hand-emoji.hidden {
+            opacity: 0.2;
+            filter: blur(4px);
+            transform: scale(0.8);
         }
 
-        .hand-emoji.hidden { opacity: 0.3; filter: blur(3px); }
-
-        .vs-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ff6b9d;
+        .hand-emoji.revealed {
+            animation: reveal 0.4s ease;
         }
+
+        @keyframes reveal {
+            0% { transform: scale(0) rotate(-180deg); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .vs-text { font-size: 1.3rem; font-weight: bold; color: #ff6b9d; }
 
         .result-display {
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             min-height: 25px;
             margin-bottom: 8px;
@@ -173,69 +162,58 @@
         .choice-card {
             background: rgba(255,255,255,0.08);
             border: 2px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
-            padding: 12px 8px;
+            border-radius: 10px;
+            padding: 10px 5px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
         }
 
-        .choice-card:hover {
-            transform: translateY(-3px);
-            border-color: #ff6b9d;
-        }
-
-        .choice-card.selected {
-            border-color: #ff6b9d;
-            background: rgba(255,107,157,0.25);
-        }
-
+        .choice-card:hover { border-color: #ff6b9d; transform: translateY(-2px); }
+        .choice-card.selected { border-color: #ff6b9d; background: rgba(255,107,157,0.25); }
         .choice-card:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .hand-emoji-small { font-size: 2rem; display: block; margin-bottom: 3px; }
-        .hand-name { font-size: 11px; color: white; font-weight: 600; }
+        .hand-emoji-small { font-size: 1.8rem; display: block; }
+        .hand-name { font-size: 10px; color: white; font-weight: 600; }
 
         .chat-sidebar {
-            width: 190px;
-            min-width: 190px;
+            width: 180px;
+            min-width: 180px;
             display: flex;
             flex-direction: column;
             background: rgba(255,255,255,0.05);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
-            max-height: 350px;
+            max-height: 320px;
         }
 
         .chat-header {
-            padding: 8px;
+            padding: 6px;
             background: rgba(255,107,157,0.15);
             text-align: center;
             color: #ff6b9d;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 100px; max-height: 220px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 6px; min-height: 80px; max-height: 200px; }
         .chat-messages::-webkit-scrollbar { width: 3px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
 
-        .chat-message { margin-bottom: 5px; padding: 5px 8px; border-radius: 8px; font-size: 11px; }
-        .chat-message.you { background: rgba(255,107,157,0.15); margin-left: 10px; }
-        .chat-message.opponent { background: rgba(116,185,255,0.15); margin-right: 10px; }
-        .chat-message .sender { font-weight: bold; font-size: 9px; display: block; }
+        .chat-message { margin-bottom: 4px; padding: 4px 7px; border-radius: 7px; font-size: 10px; }
+        .chat-message.you { background: rgba(255,107,157,0.15); margin-left: 8px; }
+        .chat-message.opponent { background: rgba(116,185,255,0.15); margin-right: 8px; }
+        .chat-message .sender { font-weight: bold; font-size: 8px; display: block; }
 
-        .chat-input-area { display: flex; gap: 4px; padding: 6px; }
-        .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
-        .chat-input-area button { padding: 6px 12px; border-radius: 14px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 10px; }
+        .chat-input-area { display: flex; gap: 3px; padding: 5px; }
+        .chat-input-area input { flex: 1; padding: 5px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 10px; }
+        .chat-input-area button { padding: 5px 10px; border-radius: 12px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 9px; }
 
         @media (max-width: 650px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; max-height: 120px; }
-            .chat-messages { max-height: 50px; min-height: 30px; }
-            .hand-emoji { font-size: 2rem; }
-            .hand-emoji-small { font-size: 1.5rem; }
-            .score-value { font-size: 22px; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 100px; }
+            .chat-messages { max-height: 40px; min-height: 25px; }
         }
     </style>
 </head>
@@ -256,13 +234,13 @@
                 <span class="score-value" id="roundNum">1/25</span>
             </div>
             <div class="score-card opp">
-                <span class="score-label">💙 OPPONENT</span>
+                <span class="score-label">💙 OPP</span>
                 <span class="score-value" id="oppScore">0</span>
             </div>
         </div>
 
-        <div class="phase-indicator" id="phaseIndicator">🎮 CHOOSE YOUR MOVE</div>
-        <div class="timer-large" id="timerDisplay">5</div>
+        <div class="status-bar" id="statusBar">🎮 CHOOSE YOUR MOVE</div>
+        <div class="timer-display" id="timerDisplay">5</div>
 
         <div class="main-layout">
             <div class="game-area">
@@ -333,23 +311,23 @@
         const HANDS = { rock: '✊', paper: '✋', scissors: '✌️' };
 
         let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
-        let gameStarted = false, gameOver = false;
         let myScore = 0, oppScore = 0;
         let currentRound = 1;
         let myChoice = null, oppChoice = null;
         let timerInterval = null;
         let timeLeft = ROUND_TIME;
-        let phase = 'choosing'; // 'choosing', 'result'
+        let phase = 'choosing';
+        let gameOver = false;
 
         function init() {
             auth.onAuthStateChanged(user => {
                 if (!user) { location.href = 'login.html'; return; }
+                myPlayerId = user.uid;
                 db.ref('users/' + user.uid).once('value').then(s => {
-                    myName = s.val()?.username || user.email.split('@')[0];
+                    myName = s.val()?.username || 'Player';
                 });
                 const p = new URLSearchParams(location.search);
                 roomId = p.get('match') || p.get('team');
-                myPlayerId = user.uid;
                 if (!roomId) { location.href = 'lobby.html'; return; }
                 setupRoom();
             });
@@ -366,27 +344,18 @@
         }
 
         function setupPlayers(data) {
-            if (data.player1 === myPlayerId) {
-                opponentId = data.player2 || null;
-                opponentName = data.player2Name || 'Opponent';
-            } else {
-                opponentId = data.player1 || null;
-                opponentName = data.player1Name || 'Opponent';
-            }
+            opponentId = data.player1 === myPlayerId ? data.player2 : data.player1;
+            opponentName = data.player1 === myPlayerId ? (data.player2Name || 'Opponent') : (data.player1Name || 'Opponent');
 
             if (opponentId) startGame();
             else {
                 db.ref('matchmaking/' + roomId + '/player2').on('value', s => {
-                    if (s.val()) {
-                        opponentId = s.val();
-                        startGame();
-                    }
+                    if (s.val()) { opponentId = s.val(); startGame(); }
                 });
             }
         }
 
         function startGame() {
-            gameStarted = true;
             setupChat();
             setupListeners();
             startChoosingPhase();
@@ -396,31 +365,32 @@
             phase = 'choosing';
             myChoice = null;
             oppChoice = null;
-            document.getElementById('phaseIndicator').textContent = '🎮 CHOOSE YOUR MOVE';
-            document.getElementById('phaseIndicator').className = 'phase-indicator phase-choosing';
+            
+            document.getElementById('statusBar').textContent = '🎮 CHOOSE YOUR MOVE';
             document.getElementById('resultDisplay').textContent = '';
             document.getElementById('myHand').textContent = '❓';
-            document.getElementById('myHand').classList.remove('hidden');
+            document.getElementById('myHand').classList.remove('hidden', 'revealed');
             document.getElementById('oppHand').textContent = '❓';
             document.getElementById('oppHand').classList.add('hidden');
+            document.getElementById('oppHand').classList.remove('revealed');
+            
             document.querySelectorAll('.choice-card').forEach(c => {
                 c.disabled = false;
                 c.classList.remove('selected');
             });
-            
+
             timeLeft = ROUND_TIME;
             document.getElementById('timerDisplay').textContent = timeLeft;
-            
+
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft--;
                 document.getElementById('timerDisplay').textContent = timeLeft;
                 
                 if (timeLeft <= 0 && phase === 'choosing') {
-                    // Auto random choice
                     if (!myChoice) {
-                        const random = ['rock', 'paper', 'scissors'][Math.floor(Math.random() * 3)];
-                        makeChoice(random, true);
+                        const auto = ['rock', 'paper', 'scissors'][Math.floor(Math.random() * 3)];
+                        makeChoice(auto, true);
                     }
                 }
             }, 1000);
@@ -429,10 +399,10 @@
         function setupListeners() {
             db.ref('gameRooms/' + roomId + '/rpsChoices').on('value', s => {
                 const data = s.val();
+                // ONLY check opponent choice when in choosing phase
                 if (data && data[opponentId] && !oppChoice && phase === 'choosing') {
                     oppChoice = data[opponentId];
-                    document.getElementById('oppHand').textContent = HANDS[oppChoice];
-                    document.getElementById('oppHand').classList.remove('hidden');
+                    // DON'T show opponent hand yet - keep hidden
                     checkResult();
                 }
             });
@@ -454,7 +424,7 @@
             myChoice = choice;
             document.getElementById('myHand').textContent = HANDS[choice];
             document.getElementById('myHand').classList.remove('hidden');
-            
+
             document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
             document.getElementById(choice + 'Btn').classList.add('selected');
             document.querySelectorAll('.choice-card').forEach(c => c.disabled = true);
@@ -464,32 +434,36 @@
         }
 
         function checkResult() {
+            // Only proceed if BOTH have chosen
             if (!myChoice || !oppChoice || phase !== 'choosing') return;
 
             clearInterval(timerInterval);
             phase = 'result';
-            
+
+            // NOW reveal opponent's hand
+            document.getElementById('oppHand').textContent = HANDS[oppChoice];
+            document.getElementById('oppHand').classList.remove('hidden');
+            document.getElementById('oppHand').classList.add('revealed');
+            document.getElementById('myHand').classList.add('revealed');
+
             const result = determineWinner(myChoice, oppChoice);
             const display = document.getElementById('resultDisplay');
-            const phaseInd = document.getElementById('phaseIndicator');
+            const status = document.getElementById('statusBar');
 
             if (result === 'win') {
                 myScore++;
-                display.textContent = '🎉 YOU WIN THIS ROUND!';
+                display.textContent = '🎉 YOU WIN!';
                 display.style.color = '#4CAF50';
-                phaseInd.textContent = '🏆 ROUND WON!';
-                phaseInd.className = 'phase-indicator phase-result';
+                status.textContent = '🏆 ROUND WON';
             } else if (result === 'lose') {
                 oppScore++;
                 display.textContent = '💙 OPPONENT WINS!';
                 display.style.color = '#ff4444';
-                phaseInd.textContent = '💔 ROUND LOST';
-                phaseInd.className = 'phase-indicator phase-result';
+                status.textContent = '💔 ROUND LOST';
             } else {
                 display.textContent = '🤝 TIE!';
                 display.style.color = '#fdcb6e';
-                phaseInd.textContent = '🤝 TIE ROUND';
-                phaseInd.className = 'phase-indicator phase-result';
+                status.textContent = '🤝 TIE ROUND';
             }
 
             document.getElementById('youScore').textContent = myScore;
@@ -510,7 +484,6 @@
                 return;
             }
 
-            // Show result for 3 seconds then next round
             setTimeout(() => {
                 currentRound++;
                 document.getElementById('roundNum').textContent = currentRound + '/25';
