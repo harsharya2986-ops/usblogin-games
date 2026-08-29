@@ -22,6 +22,10 @@
             --white: #ffffff;
             --green: #4CAF50;
             --red: #ff4444;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.15);
+            --shadow-md: 0 8px 25px rgba(0,0,0,0.25);
+            --shadow-lg: 0 25px 60px rgba(0,0,0,0.5);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -40,10 +44,13 @@
             padding: 10px;
             overflow-x: hidden;
             position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Background floating hearts */
-        .bg-hearts {
+        /* Background Hearts Animation */
+        .bg-hearts-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -54,33 +61,37 @@
             overflow: hidden;
         }
 
-        .bg-heart {
+        .bg-heart-particle {
             position: absolute;
-            bottom: -30px;
-            animation: floatUp linear infinite;
-            opacity: 0.1;
+            bottom: -40px;
+            animation: floatHeartUp linear infinite;
+            opacity: 0;
         }
 
-        @keyframes floatUp {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+        @keyframes floatHeartUp {
+            0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
             10% { opacity: 0.15; }
-            90% { opacity: 0.1; }
-            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+            50% { opacity: 0.1; }
+            90% { opacity: 0.08; }
+            100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; }
         }
 
+        /* Main Game Shell */
         .game-shell {
             position: relative;
             z-index: 10;
             background: rgba(30, 27, 75, 0.95);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 15px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 107, 157, 0.15);
+            box-shadow: var(--shadow-lg), 0 0 40px rgba(255, 107, 157, 0.15);
             width: 100%;
             max-width: 1150px;
             border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
+        /* Header Section */
         .game-header {
             display: flex;
             flex-wrap: wrap;
@@ -88,7 +99,7 @@
             justify-content: space-between;
             gap: 10px;
             margin-bottom: 12px;
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -107,15 +118,16 @@
             font-size: 12px;
             font-weight: 600;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s;
+            transition: var(--transition);
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            white-space: nowrap;
         }
 
         .back-btn:hover {
             background: rgba(255, 107, 157, 0.2);
-            border-color: #ff6b9d;
+            border-color: var(--pink);
             transform: translateX(-3px);
         }
 
@@ -127,8 +139,10 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
+        /* Scoreboard */
         .scoreboard {
             display: flex;
             gap: 8px;
@@ -145,34 +159,35 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            transition: all 0.3s;
+            transition: var(--transition);
         }
 
         .score-chip.you {
             background: rgba(255, 107, 157, 0.2);
-            border: 1px solid #ff6b9d;
-            color: #ff6b9d;
+            border: 1px solid var(--pink);
+            color: var(--pink);
         }
 
         .score-chip.opponent {
             background: rgba(116, 185, 255, 0.2);
-            border: 1px solid #74b9ff;
-            color: #74b9ff;
+            border: 1px solid var(--blue);
+            color: var(--blue);
         }
 
         .score-chip.status {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fdcb6e;
+            color: var(--gold);
             font-size: 10px;
-            animation: statusPulse 2s infinite;
+            animation: statusBlink 2s infinite;
         }
 
-        @keyframes statusPulse {
+        @keyframes statusBlink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
 
+        /* Main Layout */
         .main-layout {
             display: flex;
             gap: 12px;
@@ -184,57 +199,63 @@
             min-width: 0;
         }
 
+        /* Canvas */
         .canvas-wrap {
             position: relative;
             border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: var(--shadow-md);
             border: 2px solid rgba(255, 255, 255, 0.15);
             cursor: pointer;
-            background: #0a0a1a;
+            background: var(--darker);
             touch-action: manipulation;
         }
 
-        canvas {
+        #gameCanvas {
             display: block;
             width: 100%;
             height: auto;
         }
 
-        .game-over-overlay {
+        /* Game Over Overlay */
+        .overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 10;
         }
 
-        .game-over-overlay.show {
-            display: flex;
-        }
+        .overlay.show { display: flex; }
 
-        .game-over-content {
+        .overlay-content {
             text-align: center;
             color: white;
+            padding: 20px;
         }
 
-        .game-over-content .emoji {
-            font-size: 4rem;
-            margin-bottom: 0.5rem;
+        .overlay-emoji { font-size: 4rem; margin-bottom: 10px; animation: bounce 1s infinite; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
-        .game-over-content .title {
+        .overlay-title {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #ff6b9d;
-            margin-bottom: 0.5rem;
+            color: var(--pink);
+            margin-bottom: 10px;
         }
 
+        .overlay-score { font-size: 1.1rem; color: var(--gold); }
+
+        /* Info Bar */
         .info-bar {
             display: flex;
             gap: 6px;
@@ -254,6 +275,7 @@
             gap: 4px;
         }
 
+        /* Chat Sidebar */
         .chat-sidebar {
             width: 230px;
             min-width: 230px;
@@ -270,14 +292,10 @@
             padding: 10px;
             background: rgba(255, 107, 157, 0.15);
             text-align: center;
-            color: #ff6b9d;
+            color: var(--pink);
             font-weight: bold;
             font-size: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
         }
 
         .chat-messages {
@@ -291,14 +309,8 @@
             gap: 5px;
         }
 
-        .chat-messages::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: #ff6b9d;
-            border-radius: 2px;
-        }
+        .chat-messages::-webkit-scrollbar { width: 3px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 2px; }
 
         .chat-message {
             padding: 6px 10px;
@@ -306,10 +318,10 @@
             font-size: 11px;
             max-width: 85%;
             word-wrap: break-word;
-            animation: msgIn 0.3s ease;
+            animation: msgSlideIn 0.3s ease;
         }
 
-        @keyframes msgIn {
+        @keyframes msgSlideIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
@@ -333,8 +345,8 @@
             margin-bottom: 2px;
         }
 
-        .chat-message.you .sender { color: #ff6b9d; }
-        .chat-message.opponent .sender { color: #74b9ff; }
+        .chat-message.you .sender { color: var(--pink); }
+        .chat-message.opponent .sender { color: var(--blue); }
         .chat-message .text { color: rgba(255, 255, 255, 0.9); }
 
         .chat-input-area {
@@ -353,11 +365,11 @@
             color: white;
             outline: none;
             font-size: 11px;
-            transition: all 0.3s;
+            transition: var(--transition);
         }
 
         .chat-input-area input:focus {
-            border-color: #ff6b9d;
+            border-color: var(--pink);
             box-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
         }
 
@@ -370,7 +382,7 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 10px;
-            transition: all 0.3s;
+            transition: var(--transition);
         }
 
         .chat-input-area button:hover {
@@ -378,27 +390,18 @@
             box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
         }
 
+        /* Responsive */
         @media (max-width: 950px) {
-            .main-layout {
-                flex-direction: column;
-            }
-            .chat-sidebar {
-                width: 100%;
-                min-width: auto;
-                max-height: 160px;
-            }
-            .chat-messages {
-                max-height: 80px;
-                min-height: 50px;
-            }
-            .game-title {
-                font-size: 15px;
-            }
+            .main-layout { flex-direction: column; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 160px; }
+            .chat-messages { max-height: 80px; min-height: 50px; }
+            .game-title { font-size: 15px; }
+            .score-chip { font-size: 9px; padding: 4px 10px; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-hearts" id="bgHearts"></div>
+    <div class="bg-hearts-container" id="bgHeartsContainer"></div>
 
     <div class="game-shell">
         <div class="game-header">
@@ -407,8 +410,8 @@
                 <h1 class="game-title">💕 Online Dino Run</h1>
             </div>
             <div class="scoreboard">
-                <div class="score-chip you" id="youChip">💕 <span id="youName">You</span>: <span id="youScore">0</span></div>
-                <div class="score-chip opponent" id="opponentChip">💙 <span id="oppName">Opp</span>: <span id="oppScore">0</span></div>
+                <div class="score-chip you">💕 <span id="youNameDisplay">You</span>: <span id="youScoreDisplay">0</span></div>
+                <div class="score-chip opponent">💙 <span id="oppNameDisplay">Opp</span>: <span id="oppScoreDisplay">0</span></div>
                 <div class="score-chip status" id="statusChip">🔗 Connecting...</div>
             </div>
         </div>
@@ -417,16 +420,17 @@
             <div class="game-area">
                 <div class="canvas-wrap" id="canvasWrap">
                     <canvas id="gameCanvas" width="850" height="400"></canvas>
-                    <div class="game-over-overlay" id="gameOverOverlay">
-                        <div class="game-over-content">
-                            <div class="emoji" id="gameOverEmoji">🏆</div>
-                            <div class="title" id="gameOverTitle">Game Over!</div>
+                    <div class="overlay" id="gameOverOverlay">
+                        <div class="overlay-content">
+                            <div class="overlay-emoji" id="overlayEmoji">🏆</div>
+                            <div class="overlay-title" id="overlayTitle">Game Over!</div>
+                            <div class="overlay-score" id="overlayScore"></div>
                         </div>
                     </div>
                 </div>
                 <div class="info-bar">
-                    <div class="info-pill">⌨️ Space / Click / Tap to Jump</div>
-                    <div class="info-pill">💗 Collect Hearts +100</div>
+                    <div class="info-pill">⌨️ Space/Click/Tap</div>
+                    <div class="info-pill">💗 +100 Points</div>
                     <div class="info-pill">🌐 Real-Time 1vs1</div>
                     <div class="info-pill">⚡ Speed Increases</div>
                 </div>
@@ -437,21 +441,22 @@
                 <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input-area">
                     <input type="text" id="chatInput" placeholder="Type message..." maxlength="200">
-                    <button onclick="sendMessage()">Send</button>
+                    <button onclick="sendChatMessage()">Send</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
 
     <script>
-        // ============================================
-        // FIREBASE INITIALIZATION
-        // ============================================
-        const firebaseConfig = {
+        // =====================================================
+        // SECTION 1: FIREBASE CONFIGURATION & INITIALIZATION
+        // =====================================================
+        const FIREBASE_CONFIG = {
             apiKey: "AIzaSyCaR33cAwHFTNdSlBuuzoju9yzah8szBmQ",
             authDomain: "usblog-games.firebaseapp.com",
             databaseURL: "https://usblog-games-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -461,59 +466,83 @@
             appId: "1:568211981446:web:0e75688bb9a28c2df97d07",
             measurementId: "G-BDKRR8E565"
         };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
 
-        // ============================================
-        // GAME CONSTANTS
-        // ============================================
+        firebase.initializeApp(FIREBASE_CONFIG);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // =====================================================
+        // SECTION 2: GAME CONSTANTS & CONFIGURATION
+        // =====================================================
+        const CONFIG = {
+            WIDTH: 850,
+            HEIGHT: 400,
+            GROUND_Y: 320,
+            GRAVITY: 0.7,
+            JUMP_FORCE: -13,
+            BASE_SPEED: 6,
+            MAX_SPEED: 14,
+            HEART_BONUS: 100,
+            WIN_SCORE: 5000,
+            OBSTACLE_INTERVAL_MIN: 1200,
+            OBSTACLE_INTERVAL_MAX: 2200,
+            HEART_INTERVAL: 2200,
+            SYNC_INTERVAL: 80,
+            PLAYER_SYNC_INTERVAL: 40,
+            RESPAWN_DELAY: 1500
+        };
+
+        // =====================================================
+        // SECTION 3: DOM ELEMENTS
+        // =====================================================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const W = 850;
-        const H = 400;
-        canvas.width = W;
-        canvas.height = H;
+        canvas.width = CONFIG.WIDTH;
+        canvas.height = CONFIG.HEIGHT;
 
-        const GROUND_Y = 320;
-        const GRAVITY = 0.7;
-        const JUMP_FORCE = -13;
-        const BASE_SPEED = 6;
-        const MAX_SPEED = 14;
-        const HEART_BONUS = 100;
-        const WIN_SCORE = 5000;
+        const youNameDisplay = document.getElementById('youNameDisplay');
+        const youScoreDisplay = document.getElementById('youScoreDisplay');
+        const oppNameDisplay = document.getElementById('oppNameDisplay');
+        const oppScoreDisplay = document.getElementById('oppScoreDisplay');
+        const statusChip = document.getElementById('statusChip');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const gameOverOverlay = document.getElementById('gameOverOverlay');
+        const overlayEmoji = document.getElementById('overlayEmoji');
+        const overlayTitle = document.getElementById('overlayTitle');
+        const overlayScore = document.getElementById('overlayScore');
+        const bgHeartsContainer = document.getElementById('bgHeartsContainer');
 
-        // ============================================
-        // GAME STATE
-        // ============================================
-        let roomId = null;
-        let myPlayerId = null;
-        let opponentId = null;
-        let myName = '';
-        let opponentName = '';
-        let isHost = false;
-        let gameStarted = false;
-        let gameOver = false;
-        let myScore = 0;
-        let opponentScore = 0;
-        let obstacles = [];
-        let hearts = [];
-        let particles = [];
-        let clouds = [];
-        let stars = [];
-        let speed = BASE_SPEED;
-        let frameCount = 0;
-        let distance = 0;
+        // =====================================================
+        // SECTION 4: GAME STATE
+        // =====================================================
+        const state = {
+            roomId: null,
+            myPlayerId: null,
+            opponentId: null,
+            myName: '',
+            opponentName: '',
+            isHost: false,
+            gameStarted: false,
+            gameOver: false,
+            myScore: 0,
+            opponentScore: 0,
+            speed: CONFIG.BASE_SPEED,
+            frameCount: 0,
+            distance: 0
+        };
 
-        // Player characters
+        // =====================================================
+        // SECTION 5: GAME OBJECTS
+        // =====================================================
         const myDino = {
             x: 100,
-            y: GROUND_Y - 50,
-            w: 42,
-            h: 50,
-            vy: 0,
-            jumping: false,
-            alive: true,
+            y: CONFIG.GROUND_Y - 50,
+            width: 42,
+            height: 50,
+            velocityY: 0,
+            isJumping: false,
+            isAlive: true,
             legFrame: 0,
             color: '#f472b6',
             emoji: '💕'
@@ -521,92 +550,111 @@
 
         const oppDino = {
             x: 620,
-            y: GROUND_Y - 50,
-            w: 42,
-            h: 50,
-            vy: 0,
-            jumping: false,
-            alive: true,
+            y: CONFIG.GROUND_Y - 50,
+            width: 42,
+            height: 50,
+            velocityY: 0,
+            isJumping: false,
+            isAlive: true,
             legFrame: 0,
             color: '#60a5fa',
             emoji: '💙'
         };
 
-        // ============================================
-        // BACKGROUND INITIALIZATION
-        // ============================================
-        function createBackground() {
-            // Stars
+        let obstacles = [];
+        let hearts = [];
+        let particles = [];
+        let clouds = [];
+        let stars = [];
+
+        // =====================================================
+        // SECTION 6: BACKGROUND CREATION
+        // =====================================================
+        function createStars() {
             for (let i = 0; i < 40; i++) {
                 stars.push({
-                    x: Math.random() * W,
+                    x: Math.random() * CONFIG.WIDTH,
                     y: Math.random() * 200,
                     size: Math.random() * 2 + 0.5,
                     phase: Math.random() * Math.PI * 2
                 });
             }
-            // Clouds
+        }
+
+        function createClouds() {
             for (let i = 0; i < 6; i++) {
                 clouds.push({
-                    x: Math.random() * W,
+                    x: Math.random() * CONFIG.WIDTH,
                     y: Math.random() * 100 + 20,
-                    w: Math.random() * 70 + 50,
+                    width: Math.random() * 70 + 50,
                     speed: Math.random() * 0.3 + 0.1,
                     opacity: Math.random() * 0.2 + 0.1
                 });
             }
-            // Background hearts
-            const bgContainer = document.getElementById('bgHearts');
-            const hearts = ['💕', '💗', '💖', '💘', '💝'];
+        }
+
+        function createBackgroundHearts() {
+            const heartEmojis = ['💕', '💗', '💖', '💘', '💝'];
             for (let i = 0; i < 10; i++) {
                 const span = document.createElement('span');
-                span.className = 'bg-heart';
-                span.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                span.className = 'bg-heart-particle';
+                span.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
                 span.style.left = Math.random() * 100 + '%';
                 span.style.fontSize = Math.random() * 18 + 12 + 'px';
                 span.style.animationDuration = Math.random() * 12 + 8 + 's';
                 span.style.animationDelay = Math.random() * 10 + 's';
-                bgContainer.appendChild(span);
+                bgHeartsContainer.appendChild(span);
             }
         }
 
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        function init() {
-            createBackground();
+        // =====================================================
+        // SECTION 7: INITIALIZATION
+        // =====================================================
+        function initialize() {
+            createStars();
+            createClouds();
+            createBackgroundHearts();
+            setupAuth();
+            setupEventListeners();
+        }
+
+        function setupAuth() {
             auth.onAuthStateChanged((user) => {
                 if (!user) {
                     window.location.href = 'login.html';
                     return;
                 }
-                db.ref('users/' + user.uid).once('value').then((snap) => {
-                    const data = snap.val();
-                    myName = data ? data.username : user.email.split('@')[0];
-                    document.getElementById('youName').textContent = myName;
+
+                database.ref('users/' + user.uid).once('value').then((snapshot) => {
+                    const data = snapshot.val();
+                    state.myName = data ? data.username : user.email.split('@')[0];
+                    youNameDisplay.textContent = state.myName;
                 });
+
                 const params = new URLSearchParams(window.location.search);
-                roomId = params.get('match') || params.get('team');
-                myPlayerId = user.uid;
-                if (!roomId) {
+                state.roomId = params.get('match') || params.get('team');
+                state.myPlayerId = user.uid;
+
+                if (!state.roomId) {
                     window.location.href = 'lobby.html';
                     return;
                 }
-                setupRoom();
+
+                setupRoomConnection();
             });
         }
 
-        // ============================================
-        // ROOM SETUP
-        // ============================================
-        function setupRoom() {
-            db.ref('matchmaking/' + roomId).once('value').then((snap) => {
-                if (snap.exists()) {
-                    setupPlayers(snap.val(), 'matchmaking');
+        // =====================================================
+        // SECTION 8: ROOM SETUP
+        // =====================================================
+        function setupRoomConnection() {
+            database.ref('matchmaking/' + state.roomId).once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    setupPlayersFromRoom(snapshot.val(), 'matchmaking');
                 } else {
-                    db.ref('teams/' + roomId).once('value').then((teamSnap) => {
-                        if (teamSnap.exists()) {
-                            setupPlayers(teamSnap.val(), 'teams');
+                    database.ref('teams/' + state.roomId).once('value').then((teamSnapshot) => {
+                        if (teamSnapshot.exists()) {
+                            setupPlayersFromRoom(teamSnapshot.val(), 'teams');
                         } else {
                             alert('Room not found!');
                             window.location.href = 'lobby.html';
@@ -616,132 +664,140 @@
             });
         }
 
-        function setupPlayers(data, collection) {
-            if (data.player1 === myPlayerId) {
-                isHost = true;
-                opponentId = data.player2 || null;
-                opponentName = data.player2Name || 'Opponent';
+        function setupPlayersFromRoom(roomData, collection) {
+            if (roomData.player1 === state.myPlayerId) {
+                state.isHost = true;
+                state.opponentId = roomData.player2 || null;
+                state.opponentName = roomData.player2Name || 'Opponent';
             } else {
-                isHost = false;
-                opponentId = data.player1 || null;
-                opponentName = data.player1Name || 'Opponent';
+                state.isHost = false;
+                state.opponentId = roomData.player1 || null;
+                state.opponentName = roomData.player1Name || 'Opponent';
             }
-            document.getElementById('oppName').textContent = opponentName;
 
-            if (opponentId) {
+            oppNameDisplay.textContent = state.opponentName;
+
+            if (state.opponentId) {
                 startGame();
             } else {
-                document.getElementById('statusChip').textContent = '⏳ Waiting for opponent...';
-                db.ref(collection + '/' + roomId).on('value', (snap) => {
-                    const d = snap.val();
-                    if (d && d.player2) {
-                        opponentId = d.player2;
-                        opponentName = d.player2Name || 'Opponent';
-                        document.getElementById('oppName').textContent = opponentName;
+                statusChip.textContent = '⏳ Waiting for opponent...';
+                database.ref(collection + '/' + state.roomId).on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data && data.player2) {
+                        state.opponentId = data.player2;
+                        state.opponentName = data.player2Name || 'Opponent';
+                        oppNameDisplay.textContent = state.opponentName;
                         startGame();
                     }
                 });
             }
         }
 
-        // ============================================
-        // GAME START
-        // ============================================
+        // =====================================================
+        // SECTION 9: GAME START & SYNC
+        // =====================================================
         function startGame() {
-            gameStarted = true;
-            document.getElementById('statusChip').textContent = '🟢 LIVE';
+            state.gameStarted = true;
+            statusChip.textContent = '🟢 LIVE';
             setupChat();
-            setupSync();
-            gameLoop();
+            setupGameSync();
+            startGameLoop();
         }
 
-        function setupSync() {
-            if (isHost) {
-                // Host spawns obstacles
-                setInterval(() => {
-                    if (gameStarted && !gameOver) spawnObstacle();
-                }, 1500 + Math.random() * 500);
-
+        function setupGameSync() {
+            if (state.isHost) {
+                // Host spawns obstacles at random intervals
+                scheduleObstacleSpawn();
                 // Host spawns hearts
                 setInterval(() => {
-                    if (gameStarted && !gameOver) spawnHeart();
-                }, 2200);
-
+                    if (state.gameStarted && !state.gameOver) spawnHeart();
+                }, CONFIG.HEART_INTERVAL);
                 // Host syncs game state
                 setInterval(() => {
-                    if (gameStarted) {
-                        db.ref('gameRooms/' + roomId + '/state').set({
+                    if (state.gameStarted) {
+                        database.ref('gameRooms/' + state.roomId + '/state').set({
                             obstacles: obstacles,
                             hearts: hearts,
-                            speed: speed,
-                            hostScore: Math.floor(myScore),
-                            hostAlive: myDino.alive
+                            speed: state.speed,
+                            hostScore: Math.floor(state.myScore),
+                            hostAlive: myDino.isAlive
                         });
                     }
-                }, 80);
+                }, CONFIG.SYNC_INTERVAL);
             } else {
                 // Non-host listens to state
-                db.ref('gameRooms/' + roomId + '/state').on('value', (snap) => {
-                    const d = snap.val();
-                    if (d) {
-                        obstacles = d.obstacles || [];
-                        hearts = d.hearts || [];
-                        speed = d.speed || BASE_SPEED;
-                        opponentScore = d.hostScore || 0;
-                        oppDino.alive = d.hostAlive !== false;
-                        document.getElementById('oppScore').textContent = Math.floor(opponentScore);
+                database.ref('gameRooms/' + state.roomId + '/state').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        obstacles = data.obstacles || [];
+                        hearts = data.hearts || [];
+                        state.speed = data.speed || CONFIG.BASE_SPEED;
+                        state.opponentScore = data.hostScore || 0;
+                        oppDino.isAlive = data.hostAlive !== false;
+                        oppScoreDisplay.textContent = Math.floor(state.opponentScore);
                     }
                 });
             }
 
-            // Sync my position
+            // Sync my position to Firebase
             setInterval(() => {
-                if (gameStarted) {
-                    db.ref('gameRooms/' + roomId + '/players/' + myPlayerId).set({
+                if (state.gameStarted) {
+                    database.ref('gameRooms/' + state.roomId + '/players/' + state.myPlayerId).set({
                         y: myDino.y,
-                        jumping: myDino.jumping,
-                        alive: myDino.alive,
-                        score: Math.floor(myScore)
+                        jumping: myDino.isJumping,
+                        alive: myDino.isAlive,
+                        score: Math.floor(state.myScore)
                     });
                 }
-            }, 40);
+            }, CONFIG.PLAYER_SYNC_INTERVAL);
 
             // Listen to opponent position
-            db.ref('gameRooms/' + roomId + '/players/' + opponentId).on('value', (snap) => {
-                const d = snap.val();
-                if (d) {
-                    oppDino.y = d.y !== undefined ? d.y : oppDino.y;
-                    oppDino.jumping = d.jumping || false;
-                    oppDino.alive = d.alive !== false;
-                    document.getElementById('statusChip').textContent = '🟢 LIVE';
+            database.ref('gameRooms/' + state.roomId + '/players/' + state.opponentId).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    oppDino.y = data.y !== undefined ? data.y : oppDino.y;
+                    oppDino.isJumping = data.jumping || false;
+                    oppDino.isAlive = data.alive !== false;
+                    statusChip.textContent = '🟢 LIVE';
                 } else {
-                    document.getElementById('statusChip').textContent = '💔 Opponent left';
+                    statusChip.textContent = '💔 Opponent left';
                 }
             });
         }
 
-        // ============================================
-        // GAME OBJECTS
-        // ============================================
+        function scheduleObstacleSpawn() {
+            const interval = CONFIG.OBSTACLE_INTERVAL_MIN + Math.random() * 
+                            (CONFIG.OBSTACLE_INTERVAL_MAX - CONFIG.OBSTACLE_INTERVAL_MIN);
+            setTimeout(() => {
+                if (state.gameStarted && !state.gameOver) {
+                    spawnObstacle();
+                    scheduleObstacleSpawn();
+                }
+            }, interval);
+        }
+
+        // =====================================================
+        // SECTION 10: GAME OBJECT SPAWNING
+        // =====================================================
         function spawnObstacle() {
             const type = Math.random() > 0.5 ? 'cactus' : 'rock';
-            const w = type === 'cactus' ? 22 + Math.random() * 10 : 28 + Math.random() * 14;
-            const h = type === 'cactus' ? 35 + Math.random() * 30 : 18 + Math.random() * 15;
+            const width = type === 'cactus' ? 22 + Math.random() * 10 : 28 + Math.random() * 14;
+            const height = type === 'cactus' ? 35 + Math.random() * 30 : 18 + Math.random() * 15;
             obstacles.push({
-                x: W + 50,
-                y: GROUND_Y - h,
-                w: w,
-                h: h,
+                x: CONFIG.WIDTH + 50,
+                y: CONFIG.GROUND_Y - height,
+                width: width,
+                height: height,
                 type: type
             });
         }
 
         function spawnHeart() {
             hearts.push({
-                x: W + 50,
+                x: CONFIG.WIDTH + 50,
                 y: Math.random() * 130 + 70,
-                w: 24,
-                h: 24
+                width: 24,
+                height: 24
             });
         }
 
@@ -760,81 +816,84 @@
             }
         }
 
-        // ============================================
-        // CONTROLS
-        // ============================================
-        function jump() {
-            if (!gameStarted || gameOver || !myDino.alive) return;
-            if (!myDino.jumping) {
-                myDino.vy = JUMP_FORCE;
-                myDino.jumping = true;
-                spawnParticles(myDino.x + myDino.w / 2, myDino.y + myDino.h, myDino.color, 5);
+        // =====================================================
+        // SECTION 11: PLAYER CONTROLS
+        // =====================================================
+        function playerJump() {
+            if (!state.gameStarted || state.gameOver || !myDino.isAlive) return;
+            if (!myDino.isJumping) {
+                myDino.velocityY = CONFIG.JUMP_FORCE;
+                myDino.isJumping = true;
+                spawnParticles(myDino.x + myDino.width / 2, myDino.y + myDino.height, myDino.color, 5);
             }
         }
 
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
-                e.preventDefault();
-                jump();
-            }
-        });
-
-        canvas.addEventListener('click', jump);
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            jump();
-        });
-
-        // ============================================
-        // GAME UPDATE
-        // ============================================
-        function update() {
-            if (!gameStarted) return;
-            frameCount++;
-            distance += speed;
-            
-            // Increase speed
-            if (isHost) {
-                speed = Math.min(MAX_SPEED, BASE_SPEED + frameCount * 0.002);
-            }
-
-            // My dino physics
-            if (myDino.jumping) {
-                myDino.vy += GRAVITY;
-                myDino.y += myDino.vy;
-                if (myDino.y >= GROUND_Y - myDino.h) {
-                    myDino.y = GROUND_Y - myDino.h;
-                    myDino.jumping = false;
-                    myDino.vy = 0;
-                    spawnParticles(myDino.x + myDino.w / 2, myDino.y + myDino.h, myDino.color, 3);
+        function setupEventListeners() {
+            // Keyboard
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                    e.preventDefault();
+                    playerJump();
                 }
+            });
+
+            // Mouse
+            canvas.addEventListener('click', playerJump);
+
+            // Touch
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                playerJump();
+            });
+
+            // Chat
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendChatMessage();
+            });
+        }
+
+        // =====================================================
+        // SECTION 12: GAME UPDATE LOGIC
+        // =====================================================
+        function updateGame() {
+            if (!state.gameStarted) return;
+
+            state.frameCount++;
+            state.distance += state.speed;
+
+            // Update speed (host only)
+            if (state.isHost) {
+                state.speed = Math.min(CONFIG.MAX_SPEED, CONFIG.BASE_SPEED + state.frameCount * 0.002);
             }
+
+            // Update my dino physics
+            updateDinoPhysics(myDino);
 
             // Leg animation
-            if (frameCount % 8 === 0) {
+            if (state.frameCount % 8 === 0) {
                 myDino.legFrame = (myDino.legFrame + 1) % 2;
                 oppDino.legFrame = (oppDino.legFrame + 1) % 2;
             }
 
-            // Move clouds
+            // Update clouds
             for (const cloud of clouds) {
                 cloud.x -= cloud.speed;
-                if (cloud.x + cloud.w < 0) {
-                    cloud.x = W + 100;
+                if (cloud.x + cloud.width < 0) {
+                    cloud.x = CONFIG.WIDTH + 100;
                     cloud.y = Math.random() * 100 + 20;
                 }
             }
 
             // Move obstacles (host only)
-            if (isHost) {
+            if (state.isHost) {
                 for (let i = obstacles.length - 1; i >= 0; i--) {
-                    obstacles[i].x -= speed;
-                    if (obstacles[i].x + obstacles[i].w < 0) {
+                    obstacles[i].x -= state.speed;
+                    if (obstacles[i].x + obstacles[i].width < 0) {
                         obstacles.splice(i, 1);
                     }
                 }
                 for (let i = hearts.length - 1; i >= 0; i--) {
-                    hearts[i].x -= speed * 0.85;
+                    hearts[i].x -= state.speed * 0.85;
                     if (hearts[i].x < -30) {
                         hearts.splice(i, 1);
                     }
@@ -853,74 +912,118 @@
                 }
             }
 
-            // Collisions
-            if (myDino.alive) {
-                for (const obs of obstacles) {
-                    if (rectCollide(myDino, obs)) {
-                        myDino.alive = false;
-                        spawnParticles(myDino.x + myDino.w / 2, myDino.y + myDino.h / 2, myDino.color, 20);
+            // Check collisions
+            checkCollisions();
+
+            // Update score
+            if (myDino.isAlive) {
+                state.myScore += state.speed * 0.1;
+            }
+            youScoreDisplay.textContent = Math.floor(state.myScore);
+
+            // Check win condition
+            if (state.myScore >= CONFIG.WIN_SCORE || state.opponentScore >= CONFIG.WIN_SCORE) {
+                endGame();
+            }
+        }
+
+        function updateDinoPhysics(dino) {
+            if (dino.isJumping) {
+                dino.velocityY += CONFIG.GRAVITY;
+                dino.y += dino.velocityY;
+                if (dino.y >= CONFIG.GROUND_Y - dino.height) {
+                    dino.y = CONFIG.GROUND_Y - dino.height;
+                    dino.isJumping = false;
+                    dino.velocityY = 0;
+                    spawnParticles(dino.x + dino.width / 2, dino.y + dino.height, dino.color, 3);
+                }
+            }
+        }
+
+        function checkCollisions() {
+            if (myDino.isAlive) {
+                // Obstacle collision
+                for (const obstacle of obstacles) {
+                    if (rectCollide(myDino, obstacle)) {
+                        myDino.isAlive = false;
+                        spawnParticles(myDino.x + myDino.width / 2, myDino.y + myDino.height / 2, myDino.color, 20);
                         setTimeout(() => {
-                            myDino.alive = true;
-                            myDino.y = GROUND_Y - 50;
-                        }, 1500);
+                            myDino.isAlive = true;
+                            myDino.y = CONFIG.GROUND_Y - 50;
+                        }, CONFIG.RESPAWN_DELAY);
                         break;
                     }
                 }
+                // Heart collection
                 for (let i = hearts.length - 1; i >= 0; i--) {
                     if (rectCollide(myDino, hearts[i])) {
-                        myScore += HEART_BONUS;
+                        state.myScore += CONFIG.HEART_BONUS;
                         spawnParticles(hearts[i].x, hearts[i].y, '#ff6b9d', 10);
-                        if (isHost) hearts.splice(i, 1);
+                        if (state.isHost) hearts.splice(i, 1);
                     }
                 }
-            }
-
-            // Score
-            if (myDino.alive) {
-                myScore += speed * 0.1;
-            }
-            document.getElementById('youScore').textContent = Math.floor(myScore);
-
-            // Check win
-            if (myScore >= WIN_SCORE || opponentScore >= WIN_SCORE) {
-                gameOver = true;
-                showGameOver();
             }
         }
 
         function rectCollide(a, b) {
-            return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+            return a.x < b.x + b.width && 
+                   a.x + a.width > b.x && 
+                   a.y < b.y + b.height && 
+                   a.y + a.height > b.y;
         }
 
-        function showGameOver() {
-            const overlay = document.getElementById('gameOverOverlay');
-            overlay.classList.add('show');
-            const isWinner = myScore > opponentScore;
-            document.getElementById('gameOverEmoji').textContent = isWinner ? '🏆' : '💙';
-            document.getElementById('gameOverTitle').textContent = isWinner ? 'You Win!' : 'Opponent Wins!';
+        function endGame() {
+            state.gameOver = true;
+            const isWinner = state.myScore > state.opponentScore;
+            overlayEmoji.textContent = isWinner ? '🏆' : '💙';
+            overlayTitle.textContent = isWinner ? 'You Win!' : 'Opponent Wins!';
+            overlayScore.textContent = `💕 ${Math.floor(state.myScore)} - ${Math.floor(state.opponentScore)} 💙`;
+            gameOverOverlay.classList.add('show');
             setTimeout(() => {
-                overlay.classList.remove('show');
+                gameOverOverlay.classList.remove('show');
                 window.location.href = 'lobby.html';
             }, 3000);
         }
 
-        // ============================================
-        // RENDER
-        // ============================================
-        function render() {
-            ctx.clearRect(0, 0, W, H);
+        // =====================================================
+        // SECTION 13: RENDERING
+        // =====================================================
+        function renderGame() {
+            ctx.clearRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
 
-            // Sky gradient
-            const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
-            skyGrad.addColorStop(0, '#0a0a1a');
-            skyGrad.addColorStop(0.35, '#1a1a3e');
-            skyGrad.addColorStop(0.65, '#4a2d6b');
-            skyGrad.addColorStop(0.85, '#e8a87c');
-            skyGrad.addColorStop(1, '#f4c4a8');
-            ctx.fillStyle = skyGrad;
-            ctx.fillRect(0, 0, W, GROUND_Y);
+            // Sky
+            renderSky();
+            // Stars
+            renderStars();
+            // Clouds
+            renderClouds();
+            // Ground
+            renderGround();
+            // Obstacles
+            renderObstacles();
+            // Hearts
+            renderHearts();
+            // Particles
+            renderParticles();
+            // Connection line
+            renderConnectionLine();
+            // Dinos
+            renderDino(myDino);
+            renderDino(oppDino);
+        }
 
-            // Stars with twinkle
+        function renderSky() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, CONFIG.GROUND_Y);
+            gradient.addColorStop(0, '#0a0a1a');
+            gradient.addColorStop(0.35, '#1a1a3e');
+            gradient.addColorStop(0.65, '#4a2d6b');
+            gradient.addColorStop(0.85, '#e8a87c');
+            gradient.addColorStop(1, '#f4c4a8');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.GROUND_Y);
+        }
+
+        function renderStars() {
             for (const star of stars) {
                 const twinkle = Math.sin(Date.now() * 0.002 + star.phase) * 0.3 + 0.5;
                 ctx.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
@@ -928,71 +1031,73 @@
                 ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
                 ctx.fill();
             }
+        }
 
-            // Clouds
+        function renderClouds() {
             for (const cloud of clouds) {
                 ctx.fillStyle = `rgba(255, 255, 255, ${cloud.opacity})`;
                 ctx.beginPath();
-                ctx.arc(cloud.x, cloud.y, cloud.w / 2, 0, Math.PI * 2);
-                ctx.arc(cloud.x + cloud.w / 3, cloud.y - 10, cloud.w / 3, 0, Math.PI * 2);
-                ctx.arc(cloud.x + cloud.w / 2, cloud.y, cloud.w / 2.5, 0, Math.PI * 2);
+                ctx.arc(cloud.x, cloud.y, cloud.width / 2, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.width / 3, cloud.y - 10, cloud.width / 3, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.width / 2, cloud.y, cloud.width / 2.5, 0, Math.PI * 2);
                 ctx.fill();
             }
+        }
 
-            // Ground
-            const groundGrad = ctx.createLinearGradient(0, GROUND_Y, 0, H);
-            groundGrad.addColorStop(0, '#2d3436');
-            groundGrad.addColorStop(1, '#1e272e');
-            ctx.fillStyle = groundGrad;
-            ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+        function renderGround() {
+            const gradient = ctx.createLinearGradient(0, CONFIG.GROUND_Y, 0, CONFIG.HEIGHT);
+            gradient.addColorStop(0, '#2d3436');
+            gradient.addColorStop(1, '#1e272e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, CONFIG.GROUND_Y, CONFIG.WIDTH, CONFIG.HEIGHT - CONFIG.GROUND_Y);
 
-            // Ground line
             ctx.strokeStyle = '#e8a87c';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(0, GROUND_Y);
-            ctx.lineTo(W, GROUND_Y);
+            ctx.moveTo(0, CONFIG.GROUND_Y);
+            ctx.lineTo(CONFIG.WIDTH, CONFIG.GROUND_Y);
             ctx.stroke();
 
-            // Ground details
             ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
             for (let i = 0; i < 15; i++) {
-                const gx = (i * 60 + frameCount * 0.5) % W;
-                ctx.fillRect(gx, GROUND_Y + 10, 3, 6);
+                const gx = (i * 60 + state.frameCount * 0.5) % CONFIG.WIDTH;
+                ctx.fillRect(gx, CONFIG.GROUND_Y + 10, 3, 6);
             }
+        }
 
-            // Obstacles
-            for (const obs of obstacles) {
-                if (obs.type === 'cactus') {
+        function renderObstacles() {
+            for (const obstacle of obstacles) {
+                if (obstacle.type === 'cactus') {
                     ctx.fillStyle = '#4CAF50';
-                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
-                    ctx.fillRect(obs.x - 6, obs.y + 12, 8, 16);
-                    ctx.fillRect(obs.x + obs.w - 2, obs.y + 15, 8, 14);
-                    // Flower on cactus
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                    ctx.fillRect(obstacle.x - 6, obstacle.y + 12, 8, 16);
+                    ctx.fillRect(obstacle.x + obstacle.width - 2, obstacle.y + 15, 8, 14);
                     ctx.font = '12px Arial';
                     ctx.textAlign = 'center';
-                    ctx.fillText('🌸', obs.x + obs.w / 2, obs.y - 3);
+                    ctx.fillText('🌸', obstacle.x + obstacle.width / 2, obstacle.y - 3);
                 } else {
                     ctx.fillStyle = '#795548';
                     ctx.beginPath();
-                    ctx.arc(obs.x + obs.w / 2, obs.y + obs.h, obs.w / 2, Math.PI, 0);
+                    ctx.arc(obstacle.x + obstacle.width / 2, obstacle.y + obstacle.height, obstacle.width / 2, Math.PI, 0);
                     ctx.fill();
                     ctx.fillStyle = '#8d6e63';
                     ctx.beginPath();
-                    ctx.arc(obs.x + obs.w / 2, obs.y + 5, obs.w * 0.3, Math.PI, 2 * Math.PI);
+                    ctx.arc(obstacle.x + obstacle.width / 2, obstacle.y + 5, obstacle.width * 0.3, Math.PI, 2 * Math.PI);
                     ctx.fill();
                 }
             }
+        }
 
-            // Hearts
+        function renderHearts() {
             for (const heart of hearts) {
-                const bob = Math.sin(frameCount * 0.05 + heart.x) * 3;
+                const bob = Math.sin(state.frameCount * 0.05 + heart.x) * 3;
                 ctx.font = '24px Arial';
                 ctx.textAlign = 'center';
                 ctx.fillText('💗', heart.x + 12, heart.y + 12 + bob);
             }
+        }
 
-            // Particles
+        function renderParticles() {
             for (const p of particles) {
                 const alpha = p.life / p.maxLife;
                 ctx.globalAlpha = alpha;
@@ -1002,149 +1107,139 @@
                 ctx.fill();
             }
             ctx.globalAlpha = 1;
+        }
 
-            // Connection line
-            if (myDino.alive && oppDino.alive) {
+        function renderConnectionLine() {
+            if (myDino.isAlive && oppDino.isAlive) {
                 ctx.save();
                 ctx.strokeStyle = 'rgba(244, 114, 182, 0.3)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 5]);
                 ctx.beginPath();
-                ctx.moveTo(myDino.x + myDino.w / 2, myDino.y + myDino.h / 2);
-                ctx.lineTo(oppDino.x + oppDino.w / 2, oppDino.y + oppDino.h / 2);
+                ctx.moveTo(myDino.x + myDino.width / 2, myDino.y + myDino.height / 2);
+                ctx.lineTo(oppDino.x + oppDino.width / 2, oppDino.y + oppDino.height / 2);
                 ctx.stroke();
                 ctx.setLineDash([]);
-                // Floating hearts on line
+
                 for (let i = 0; i < 3; i++) {
-                    const t = (frameCount * 0.02 + i * 0.33) % 1;
-                    const hx = myDino.x + myDino.w / 2 + (oppDino.x + oppDino.w / 2 - myDino.x - myDino.w / 2) * t;
-                    const hy = myDino.y + myDino.h / 2 + (oppDino.y + oppDino.h / 2 - myDino.y - myDino.h / 2) * t - 10;
+                    const t = (state.frameCount * 0.02 + i * 0.33) % 1;
+                    const hx = myDino.x + myDino.width / 2 + (oppDino.x + oppDino.width / 2 - myDino.x - myDino.width / 2) * t;
+                    const hy = myDino.y + myDino.height / 2 + (oppDino.y + oppDino.height / 2 - myDino.y - myDino.height / 2) * t - 10;
                     ctx.font = '10px Arial';
                     ctx.textAlign = 'center';
                     ctx.fillText('💗', hx, hy);
                 }
                 ctx.restore();
             }
-
-            // Draw dinos
-            if (myDino.alive) drawDino(myDino);
-            if (oppDino.alive) drawDino(oppDino);
         }
 
-        function drawDino(dino) {
-            const ctx2 = ctx;
-            
+        function renderDino(dino) {
             // Body
-            ctx2.fillStyle = dino.color;
-            ctx2.beginPath();
-            ctx2.roundRect(dino.x, dino.y, dino.w, dino.h, 8);
-            ctx2.fill();
+            ctx.fillStyle = dino.color;
+            ctx.beginPath();
+            roundRect(ctx, dino.x, dino.y, dino.width, dino.height, 8);
+            ctx.fill();
 
             // Belly
-            ctx2.fillStyle = 'rgba(255, 255, 255, 0.25)';
-            ctx2.beginPath();
-            ctx2.roundRect(dino.x + 10, dino.y + 20, dino.w - 20, dino.h - 25, 5);
-            ctx2.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+            ctx.beginPath();
+            roundRect(ctx, dino.x + 10, dino.y + 20, dino.width - 20, dino.height - 25, 5);
+            ctx.fill();
 
             // Eye
-            ctx2.fillStyle = 'white';
-            ctx2.beginPath();
-            ctx2.arc(dino.x + dino.w - 15, dino.y + 14, 6, 0, Math.PI * 2);
-            ctx2.fill();
-            
-            // Pupil
-            ctx2.fillStyle = '#1a1a1a';
-            ctx2.beginPath();
-            ctx2.arc(dino.x + dino.w - 13, dino.y + 15, 3, 0, Math.PI * 2);
-            ctx2.fill();
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(dino.x + dino.width - 15, dino.y + 14, 6, 0, Math.PI * 2);
+            ctx.fill();
 
-            // Legs with animation
-            ctx2.fillStyle = dino.color;
+            // Pupil
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.arc(dino.x + dino.width - 13, dino.y + 15, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Legs
+            ctx.fillStyle = dino.color;
             const legOffset = dino.legFrame === 0 ? 0 : 5;
-            ctx2.fillRect(dino.x + 10, dino.y + dino.h - 4, 9, 16 + legOffset);
-            ctx2.fillRect(dino.x + dino.w - 19, dino.y + dino.h - 4, 9, 16 - legOffset);
+            ctx.fillRect(dino.x + 10, dino.y + dino.height - 4, 9, 16 + legOffset);
+            ctx.fillRect(dino.x + dino.width - 19, dino.y + dino.height - 4, 9, 16 - legOffset);
 
             // Tail
-            ctx2.fillStyle = dino.color;
-            ctx2.beginPath();
-            ctx2.moveTo(dino.x, dino.y + 30);
-            ctx2.lineTo(dino.x - 15, dino.y + 20);
-            ctx2.lineTo(dino.x, dino.y + 20);
-            ctx2.fill();
+            ctx.fillStyle = dino.color;
+            ctx.beginPath();
+            ctx.moveTo(dino.x, dino.y + 30);
+            ctx.lineTo(dino.x - 15, dino.y + 20);
+            ctx.lineTo(dino.x, dino.y + 20);
+            ctx.fill();
 
             // Emoji
-            ctx2.font = '15px Arial';
-            ctx2.textAlign = 'center';
-            ctx2.fillText(dino.emoji, dino.x + dino.w / 2, dino.y + dino.h / 2 + 5);
+            ctx.font = '15px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(dino.emoji, dino.x + dino.width / 2, dino.y + dino.height / 2 + 5);
         }
 
-        // ============================================
-        // CHAT SYSTEM
-        // ============================================
+        function roundRect(ctx, x, y, width, height, radius) {
+            if (width < 2 * radius) radius = width / 2;
+            if (height < 2 * radius) radius = height / 2;
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+        }
+
+        // =====================================================
+        // SECTION 14: CHAT SYSTEM
+        // =====================================================
         function setupChat() {
-            const chatRef = db.ref('gameRooms/' + roomId + '/chat');
+            const chatRef = database.ref('gameRooms/' + state.roomId + '/chat');
             chatRef.off();
-            chatRef.limitToLast(50).on('child_added', (snap) => {
-                const msg = snap.val();
-                displayMessage(msg.sender, msg.message, msg.sender === myName);
+            chatRef.limitToLast(50).on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                displayChatMessage(message.sender, message.message, message.sender === state.myName);
             });
         }
 
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const msg = input.value.trim();
-            if (msg && roomId) {
-                db.ref('gameRooms/' + roomId + '/chat').push({
-                    sender: myName,
-                    message: msg,
+        function sendChatMessage() {
+            const message = chatInput.value.trim();
+            if (message && state.roomId) {
+                database.ref('gameRooms/' + state.roomId + '/chat').push({
+                    sender: state.myName,
+                    message: message,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
-                input.value = '';
+                chatInput.value = '';
             }
         }
 
-        function displayMessage(sender, msg, isYou) {
-            const container = document.getElementById('chatMessages');
+        function displayChatMessage(sender, message, isYou) {
             const div = document.createElement('div');
             div.className = `chat-message ${isYou ? 'you' : 'opponent'}`;
-            div.innerHTML = `<span class="sender">${sender}</span><span class="text">${msg}</span>`;
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
+            div.innerHTML = `<span class="sender">${sender}</span><span class="text">${message}</span>`;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        document.getElementById('chatInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        // ============================================
-        // GAME LOOP
-        // ============================================
-        function gameLoop() {
-            update();
-            render();
-            requestAnimationFrame(gameLoop);
+        // =====================================================
+        // SECTION 15: GAME LOOP
+        // =====================================================
+        function startGameLoop() {
+            function loop() {
+                updateGame();
+                renderGame();
+                requestAnimationFrame(loop);
+            }
+            loop();
         }
 
-        // RoundRect polyfill
-        if (!CanvasRenderingContext2D.prototype.roundRect) {
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-                if (w < 2 * r) r = w / 2;
-                if (h < 2 * r) r = h / 2;
-                this.moveTo(x + r, y);
-                this.lineTo(x + w - r, y);
-                this.quadraticCurveTo(x + w, y, x + w, y + r);
-                this.lineTo(x + w, y + h - r);
-                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-                this.lineTo(x + r, y + h);
-                this.quadraticCurveTo(x, y + h, x, y + h - r);
-                this.lineTo(x, y + r);
-                this.quadraticCurveTo(x, y, x + r, y);
-                return this;
-            };
-        }
-
-        // Start
-        document.addEventListener('DOMContentLoaded', init);
+        // =====================================================
+        // SECTION 16: START
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', initialize);
     </script>
 </body>
 </html>
