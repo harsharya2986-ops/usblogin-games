@@ -48,8 +48,6 @@
 
         .players-info { display: flex; gap: 6px; flex-wrap: wrap; }
         .player-chip { padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 600; }
-        .player-chip.red { background: rgba(255,68,68,0.2); border: 1px solid #ff4444; color: #ff4444; }
-        .player-chip.violet { background: rgba(156,39,176,0.2); border: 1px solid #9c27b0; color: #ce93d8; }
         .player-chip.status { background: rgba(255,255,255,0.1); color: #fdcb6e; font-size: 10px; }
 
         .status-bar {
@@ -81,23 +79,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
+            font-size: 1.7rem;
             cursor: pointer;
             position: relative;
             user-select: none;
             -webkit-user-select: none;
-            pointer-events: auto;
         }
 
         .square.light { background: #ffd1dc; }
         .square.dark { background: #e6e6fa; }
-        .square.selected { box-shadow: inset 0 0 15px rgba(255,0,0,0.8); }
+        .square.selected { box-shadow: inset 0 0 15px rgba(255,215,0,0.9); }
         
         .square.valid-move::after {
             content: '';
             position: absolute;
-            width: 30%;
-            height: 30%;
+            width: 28%;
+            height: 28%;
             border-radius: 50%;
             background: rgba(76,175,80,0.7);
         }
@@ -105,10 +102,10 @@
         .square.valid-capture::after {
             content: '';
             position: absolute;
-            width: 85%;
-            height: 85%;
+            width: 82%;
+            height: 82%;
             border-radius: 50%;
-            border: 4px solid rgba(255,0,0,0.6);
+            border: 3px solid rgba(255,0,0,0.6);
         }
 
         .chat-sidebar {
@@ -138,7 +135,7 @@
 
         .chat-message { padding: 5px 8px; border-radius: 8px; font-size: 10px; max-width: 90%; }
         .chat-message.you { background: rgba(255,107,157,0.2); align-self: flex-end; }
-        .chat-message.opponent { background: rgba(156,39,176,0.2); align-self: flex-start; }
+        .chat-message.opponent { background: rgba(116,185,255,0.15); align-self: flex-start; }
         .chat-message .sender { font-weight: bold; font-size: 8px; display: block; }
 
         .chat-input-area { display: flex; gap: 4px; padding: 6px; }
@@ -149,7 +146,7 @@
             .main-layout { flex-direction: column; }
             .chat-sidebar { width: 100%; min-width: auto; max-height: 100px; }
             .chat-messages { max-height: 40px; min-height: 25px; }
-            .square { font-size: 1rem; }
+            .square { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -159,8 +156,8 @@
             <a href="lobby.html" class="back-btn">← Lobby</a>
             <h1 class="game-title">♟️ Chess</h1>
             <div class="players-info">
-                <div class="player-chip red" id="youChip">🔴 You</div>
-                <div class="player-chip violet" id="opponentChip">🟣 Opp</div>
+                <div class="player-chip" id="youChip">💙 You</div>
+                <div class="player-chip" id="opponentChip">❤️ Opp</div>
                 <div class="player-chip status" id="statusChip">Connecting...</div>
             </div>
         </div>
@@ -200,25 +197,27 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // Piece symbols - RED uses standard white pieces, VIOLET uses black pieces
-        const RED_PIECES = { K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙' };
-        const VIOLET_PIECES = { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞', P: '♟' };
+        // Team colors - BLUE HEART vs RED HEART
+        const TEAMS = {
+            blue: { color: '#4488ff', name: 'Blue Heart', emoji: '💙', pieces: { K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙' } },
+            red: { color: '#ff4444', name: 'Red Heart', emoji: '❤️', pieces: { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞', P: '♟' } }
+        };
 
         let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
-        let myColor = 'red', currentTurn = 'red';
+        let myTeam = 'blue', currentTurn = 'blue';
         let selectedRow = -1, selectedCol = -1;
         let validMoves = [];
         let board = [];
         let gameStarted = false;
 
-        // GLOBAL CLICK FUNCTION
+        // GLOBAL CLICK
         window.chessClick = function(row, col) {
             if (!gameStarted) return;
-            if (currentTurn !== myColor) return;
+            if (currentTurn !== myTeam) return;
             
             const piece = board[row][col];
 
-            if (selectedRow !== -1 && selectedCol !== -1) {
+            if (selectedRow !== -1) {
                 const isValid = validMoves.some(m => m.r === row && m.c === col);
                 if (isValid) {
                     doMove(selectedRow, selectedCol, row, col);
@@ -226,10 +225,10 @@
                 }
             }
 
-            if (piece && piece.color === myColor) {
+            if (piece && piece.team === myTeam) {
                 selectedRow = row;
                 selectedCol = col;
-                validMoves = getLegalMoves(row, col);
+                validMoves = getMoves(row, col);
                 renderBoard();
             } else {
                 selectedRow = -1;
@@ -240,11 +239,24 @@
         };
 
         function init() {
+            // RANDOM TEAM ASSIGNMENT - Always different
+            myTeam = Math.random() < 0.5 ? 'blue' : 'red';
+            const oppTeam = myTeam === 'blue' ? 'red' : 'blue';
+            
+            document.getElementById('youChip').style.color = TEAMS[myTeam].color;
+            document.getElementById('youChip').style.border = '1px solid ' + TEAMS[myTeam].color;
+            document.getElementById('youChip').style.background = TEAMS[myTeam].color + '22';
+            
+            document.getElementById('opponentChip').style.color = TEAMS[oppTeam].color;
+            document.getElementById('opponentChip').style.border = '1px solid ' + TEAMS[oppTeam].color;
+            document.getElementById('opponentChip').style.background = TEAMS[oppTeam].color + '22';
+
             auth.onAuthStateChanged(user => {
                 if (!user) { location.href = 'login.html'; return; }
                 myPlayerId = user.uid;
                 db.ref('users/' + user.uid).once('value').then(s => {
                     myName = s.val()?.username || 'Player';
+                    document.getElementById('youChip').textContent = TEAMS[myTeam].emoji + ' ' + myName;
                 });
                 const p = new URLSearchParams(location.search);
                 roomId = p.get('match') || p.get('team');
@@ -265,11 +277,11 @@
 
         function setupPlayers(data) {
             if (data.player1 === myPlayerId) {
-                myColor = 'red';
+                currentTurn = 'blue';
                 opponentId = data.player2 || null;
                 opponentName = data.player2Name || 'Opponent';
             } else {
-                myColor = 'violet';
+                currentTurn = 'blue';
                 opponentId = data.player1 || null;
                 opponentName = data.player1Name || 'Opponent';
             }
@@ -277,7 +289,7 @@
             if (opponentId) {
                 db.ref('users/' + opponentId).once('value').then(us => {
                     if (us.exists()) opponentName = us.val().username || opponentName;
-                    updateChips();
+                    document.getElementById('opponentChip').textContent = TEAMS[myTeam === 'blue' ? 'red' : 'blue'].emoji + ' ' + opponentName;
                 });
                 startGame();
             } else {
@@ -287,7 +299,7 @@
                         opponentId = s.val();
                         db.ref('users/' + opponentId).once('value').then(us => {
                             if (us.exists()) opponentName = us.val().username || 'Opponent';
-                            updateChips();
+                            document.getElementById('opponentChip').textContent = TEAMS[myTeam === 'blue' ? 'red' : 'blue'].emoji + ' ' + opponentName;
                             startGame();
                         });
                     }
@@ -295,32 +307,24 @@
             }
         }
 
-        function updateChips() {
-            document.getElementById('youChip').textContent = (myColor === 'red' ? '🔴 ' : '🟣 ') + myName;
-            document.getElementById('opponentChip').textContent = (myColor === 'red' ? '🟣 ' : '🔴 ') + opponentName;
-        }
-
         function initBoard() {
             board = [];
             const backRow = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
             
             for (let row = 0; row < 8; row++) {
-                board[row] = [];
-                for (let col = 0; col < 8; col++) {
-                    board[row][col] = null;
-                }
+                board[row] = Array(8).fill(null);
             }
             
-            // Violet pieces at top (rows 0-1)
+            // Red team at top (rows 0-1)
             for (let col = 0; col < 8; col++) {
-                board[0][col] = { type: backRow[col], color: 'violet' };
-                board[1][col] = { type: 'P', color: 'violet' };
+                board[0][col] = { type: backRow[col], team: 'red' };
+                board[1][col] = { type: 'P', team: 'red' };
             }
             
-            // Red pieces at bottom (rows 6-7)
+            // Blue team at bottom (rows 6-7)
             for (let col = 0; col < 8; col++) {
-                board[6][col] = { type: 'P', color: 'red' };
-                board[7][col] = { type: backRow[col], color: 'red' };
+                board[6][col] = { type: 'P', team: 'blue' };
+                board[7][col] = { type: backRow[col], team: 'blue' };
             }
         }
 
@@ -331,7 +335,7 @@
             selectedRow = -1;
             selectedCol = -1;
             validMoves = [];
-            currentTurn = 'red';
+            currentTurn = 'blue';
             renderBoard();
             updateStatus();
             setupChat();
@@ -352,32 +356,30 @@
                 }
             });
 
-            if (myColor === 'red') {
-                db.ref('gameRooms/' + roomId + '/board').set(board);
-                db.ref('gameRooms/' + roomId + '/turn').set('red');
-            }
+            db.ref('gameRooms/' + roomId + '/board').set(board);
+            db.ref('gameRooms/' + roomId + '/turn').set('blue');
         }
 
         function updateStatus() {
             const sb = document.getElementById('statusBar');
-            if (currentTurn === myColor) {
-                sb.textContent = myColor === 'red' ? '🔴 YOUR TURN - CLICK A PIECE!' : '🟣 YOUR TURN - CLICK A PIECE!';
-                sb.style.color = myColor === 'red' ? '#ff4444' : '#ce93d8';
+            if (currentTurn === myTeam) {
+                sb.textContent = TEAMS[myTeam].emoji + ' YOUR TURN - CLICK A PIECE!';
+                sb.style.color = TEAMS[myTeam].color;
             } else {
-                sb.textContent = (myColor === 'red' ? '🟣 ' : '🔴 ') + opponentName + ' IS THINKING...';
+                sb.textContent = TEAMS[myTeam === 'blue' ? 'red' : 'blue'].emoji + ' ' + opponentName + ' IS THINKING...';
                 sb.style.color = '#fdcb6e';
             }
         }
 
-        function getLegalMoves(row, col) {
+        function getMoves(row, col) {
             const piece = board[row][col];
             if (!piece) return [];
             const moves = [];
             
             switch (piece.type) {
                 case 'P':
-                    const dir = piece.color === 'red' ? -1 : 1;
-                    const startRow = piece.color === 'red' ? 6 : 1;
+                    const dir = piece.team === 'blue' ? -1 : 1;
+                    const startRow = piece.team === 'blue' ? 6 : 1;
                     if (board[row + dir] && !board[row + dir][col]) {
                         moves.push({ r: row + dir, c: col });
                         if (row === startRow && board[row + 2*dir] && !board[row + 2*dir][col]) {
@@ -388,7 +390,7 @@
                         const nc = col + dc;
                         if (nc >= 0 && nc < 8 && board[row + dir]) {
                             const t = board[row + dir][nc];
-                            if (t && t.color !== piece.color) moves.push({ r: row + dir, c: nc });
+                            if (t && t.team !== piece.team) moves.push({ r: row + dir, c: nc });
                         }
                     }
                     break;
@@ -399,7 +401,7 @@
                         const nr = row + dr, nc = col + dc;
                         if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                             const t = board[nr][nc];
-                            if (!t || t.color !== piece.color) moves.push({ r: nr, c: nc });
+                            if (!t || t.team !== piece.team) moves.push({ r: nr, c: nc });
                         }
                     }
                     break;
@@ -415,7 +417,7 @@
                         while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                             const t = board[nr][nc];
                             if (!t) moves.push({ r: nr, c: nc });
-                            else { if (t.color !== piece.color) moves.push({ r: nr, c: nc }); break; }
+                            else { if (t.team !== piece.team) moves.push({ r: nr, c: nc }); break; }
                             nr += dr; nc += dc;
                         }
                     }
@@ -426,7 +428,7 @@
                         const nr = row + dr, nc = col + dc;
                         if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                             const t = board[nr][nc];
-                            if (!t || t.color !== piece.color) moves.push({ r: nr, c: nc });
+                            if (!t || t.team !== piece.team) moves.push({ r: nr, c: nc });
                         }
                     }
                     break;
@@ -438,15 +440,14 @@
             board[toR][toC] = board[fromR][fromC];
             board[fromR][fromC] = null;
             
-            // Pawn promotion
-            if (board[toR][toC].type === 'P' && (toR === 0 || toR === 7)) {
-                board[toR][toC] = { type: 'Q', color: board[toR][toC].color };
+            if (board[toR][toC] && board[toR][toC].type === 'P' && (toR === 0 || toR === 7)) {
+                board[toR][toC] = { type: 'Q', team: board[toR][toC].team };
             }
             
             selectedRow = -1;
             selectedCol = -1;
             validMoves = [];
-            currentTurn = currentTurn === 'red' ? 'violet' : 'red';
+            currentTurn = currentTurn === 'blue' ? 'red' : 'blue';
             
             db.ref('gameRooms/' + roomId + '/board').set(board);
             db.ref('gameRooms/' + roomId + '/turn').set(currentTurn);
@@ -468,8 +469,9 @@
                     
                     const piece = board[row] ? board[row][col] : null;
                     if (piece) {
-                        sq.textContent = piece.color === 'red' ? RED_PIECES[piece.type] : VIOLET_PIECES[piece.type];
-                        sq.style.color = piece.color === 'red' ? '#d32f2f' : '#7b1fa2';
+                        sq.textContent = TEAMS[piece.team].pieces[piece.type];
+                        sq.style.color = TEAMS[piece.team].color;
+                        sq.style.textShadow = '0 0 5px ' + TEAMS[piece.team].color;
                     }
                     
                     if (selectedRow === row && selectedCol === col) {
