@@ -23,7 +23,7 @@
             padding: 15px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.5);
             width: 100%;
-            max-width: 800px;
+            max-width: 850px;
         }
 
         .game-header {
@@ -72,7 +72,7 @@
             overflow: hidden;
             border: 3px solid rgba(255,255,255,0.2);
             background: #0a0a1a;
-            max-width: 500px;
+            max-width: 450px;
             margin: 0 auto;
         }
 
@@ -99,10 +99,18 @@
             border-radius: 50%;
             background: rgba(76,175,80,0.8);
         }
+        .square.valid-capture::after {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            border: 3px solid rgba(255,0,0,0.6);
+        }
 
         .chat-sidebar {
-            width: 200px;
-            min-width: 200px;
+            width: 190px;
+            min-width: 190px;
             display: flex;
             flex-direction: column;
             background: rgba(255,255,255,0.05);
@@ -190,7 +198,6 @@
         const db = firebase.database();
 
         const COLORS = ['#ff6b9d', '#74b9ff', '#4CAF50', '#FF9800', '#9c27b0'];
-        
         const PIECES = {
             white: { king: '🤴', queen: '👸', rook: '🏰', bishop: '🕊️', knight: '🦄', pawn: '❤️' },
             black: { king: '🧝', queen: '🧚', rook: '🏯', bishop: '🏹', knight: '🐉', pawn: '💜' }
@@ -203,32 +210,34 @@
         let validMoves = [];
         let board = [];
         let gameStarted = false;
+        let listenersAttached = false;
 
-        window.squareClick = function(row, col) {
+        // GLOBAL CLICK FUNCTION
+        window.cellClick = function(row, col) {
             if (!gameStarted) return;
-            if (currentTurn !== mySide) return;
+            if (currentTurn !== mySide) {
+                updateStatus();
+                return;
+            }
             
             const piece = board[row][col];
 
-            if (selectedRow >= 0) {
+            if (selectedRow >= 0 && selectedCol >= 0) {
                 const isValid = validMoves.some(m => m.r === row && m.c === col);
                 if (isValid) {
                     makeMove(selectedRow, selectedCol, row, col);
                     return;
                 }
-                if (piece && piece.side === mySide) {
-                    selectSquare(row, col);
-                    return;
-                }
-                deselectSquare();
-                return;
             }
 
-            if (piece && piece.side === mySide) selectSquare(row, col);
+            if (piece && piece.side === mySide) {
+                selectSquare(row, col);
+            } else {
+                deselectSquare();
+            }
         };
 
         function init() {
-            // Random colors
             const myIdx = Math.floor(Math.random() * COLORS.length);
             let oppIdx = Math.floor(Math.random() * COLORS.length);
             while (oppIdx === myIdx) oppIdx = Math.floor(Math.random() * COLORS.length);
@@ -237,10 +246,8 @@
 
             document.getElementById('youChip').style.color = myColor;
             document.getElementById('youChip').style.border = '1px solid ' + myColor;
-            document.getElementById('youChip').style.background = myColor + '22';
             document.getElementById('opponentChip').style.color = oppColor;
             document.getElementById('opponentChip').style.border = '1px solid ' + oppColor;
-            document.getElementById('opponentChip').style.background = oppColor + '22';
 
             auth.onAuthStateChanged(user => {
                 if (!user) { location.href = 'login.html'; return; }
@@ -313,25 +320,31 @@
             gameStarted = true;
             document.getElementById('statusChip').textContent = '🟢 LIVE';
             initBoard();
+            selectedRow = -1;
+            selectedCol = -1;
+            validMoves = [];
+            currentTurn = 'white';
             renderBoard();
             updateStatus();
             setupChat();
 
-            db.ref('gameRooms/' + roomId + '/chessBoard').on('value', snap => {
-                const data = snap.val();
-                if (data) {
-                    board = data;
-                    renderBoard();
-                }
-            });
-
-            db.ref('gameRooms/' + roomId + '/chessTurn').on('value', snap => {
-                const turn = snap.val();
-                if (turn) {
-                    currentTurn = turn;
-                    updateStatus();
-                }
-            });
+            if (!listenersAttached) {
+                listenersAttached = true;
+                db.ref('gameRooms/' + roomId + '/chessBoard').on('value', snap => {
+                    const data = snap.val();
+                    if (data) {
+                        board = data;
+                        renderBoard();
+                    }
+                });
+                db.ref('gameRooms/' + roomId + '/chessTurn').on('value', snap => {
+                    const turn = snap.val();
+                    if (turn) {
+                        currentTurn = turn;
+                        updateStatus();
+                    }
+                });
+            }
 
             if (mySide === 'white') {
                 db.ref('gameRooms/' + roomId + '/chessBoard').set(board);
@@ -342,7 +355,7 @@
         function updateStatus() {
             const sb = document.getElementById('statusBar');
             if (currentTurn === mySide) {
-                sb.textContent = '💕 YOUR TURN!';
+                sb.textContent = '💕 YOUR TURN - CLICK A PIECE!';
                 sb.style.color = myColor;
             } else {
                 sb.textContent = '💙 ' + opponentName + ' IS THINKING...';
@@ -464,7 +477,7 @@
                 for (let col = 0; col < 8; col++) {
                     const sq = document.createElement('div');
                     sq.className = 'square ' + ((row + col) % 2 === 0 ? 'light' : 'dark');
-                    sq.setAttribute('onclick', 'squareClick(' + row + ',' + col + ')');
+                    sq.setAttribute('onclick', 'cellClick(' + row + ',' + col + ')');
                     
                     const piece = board[row] ? board[row][col] : null;
                     if (piece) {
