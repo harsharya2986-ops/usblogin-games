@@ -34,7 +34,7 @@
             padding: 15px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.5);
             width: 100%;
-            max-width: 800px;
+            max-width: 750px;
         }
 
         .game-header {
@@ -43,7 +43,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .back-btn {
@@ -59,85 +59,60 @@
             font-size: 20px;
             font-weight: bold;
             color: #ff6b9d;
-            text-shadow: 0 0 20px rgba(255,107,157,0.5);
         }
 
-        /* BIG SCOREBOARD */
         .scoreboard {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-bottom: 12px;
-        }
-
-        .score-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 12px 25px;
-            text-align: center;
-            min-width: 140px;
-            border: 2px solid;
-        }
-
-        .score-card.you-card {
-            border-color: #ff6b9d;
-            background: rgba(255,107,157,0.15);
-        }
-
-        .score-card.opp-card {
-            border-color: #74b9ff;
-            background: rgba(116,185,255,0.15);
-        }
-
-        .score-card.round-card {
-            border-color: #fdcb6e;
-            background: rgba(253,203,110,0.15);
-            min-width: 100px;
-        }
-
-        .score-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        .score-value {
-            font-size: 32px;
-            font-weight: 800;
-            display: block;
-        }
-
-        .score-card.you-card .score-value { color: #ff6b9d; text-shadow: 0 0 15px rgba(255,107,157,0.6); }
-        .score-card.opp-card .score-value { color: #74b9ff; text-shadow: 0 0 15px rgba(116,185,255,0.6); }
-        .score-card.round-card .score-value { color: #fdcb6e; text-shadow: 0 0 15px rgba(253,203,110,0.6); }
-
-        .timer-display {
-            text-align: center;
             margin-bottom: 10px;
         }
 
-        .timer-circle {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            border: 3px solid #fdcb6e;
-            color: #fdcb6e;
-            font-size: 22px;
-            font-weight: bold;
-            line-height: 44px;
+        .score-card {
+            border-radius: 14px;
+            padding: 10px 20px;
             text-align: center;
+            min-width: 100px;
+            border: 2px solid;
+        }
+
+        .score-card.you { border-color: #ff6b9d; background: rgba(255,107,157,0.15); }
+        .score-card.opp { border-color: #74b9ff; background: rgba(116,185,255,0.15); }
+        .score-card.round { border-color: #fdcb6e; background: rgba(253,203,110,0.1); }
+
+        .score-label { font-size: 10px; color: rgba(255,255,255,0.7); display: block; margin-bottom: 3px; }
+        .score-value { font-size: 28px; font-weight: 800; }
+        .score-card.you .score-value { color: #ff6b9d; }
+        .score-card.opp .score-value { color: #74b9ff; }
+        .score-card.round .score-value { color: #fdcb6e; font-size: 20px; }
+
+        .phase-indicator {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .phase-choosing { background: rgba(255,255,255,0.1); color: #fdcb6e; }
+        .phase-waiting { background: rgba(255,255,255,0.05); color: #74b9ff; }
+        .phase-result { background: rgba(0,0,0,0.3); color: #fff; }
+
+        .timer-large {
+            font-size: 50px;
+            font-weight: 800;
+            text-align: center;
+            margin: 10px 0;
+            color: #fdcb6e;
+            text-shadow: 0 0 20px rgba(253,203,110,0.6);
             animation: pulseTimer 1s infinite;
         }
 
         @keyframes pulseTimer {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.15); }
         }
 
         .main-layout { display: flex; gap: 10px; }
@@ -146,9 +121,9 @@
         .arena {
             background: rgba(0,0,0,0.3);
             border-radius: 14px;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
-            min-height: 130px;
+            min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -156,103 +131,80 @@
             border: 2px solid rgba(255,255,255,0.1);
         }
 
-        .arena-content { text-align: center; }
-
         .arena-hands {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 25px;
+            gap: 20px;
         }
 
-        .hand-display { text-align: center; }
+        .hand-box { text-align: center; }
 
-        .hand-label {
-            font-size: 11px;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
+        .hand-label { font-size: 10px; color: rgba(255,255,255,0.6); margin-bottom: 5px; }
 
         .hand-emoji {
-            font-size: 4rem;
+            font-size: 3rem;
             transition: all 0.3s;
         }
 
-        .hand-emoji.hidden-hand {
-            filter: blur(5px);
-            opacity: 0.5;
-        }
+        .hand-emoji.hidden { opacity: 0.3; filter: blur(3px); }
 
-        .hand-emoji.revealed {
-            animation: revealHand 0.5s ease;
-        }
-
-        @keyframes revealHand {
-            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1) rotate(0); opacity: 1; }
-        }
-
-        .vs-badge {
-            font-size: 1.8rem;
+        .vs-text {
+            font-size: 1.5rem;
             font-weight: bold;
             color: #ff6b9d;
-            text-shadow: 0 0 15px rgba(255,107,157,0.6);
         }
 
         .result-display {
             text-align: center;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            min-height: 30px;
-            margin-bottom: 10px;
+            min-height: 25px;
+            margin-bottom: 8px;
         }
 
         .choices-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .choice-card {
             background: rgba(255,255,255,0.08);
             border: 2px solid rgba(255,255,255,0.15);
-            border-radius: 14px;
-            padding: 15px 10px;
+            border-radius: 12px;
+            padding: 12px 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
         }
 
         .choice-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             border-color: #ff6b9d;
-            box-shadow: 0 5px 20px rgba(255,107,157,0.3);
         }
 
         .choice-card.selected {
             border-color: #ff6b9d;
             background: rgba(255,107,157,0.25);
-            transform: translateY(-3px);
         }
 
-        .choice-card:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .choice-card:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .hand-emoji-small { font-size: 2.5rem; display: block; margin-bottom: 3px; }
-        .hand-name { font-size: 12px; color: white; font-weight: 600; }
+        .hand-emoji-small { font-size: 2rem; display: block; margin-bottom: 3px; }
+        .hand-name { font-size: 11px; color: white; font-weight: 600; }
 
         .chat-sidebar {
-            width: 200px;
-            min-width: 200px;
+            width: 190px;
+            min-width: 190px;
             display: flex;
             flex-direction: column;
             background: rgba(255,255,255,0.05);
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
-            max-height: 400px;
+            max-height: 350px;
         }
 
         .chat-header {
@@ -264,7 +216,7 @@
             font-size: 12px;
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 120px; max-height: 250px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 8px; min-height: 100px; max-height: 220px; }
         .chat-messages::-webkit-scrollbar { width: 3px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #ff6b9d; border-radius: 2px; }
 
@@ -277,13 +229,13 @@
         .chat-input-area input { flex: 1; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 11px; }
         .chat-input-area button { padding: 6px 12px; border-radius: 14px; border: none; background: #ff6b9d; color: white; font-weight: bold; cursor: pointer; font-size: 10px; }
 
-        @media (max-width: 700px) {
+        @media (max-width: 650px) {
             .main-layout { flex-direction: column; }
-            .chat-sidebar { width: 100%; min-width: auto; max-height: 130px; }
-            .chat-messages { max-height: 60px; min-height: 40px; }
-            .hand-emoji { font-size: 2.5rem; }
-            .hand-emoji-small { font-size: 2rem; }
-            .score-value { font-size: 24px; }
+            .chat-sidebar { width: 100%; min-width: auto; max-height: 120px; }
+            .chat-messages { max-height: 50px; min-height: 30px; }
+            .hand-emoji { font-size: 2rem; }
+            .hand-emoji-small { font-size: 1.5rem; }
+            .score-value { font-size: 22px; }
         }
     </style>
 </head>
@@ -291,48 +243,44 @@
     <div class="game-shell">
         <div class="game-header">
             <a href="lobby.html" class="back-btn">← Lobby</a>
-            <h1 class="game-title">✂️ Online RPS</h1>
+            <h1 class="game-title">✂️ RPS 25 Rounds</h1>
         </div>
 
-        <!-- BIG SCOREBOARD -->
         <div class="scoreboard">
-            <div class="score-card you-card">
-                <span class="score-label">💕 You</span>
+            <div class="score-card you">
+                <span class="score-label">💕 YOU</span>
                 <span class="score-value" id="youScore">0</span>
             </div>
-            <div class="score-card round-card">
-                <span class="score-label">Round</span>
+            <div class="score-card round">
+                <span class="score-label">ROUND</span>
                 <span class="score-value" id="roundNum">1/25</span>
             </div>
-            <div class="score-card opp-card">
-                <span class="score-label">💙 Opponent</span>
+            <div class="score-card opp">
+                <span class="score-label">💙 OPPONENT</span>
                 <span class="score-value" id="oppScore">0</span>
             </div>
         </div>
 
-        <div class="timer-display">
-            <div class="timer-circle" id="timerDisplay">5</div>
-        </div>
+        <div class="phase-indicator" id="phaseIndicator">🎮 CHOOSE YOUR MOVE</div>
+        <div class="timer-large" id="timerDisplay">5</div>
 
         <div class="main-layout">
             <div class="game-area">
                 <div class="arena">
-                    <div class="arena-content" id="arenaContent">
-                        <div class="arena-hands">
-                            <div class="hand-display">
-                                <div class="hand-label">YOU</div>
-                                <div class="hand-emoji" id="myHand">❓</div>
-                            </div>
-                            <div class="vs-badge">VS</div>
-                            <div class="hand-display">
-                                <div class="hand-label">OPPONENT</div>
-                                <div class="hand-emoji hidden-hand" id="oppHand">❓</div>
-                            </div>
+                    <div class="arena-hands">
+                        <div class="hand-box">
+                            <div class="hand-label">YOU</div>
+                            <div class="hand-emoji" id="myHand">❓</div>
+                        </div>
+                        <div class="vs-text">VS</div>
+                        <div class="hand-box">
+                            <div class="hand-label">OPPONENT</div>
+                            <div class="hand-emoji hidden" id="oppHand">❓</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="result-display" id="resultDisplay">Choose your move!</div>
+                <div class="result-display" id="resultDisplay"></div>
 
                 <div class="choices-grid">
                     <div class="choice-card" id="rockBtn" onclick="makeChoice('rock')">
@@ -381,6 +329,7 @@
 
         const TOTAL_ROUNDS = 25;
         const ROUND_TIME = 5;
+        const RESULT_TIME = 3;
         const HANDS = { rock: '✊', paper: '✋', scissors: '✌️' };
 
         let roomId, myPlayerId, opponentId, myName = '', opponentName = '';
@@ -390,7 +339,7 @@
         let myChoice = null, oppChoice = null;
         let timerInterval = null;
         let timeLeft = ROUND_TIME;
-        let oppLastSeen = Date.now();
+        let phase = 'choosing'; // 'choosing', 'result'
 
         function init() {
             auth.onAuthStateChanged(user => {
@@ -438,13 +387,27 @@
 
         function startGame() {
             gameStarted = true;
-            oppLastSeen = Date.now();
             setupChat();
             setupListeners();
-            startTimer();
+            startChoosingPhase();
         }
 
-        function startTimer() {
+        function startChoosingPhase() {
+            phase = 'choosing';
+            myChoice = null;
+            oppChoice = null;
+            document.getElementById('phaseIndicator').textContent = '🎮 CHOOSE YOUR MOVE';
+            document.getElementById('phaseIndicator').className = 'phase-indicator phase-choosing';
+            document.getElementById('resultDisplay').textContent = '';
+            document.getElementById('myHand').textContent = '❓';
+            document.getElementById('myHand').classList.remove('hidden');
+            document.getElementById('oppHand').textContent = '❓';
+            document.getElementById('oppHand').classList.add('hidden');
+            document.querySelectorAll('.choice-card').forEach(c => {
+                c.disabled = false;
+                c.classList.remove('selected');
+            });
+            
             timeLeft = ROUND_TIME;
             document.getElementById('timerDisplay').textContent = timeLeft;
             
@@ -453,10 +416,11 @@
                 timeLeft--;
                 document.getElementById('timerDisplay').textContent = timeLeft;
                 
-                if (timeLeft <= 0) {
+                if (timeLeft <= 0 && phase === 'choosing') {
+                    // Auto random choice
                     if (!myChoice) {
                         const random = ['rock', 'paper', 'scissors'][Math.floor(Math.random() * 3)];
-                        makeChoice(random);
+                        makeChoice(random, true);
                     }
                 }
             }, 1000);
@@ -465,15 +429,11 @@
         function setupListeners() {
             db.ref('gameRooms/' + roomId + '/rpsChoices').on('value', s => {
                 const data = s.val();
-                if (data && data[opponentId]) {
-                    oppLastSeen = Date.now();
-                    if (!oppChoice) {
-                        oppChoice = data[opponentId];
-                        document.getElementById('oppHand').textContent = HANDS[oppChoice];
-                        document.getElementById('oppHand').classList.remove('hidden-hand');
-                        document.getElementById('oppHand').classList.add('revealed');
-                        checkResult();
-                    }
+                if (data && data[opponentId] && !oppChoice && phase === 'choosing') {
+                    oppChoice = data[opponentId];
+                    document.getElementById('oppHand').textContent = HANDS[oppChoice];
+                    document.getElementById('oppHand').classList.remove('hidden');
+                    checkResult();
                 }
             });
 
@@ -486,24 +446,15 @@
                     document.getElementById('oppScore').textContent = oppScore;
                 }
             });
-
-            // Opponent disconnect check
-            setInterval(() => {
-                if (gameStarted && !gameOver && Date.now() - oppLastSeen > 10000) {
-                    gameOver = true;
-                    alert(opponentName + ' has left!');
-                    location.href = 'lobby.html';
-                }
-            }, 5000);
         }
 
-        function makeChoice(choice) {
-            if (!gameStarted || gameOver || myChoice) return;
+        function makeChoice(choice, isAuto = false) {
+            if (phase !== 'choosing' || myChoice || gameOver) return;
 
             myChoice = choice;
             document.getElementById('myHand').textContent = HANDS[choice];
-            document.getElementById('myHand').classList.add('revealed');
-
+            document.getElementById('myHand').classList.remove('hidden');
+            
             document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
             document.getElementById(choice + 'Btn').classList.add('selected');
             document.querySelectorAll('.choice-card').forEach(c => c.disabled = true);
@@ -513,32 +464,41 @@
         }
 
         function checkResult() {
-            if (!myChoice || !oppChoice || gameOver) return;
+            if (!myChoice || !oppChoice || phase !== 'choosing') return;
 
             clearInterval(timerInterval);
+            phase = 'result';
+            
             const result = determineWinner(myChoice, oppChoice);
             const display = document.getElementById('resultDisplay');
+            const phaseInd = document.getElementById('phaseIndicator');
 
             if (result === 'win') {
                 myScore++;
-                display.textContent = '🎉 YOU WIN!';
+                display.textContent = '🎉 YOU WIN THIS ROUND!';
                 display.style.color = '#4CAF50';
+                phaseInd.textContent = '🏆 ROUND WON!';
+                phaseInd.className = 'phase-indicator phase-result';
             } else if (result === 'lose') {
                 oppScore++;
                 display.textContent = '💙 OPPONENT WINS!';
                 display.style.color = '#ff4444';
+                phaseInd.textContent = '💔 ROUND LOST';
+                phaseInd.className = 'phase-indicator phase-result';
             } else {
                 display.textContent = '🤝 TIE!';
                 display.style.color = '#fdcb6e';
+                phaseInd.textContent = '🤝 TIE ROUND';
+                phaseInd.className = 'phase-indicator phase-result';
             }
+
+            document.getElementById('youScore').textContent = myScore;
+            document.getElementById('oppScore').textContent = oppScore;
 
             db.ref('gameRooms/' + roomId + '/rpsScores').set({
                 [myPlayerId]: myScore,
                 [opponentId]: oppScore
             });
-
-            document.getElementById('youScore').textContent = myScore;
-            document.getElementById('oppScore').textContent = oppScore;
 
             if (currentRound >= TOTAL_ROUNDS) {
                 gameOver = true;
@@ -546,28 +506,17 @@
                     const msg = myScore > oppScore ? '🏆 YOU WIN THE GAME!' : myScore < oppScore ? '💙 OPPONENT WINS!' : '🤝 TIE GAME!';
                     alert(msg);
                     location.href = 'lobby.html';
-                }, 1500);
+                }, RESULT_TIME * 1000);
                 return;
             }
 
+            // Show result for 3 seconds then next round
             setTimeout(() => {
                 currentRound++;
                 document.getElementById('roundNum').textContent = currentRound + '/25';
-                myChoice = null;
-                oppChoice = null;
-                document.getElementById('myHand').textContent = '❓';
-                document.getElementById('myHand').classList.remove('revealed');
-                document.getElementById('oppHand').textContent = '❓';
-                document.getElementById('oppHand').classList.add('hidden-hand');
-                document.getElementById('oppHand').classList.remove('revealed');
-                document.getElementById('resultDisplay').textContent = 'Choose your move!';
-                document.querySelectorAll('.choice-card').forEach(c => {
-                    c.disabled = false;
-                    c.classList.remove('selected');
-                });
                 db.ref('gameRooms/' + roomId + '/rpsChoices').remove();
-                startTimer();
-            }, 2000);
+                startChoosingPhase();
+            }, RESULT_TIME * 1000);
         }
 
         function determineWinner(my, opp) {
