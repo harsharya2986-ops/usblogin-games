@@ -21,4 +21,27 @@ Disallow: /online/game-room-dots.html
 Crawl-delay: 10
 
 # Sitemap location
+Sitemap: https://www.usblog.in/sitemap.xml# UsBlog Games - Robots.txt
+# https://www.usblog.in
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow authentication and game rooms (dynamic pages)
+Disallow: /online/login.html
+Disallow: /online/lobby.html
+Disallow: /online/game-room.html
+Disallow: /online/game-room-ping-pong.html
+Disallow: /online/game-room-rps.html
+Disallow: /online/game-room-tic-tac-toe.html
+Disallow: /online/game-room-chess.html
+Disallow: /online/game-room-connect-four.html
+Disallow: /online/game-room-tumble.html
+Disallow: /online/game-room-dots.html
+
+# Crawl-delay (polite crawling)
+Crawl-delay: 10
+
+# Sitemap location
 Sitemap: https://www.usblog.in/sitemap.xml
