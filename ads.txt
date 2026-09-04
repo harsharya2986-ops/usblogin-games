@@ -1,1 +1,10 @@
+# ads.txt - Authorized Digital Sellers for US Blog
+# Last updated: 2026-09-04
+
 google.com, pub-4375560410614397, DIRECT, f08c47fec0942fa0
+google.com, pub-4375560410614397, RESELLER, f08c47fec0942fa0
+
+# Add additional ad partners as needed
+# Example: 
+# appnexus.com, 12345, RESELLER, f08c47fec0942fa0
+# rubiconproject.com, 12345, RESELLER, f08c47fec0942fa0

@@ -1,47 +1,93 @@
-# UsBlog Games - Robots.txt
-# https://www.usblog.in
+# robots.txt - Advanced SEO Configuration for usblog.in
+# Optimized for maximum crawl efficiency and indexation
 
-# Allow all crawlers
 User-agent: *
 Allow: /
+Allow: /games/
+Allow: /online/
+Allow: /pages/
+Allow: /assests/images/
+Allow: /css/
+Allow: /js/
 
-# Disallow authentication and game rooms (dynamic pages)
-Disallow: /online/login.html
-Disallow: /online/lobby.html
-Disallow: /online/game-room.html
-Disallow: /online/game-room-ping-pong.html
-Disallow: /online/game-room-rps.html
-Disallow: /online/game-room-tic-tac-toe.html
-Disallow: /online/game-room-chess.html
-Disallow: /online/game-room-connect-four.html
-Disallow: /online/game-room-tumble.html
-Disallow: /online/game-room-dots.html
+# Disallow sensitive/admin paths
+Disallow: /admin/
+Disallow: /server/
+Disallow: /node_modules/
+Disallow: /temp/
+Disallow: /tmp/
+Disallow: /backup/
+Disallow: /config/
+Disallow: /*.php$
+Disallow: /cgi-bin/
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+Disallow: /feed/
+Disallow: /trackback/
+Disallow: /xmlrpc.php
+Disallow: /api/
+Disallow: /private/
 
-# Crawl-delay (polite crawling)
-Crawl-delay: 10
+# Crawl-delay to prevent server overload
+Crawl-delay: 0.5
 
-# Sitemap location
-Sitemap: https://www.usblog.in/sitemap.xml# UsBlog Games - Robots.txt
-# https://www.usblog.in
-
-# Allow all crawlers
-User-agent: *
-Allow: /
-
-# Disallow authentication and game rooms (dynamic pages)
-Disallow: /online/login.html
-Disallow: /online/lobby.html
-Disallow: /online/game-room.html
-Disallow: /online/game-room-ping-pong.html
-Disallow: /online/game-room-rps.html
-Disallow: /online/game-room-tic-tac-toe.html
-Disallow: /online/game-room-chess.html
-Disallow: /online/game-room-connect-four.html
-Disallow: /online/game-room-tumble.html
-Disallow: /online/game-room-dots.html
-
-# Crawl-delay (polite crawling)
-Crawl-delay: 10
-
-# Sitemap location
+# Sitemap locations
 Sitemap: https://www.usblog.in/sitemap.xml
+Sitemap: https://www.usblog.in/sitemap-news.xml
+Sitemap: https://www.usblog.in/sitemap-video.xml
+Sitemap: https://www.usblog.in/sitemap-games.xml
+
+# Googlebot specific directives
+User-agent: Googlebot
+Allow: /
+Allow: /games/
+Allow: /online/
+Allow: /pages/
+Crawl-delay: 0.3
+Host: https://www.usblog.in
+
+# Bingbot specific
+User-agent: Bingbot
+Allow: /
+Allow: /games/
+Allow: /online/
+Crawl-delay: 0.5
+
+# Mobile-first indexing
+User-agent: Googlebot-Mobile
+Allow: /
+
+# Image optimization for Google Image Search
+User-agent: Googlebot-Image
+Allow: /assests/images/
+Allow: /*.jpg$
+Allow: /*.png$
+Allow: /*.gif$
+Allow: /*.webp$
+Allow: /*.svg$
+
+# Block AI scrapers (optional)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+# Baidu (Chinese search)
+User-agent: Baiduspider
+Allow: /
+Disallow: /games/
+Crawl-delay: 2
+
+# Yandex
+User-agent: Yandex
+Allow: /
+Crawl-delay: 1
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+# Sitemap reference
+Sitemap: https://www.usblog.in/sitemap_index.xml

@@ -1,5 +1,10 @@
-# Security.txt for usblog.in
+# Security.txt - US Blog Security Policy
+# https://www.usblog.in/.well-known/security.txt
+
 Contact: mailto:security@usblog.in
-Preferred-Languages: en
-Canonical: https://www.usblog.in/security.txt
-Policy: https://www.usblog.in/pages/privacy-policy.html
+Contact: https://www.usblog.in/pages/contact.html
+Encryption: https://www.usblog.in/.well-known/pgp-key.asc
+Preferred-Languages: en, hi
+Canonical: https://www.usblog.in/.well-known/security.txt
+Policy: https://www.usblog.in/pages/security-policy.html
+Expires: 2027-09-04T08:00:00.000Z

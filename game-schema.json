@@ -1,0 +1,20 @@
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Chess Online",
+  "description": "Play chess online with players worldwide. Free multiplayer chess game with AI opponents.",
+  "url": "https://www.usblog.in/games/chess.html",
+  "image": "https://www.usblog.in/assests/images/games-thumbnails/chess.jpg",
+  "applicationCategory": "Game",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires HTML5 support",
+  "gamePlatform": "Web Browser",
+  "playMode": "MultiPlayer",
+  "processorRequirements": "None",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  }
+}

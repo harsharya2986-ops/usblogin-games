@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Homepage - Highest Priority -->
+  <url>
+    <loc>https://www.usblog.in/</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.usblog.in/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.usblog.in/hi/"/>
+    <image:image>
+      <image:loc>https://www.usblog.in/assests/images/logo.png</image:loc>
+      <image:title>US Blog - Gaming &amp; Tech Hub</image:title>
+      <image:caption>Ultimate gaming and technology blog platform</image:caption>
+    </image:image>
+  </url>
+
+  <!-- About Page -->
+  <url>
+    <loc>https://www.usblog.in/pages/about.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Contact Page -->
+  <url>
+    <loc>https://www.usblog.in/pages/contact.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Legal Pages -->
+  <url>
+    <loc>https://www.usblog.in/pages/privacy-policy.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/pages/terms-conditions.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/pages/disclaimer.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Online/Games Pages -->
+  <url>
+    <loc>https://www.usblog.in/online/lobby.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/online/login.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Game Pages -->
+  <url>
+    <loc>https://www.usblog.in/games/chess.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.usblog.in/assests/images/games-thumbnails/chess.jpg</image:loc>
+      <image:title>Play Chess Online</image:image>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/games/connect-four.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.usblog.in/assests/images/games-thumbnails/connect-four.jpg</image:loc>
+      <image:title>Connect Four Game</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/games/tic-tac-toe.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.usblog.in/assests/images/games-thumbnails/tic-tac-toe.jpg</image:loc>
+      <image:title>Tic Tac Toe Game</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/games/dino-run.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/games/ping-pong.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/games/rock-paper-scissors.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/games/dots-boxes.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/games/tic-tac-tumble.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Online Game Rooms -->
+  <url>
+    <loc>https://www.usblog.in/online/game-room.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/online/game-room-chess.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/online/game-room-connect-four.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/online/game-room-tic-tac-toe.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/online/game-room-ping-pong.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/online/game-room-rps.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/online/game-room-dots.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.usblog.in/online/game-room-tumble.html</loc>
+    <lastmod>2026-09-04T08:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+</urlset>
